@@ -45,15 +45,17 @@
 - Backend: Supabase (Auth, Postgres, Storage, Realtime)
 - Code-execution sandbox: n/a
 - Hosting: Vercel · GitHub · pnpm
-- AI / OCR: **OPEN DECISION — not yet chosen.** Design handoff calls for real OCR (printed EN/RU primary, handwritten best-effort) — candidates: Google Cloud Vision, Azure Document Intelligence, AWS Textract. Vendor/cost decision for the operator — not defaulting silently per the app's Primary Design Lens (no lock-in).
+- AI / OCR: **SETTLED — Azure AI Document Intelligence, prebuilt Receipt model** (confirmed Russian printed+handwritten support; Textract disqualified — no Russian at all; Google Document AI inconsistent non-Latin quality + GCP lock-in). Abstracted behind the `lib/ocr` interface.
 - CI: GitHub Actions (once repo exists)
-- **Code Agent delivery:** <<pending — operator's autowire directions>>
+- **Code Agent delivery:** operator relay — no direct GitHub/Cody MCP exists (confirmed: this session's Cody message itself arrived via operator relay).
 
 ## 4. IN-FLIGHT WORK
 - **Repo creation** — not started; pending operator's autowire directions.
 - **Supabase project** — not created. Supabase MCP is connected (org `twbszfyctshpcyyzizsp`); creating a project is a cost-incurring op — will run `get_cost` + present the confirmation before creating.
 - **Vercel project** — not created; Vercel MCP connected, team binding pending.
-- **OCR provider decision** — open (see §3), needs operator input.
+- **OCR provider decision** — SETTLED: Azure AI Document Intelligence (see §3).
+- **i18n seed files** — extracted from design_handoff STR dictionaries (197 EN/RU keys, verbatim, 2 trivial wording collisions resolved) — delivered by Director. **NOTE (Cody):** files did NOT arrive in the Code Agent environment via the relay — not on disk. Verbatim i18n seeding is blocked until they land in the repo.
+- **Cody scaffold directive** — drafted, held pending: (a) Supabase project cost confirmation ($10/mo, org on Pro plan), (b) repo existence/ownership.
 - **Logo assets received** — `CLeng.png` (cross-in-circle emblem) and `CLlogo1.png` (wordmark), both white/monochrome. Fine for the dark sidebar (`#29251d`) / capture screen (`#26211b`); will need a dark or full-color variant for the light canvas (`#faf7f1`) before launch — not blocking.
 
 ## 5. RECENT SHIPPED WORK
@@ -99,6 +101,8 @@
 - **i18n:** EN/RU via a real i18n library (react-intl or i18next); the prototypes' inline `STR` dictionaries are the seed translation source. User-generated content (vendor names, comments, rejection reasons, no-receipt-note descriptions, people's names) is NEVER translated.
 - **Primary Design Lens (Core Discipline 16):** production-correct, no ceiling/lock-in, right-sized for a moderately-complex bilingual finance/logistics app. Real OCR, real FX feed, real RLS-scoped per-group roles from day one — no throwaway shortcuts that fail at the role/deadline/export boundaries the brief calls out explicitly (submission cutoffs, duplicate detection, resubmission-resets-to-Pending).
 - **Signatures:** must be real canvas-based touch/drawn capture in production — the cursive-text placeholder in the design files is not to be carried into the build.
+- **OCR provider:** Azure AI Document Intelligence (Receipt model), abstracted behind `lib/ocr/index.ts` — never call the Azure SDK directly outside that module.
+- **Cody dispatch protocol:** no direct MCP/GitHub path exists; Director produces single "Send this to Cody" blocks, operator relays both directions, until a more automated wiring is set up.
 
 ## 10. PRE-APPROVED BUNDLES
 - `scaffold-app(name)` → repo init → stack scaffold → Supabase project → base schema → deploy skeleton → verify → report.
@@ -120,7 +124,7 @@
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - How the repo was created: <<pending>>
-- How the Code Agent connects: <<pending — operator's autowire directions>>
+- How the Code Agent connects: operator relay (see §3).
 - Pipeline verification: <<not yet run>>
-- Governance: <<not yet established>>
+- Governance: location still pending — set once repo exists.
 - **Verification note:** Director has no GitHub MCP; PR/CI status and merges relay through the Code Agent or the operator once wired.
