@@ -70,7 +70,7 @@
 - Active edge function versions: n/a
 - Storage buckets in use: n/a (will need buckets for receipt photos + signatures)
 - GitHub repo + default branch: `ikuniversal/choose-life-treasurer-` (private), default `main` — now has real content (scaffold PR #1 merged at `a323d0e`, no longer empty).
-- Hosting (Vercel project + prod domain): none yet
+- Hosting (Vercel project + prod domain): project `choose-life-treasurer` (`prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m`, team `team_IHCTzTPcdY47mLkznoU0idjD` / roof-clean-pros-projects). Framework auto-detected: Next.js. First production deployment READY (`dpl_8TX783mjTyvwpQVgpW7ambacL9mv`). Domains: choose-life-treasurer.vercel.app + 2 auto-generated aliases. Verified live via `get_project`, not just reported.
 - CI workflows + quality gates: `.github/workflows/ci.yml` — install + lint + typecheck + build on PR/push to `main` (green on PR #1).
 - **Prod-ahead-of-repo drift:** none (nothing exists yet — reconciled by default)
 - **MCP / tooling state:**
