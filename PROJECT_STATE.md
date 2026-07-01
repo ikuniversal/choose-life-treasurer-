@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.7
-> Last updated: 2026-07-01 by Choose Life Director 4.0 (outgoing) — handoff to 5.0
+> Last updated: 2026-07-01 by Choose Life Director 5.0 (active) — Slice 1 banked
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, immediate (operator asked for a handoff right after 4.0 cold-started, before any task was given). NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. IMPORTANT: no work was performed during the 4.0 session — zero new PRs, zero new decisions, zero schema changes. Everything below this point is identical in substance to the v2.6 (3.0→4.0) bank; only this section and the identity/swap-log sections changed. Do not assume something was missed — nothing happened in between.
@@ -16,17 +16,17 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   (PR #12). Polish pass COMPLETE (PR #13): member→console link, dead Export button removed.
   Projects & Groups management — SLICE 1 COMPLETE (PR #14): list/create/edit for projects
   and groups, admin-only, on existing RLS. NO delete (see hazard below) — deferred slice.
-- App live: https://choose-life-treasurer.vercel.app · prod = 58f2b384 (merge #14), READY,
-  0 runtime errors (confirmed this session, 1h window).
+  Roadmap #5 slice 1 (no-receipt notes: member file w/ dual canvas signatures + console
+  review) COMPLETE (PR #18, 26a9e03).
+- App live: https://choose-life-treasurer.vercel.app · prod = 26a9e03 (merge #18), READY.
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP this
   session (verified 0 rows remaining). ⚠️ NEW test data was created during operator smoke
   test of PR #14: project "Belts" (id 53ffda50-…) → group "Camp" (id 5e759172-…,
   spending_limit 200.00). Left in place on operator instruction (not cleared without
   asking) — next Director: confirm with operator whether to keep or delete.
-- ⚠️ 2 orphan/linked files in storage bucket receipt-photos (Chisinau path) still
-  PENDING operator tap-delete in the Supabase dashboard (no storage-delete MCP tool
-  exists — deleting via raw SQL would strand physical files, so dashboard is the
-  correct path, not a workaround). Link: Supabase Studio → Storage → receipt-photos.
+- ⚠️ 4 orphan files PENDING operator dashboard tap-delete: 2 in receipt-photos (Chisinau
+  path, historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke test —
+  note row already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
 - i18n 197-key EN/RU seed + logo PNGs — STILL BLOCKED on a desktop direct commit
   (relay/Cody-attach drop large text+binaries — §12). Source risk noted in §12.
 
@@ -38,8 +38,9 @@ IN-FLIGHT / HANDED FORWARD:
    Cody default — do not let Cody add a delete button against current schema.
 2. Test data cleanup — "Belts"/"Camp" (see above) and the 2 orphan storage files — both
    awaiting operator action/decision, not yet resolved.
-3. Next feature direction after Projects/Groups: roadmap #5 (no-receipt notes, tasks,
-   comments, chat, currency converter) is the next unclaimed surface. Not yet scoped.
+3. Roadmap #5 remaining after slice 1: tasks, comments/chat (needs operator clarification:
+   item-comments vs group chat, Realtime or not), currency converter. Slicing + order
+   already Director-approved: tasks → comments → converter.
 4. i18n real-seed + logo drop-in — blocked on desktop commit (source risk if operator
    no longer has the original prototype JSON — see §12).
 5. Migrations source-lock-in — DECIDED, NOT EXECUTED. Director determined (per Primary
@@ -105,8 +106,11 @@ IN-FLIGHT / HANDED FORWARD:
   STATUS above).
 - i18n 197-key seed + logo PNGs — STILL BLOCKED, need desktop direct commit (source risk:
   see §12). App runs on placeholder next-intl keys; PWA manifest icons missing.
-- Roadmap #5 (no-receipt notes/tasks/comments/chat/currency converter) — next unclaimed
-  surface, not yet scoped.
+- Roadmap #5 remaining after slice 1: tasks, comments/chat (needs operator clarification:
+  item-comments vs group chat, Realtime or not), currency converter. Slicing + order
+  already Director-approved: tasks → comments → converter.
+- Test data: no_receipt_notes test row deleted (verified 0 rows); 2 signature PNGs pending
+  operator dashboard delete.
 
 ## 5. RECENT SHIPPED WORK
 | # | Title | Merge SHA | Date | One-liner |
@@ -125,8 +129,18 @@ IN-FLIGHT / HANDED FORWARD:
 | 12 | Treasurer Review Queue (roadmap #4) | 51bca7c3 | 2026-07-01 | /console/review, RLS-scoped pending list, signed-URL photos, approve/reject + required reason, bulk approve; RLS-respecting client only; verified e2e (reject→rejected+reason) on prod |
 | 13 | Polish: member→console link + remove dead Export button | 0c13ed1 | 2026-07-01 | (member) home shows console entry link admin/treasurer-only (reused PR #5 canAccessConsole, no new auth path); removed non-functional console Export placeholder + unused import; UI-only; verified: independent Vercel READY check + 0 runtime errors + operator confirmed live render/route on prod |
 | 14 | Projects & Groups management, slice 1 (roadmap #2) | 58f2b38 | 2026-07-01 | /console/projects admin-only (mirrors #7 gating); list/create/rename project; create/edit group (name, spending_limit≥0, submission_deadline), all via existing RLS (projects_admin_write/groups_admin_write, is_admin()); updated_at via existing groups_set_updated_at trigger (verified, not set manually); NO delete (FKs cascade — deferred, see §6/§8/§12); UI/server-actions only, no schema/migration/RLS/env/seed; verified e2e on prod (real create+edit round-trip confirmed via direct DB read: row present, correct values, trigger fired) |
+| 18 | No-receipt notes: file + review (roadmap #5.1) | 26a9e03 | 2026-07-01 | /no-receipt member flow (desc, date, 2 signer names, 2 real canvas pads → PNG to signatures/{group_id}/, insert w/ status pending, trigger owns updated_at) + /console/review Notes section (signed-URL sigs, approve/reject+reason); UI/server-actions only, zero new RLS/migration (all pre-existing, Director-verified before dispatch); e2e verified on prod: operator device test + Director DB/storage cross-check (row+2 PNGs+trigger+RLS paths all correct) |
 
 ## 5b. LATEST SESSION NOTES
+- 2026-07-01 (Director 5.0): cold-started from v2.7, verified handoff vs live (zero drift:
+  schema, CASCADE FKs, migrations, buckets, advisors). NOTE: Vercel MCP absent this session
+  (capability drift vs §6 toolkit) — verification-independence degraded to
+  operator-spot-check + Director DB-side checks; worked, but next Director should confirm
+  Vercel MCP presence at cold start. Scoped roadmap #5 → 4 slices (RLS pre-verified: ALL
+  surfaces need zero new RLS/migrations; comments are append-only by policy — no
+  update/delete). Shipped #18 (notes). Operator merged #18 pre-clearance/pre-CI-relay
+  (known §12 pattern) — post-hoc Director verification passed on all points. Test note
+  MCP-deleted post-verification (dependency-checked, 0 comments).
 - 2026-07-01 (Director 1.0): empty repo → live app. Scaffold (#1), Supabase wiring (#4),
   real Auth (#5) + docs. Authored DB schema + RLS + 2 buckets via MCP. Created Vercel
   project; fixed prod 500 (env only in .env.local). Seeded admin + Moldova/2 groups +
@@ -384,8 +398,8 @@ FEATURE ROADMAP
    Delete deferred — Director-gated on CASCADE-FK guard decision (§6/§8/§9/§12).
 3. Member Capture → Verify → Save. ✅ DONE (#10).
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
-5. No-receipt notes, tasks, comments, chat, currency converter (remaining surfaces). ← NEXT
-   unclaimed surface, not yet scoped.
+5. ← IN PROGRESS: notes ✅ DONE (#18). Remaining: tasks, comments/chat (clarification
+   pending), currency converter.
 6. Cross-cutting: real duplicate detection, PDF/CSV export, deadline enforcement, real
    Azure OCR wiring, i18n real-seed + logo drop-in (once assets land), Projects/Groups
    guarded delete.
@@ -396,5 +410,7 @@ POLISH / CLEANUP — DONE THIS SESSION:
 - ✅ Test receipt "Ifogbb" — deleted via MCP, verified 0 rows.
 
 CLEANUP STILL PENDING (operator action):
-- 2 storage files in receipt-photos/Chisinau path — dashboard tap-delete.
-- "Belts"/"Camp" smoke-test project+group — keep or clear, operator's call.
+- 4 orphan storage files — dashboard tap-delete: 2 in receipt-photos (Chisinau path,
+  historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke test; note row
+  already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
+- "Belts"/"Camp" smoke-test project+group — keep or clear, operator's call (unchanged).
