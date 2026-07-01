@@ -50,11 +50,8 @@
 - **Code Agent delivery:** operator relay — no direct GitHub/Cody MCP exists (confirmed: this session's Cody message itself arrived via operator relay).
 
 ## 4. IN-FLIGHT WORK
-- **Repo / Supabase project / Vercel project** — all created and live (see §6). Reconciled out of in-flight.
-- **Supabase member ledger (PR #4) + real Auth (PR #5) → SHIPPED to main.** Ledger queries `receipts`+`no_receipt_notes` with generated types; Auth = sign-in, password reset, middleware route protection, real `user_roles` gating, console context switcher (`lib/auth.ts` stub retired). **Production env-var bug RESOLVED** — confirmed by direct page load (not just logs): title, EN/RU toggle, and the graceful signed-out empty state all render correctly. **End-to-end sign-in CONFIRMED by the operator as Admin.** Forward note: env vars were added at the Vercel **project** level, so any pre-existing preview build needs its own redeploy to pick them up (fresh deploys are fine).
-- **OCR provider decision** — SETTLED: Azure AI Document Intelligence (see §3); SDK wiring is a later follow-up.
-- **Admin "Invite user" flow** — deferred to its own follow-up. First real user is created manually via the Supabase dashboard; Director inserts the `profiles` + `user_roles` (admin) row directly.
-- **i18n seed + logos → NEW follow-up PR.** PR #1 is merged/closed, so the real `en.json`/`ru.json` (197 keys) and `CLeng.png`/`CLlogo1.png` land via a fresh follow-up PR, not an amendment to #1. Blocker unchanged: the text relay drops large payloads and binaries can't relay through text at all — still needs direct-to-Cody-environment delivery or a direct commit. Placeholder EN/RU keys + missing icons remain flagged in-repo (`public/icons/README.md`).
+- **Invite/auth flow COMPLETE** (PR #7 + #8 merged).
+- **i18n 197-key seed + logo PNGs — STILL BLOCKED**, need direct-to-env delivery.
 
 ## 5. RECENT SHIPPED WORK
 | # | Title | SHA | Date | One-liner |
@@ -62,8 +59,11 @@
 | PR #1 | merge `a323d0e` | 2026-07-01 | Initial Next.js 16 / React 19 / Tailwind v4 / shadcn scaffold — (member)/(console) route groups, locked design tokens via `globals.css @theme`, next-intl wired (placeholder EN/RU keys), `lib/ocr/index.ts` interface stub, PWA manifest, CI workflow (install+lint+typecheck+build). Merged by operator directly on green CI. **Gating event:** the operator's own "merged on green" spot-check / sign-off — the Director never received a relayed concluded CI result before the merge. Cody's GitHub-MCP readback (run 28495894599, conclusion=success) is supporting detail only, not the gate. |
 | PR #4 | merge `161144c` | 2026-07-01 | Supabase wired into `(member)` ledger — typed browser/server clients from generated `Database` types (live project `avmygueukigqbqhftuic`), `.env.local.example`, real `receipts`+`no_receipt_notes` query scoped to the member's group + own submissions, graceful no-session empty state, StatusPill on the locked tokens. Merged by operator (merge commit). **Verification:** operator clearance on green CI + Vercel (§11-excluded UI/config); Cody readback (run 28497480958, success) supporting. |
 | PR #5 | merge `79ef80c` | 2026-07-01 | Real Supabase Auth — email+password sign-in, password reset (`/reset-password`→`/auth/confirm`→`/update-password`), middleware route protection, `lib/auth.ts` real `user_roles` gating (zero-role → "contact your Admin"; member-only redirected off `/console`), console context switcher across the user's own assignments only. Merged by Cody (squash) on explicit Director clearance. **Verification:** full chain — CI + Vercel build + zero runtime errors + operator-confirmed end-to-end sign-in as Admin (the §9-independent check; Cody readback run 28498916344 supporting). |
+| 7 | Admin Invite-user / Users & Roles (B5) | 144b157 | 2026-07-01 | server-only admin client, inviteUser + role mgmt, /console/users; SUPABASE_SECRET_KEY rename |
+| 8 | Auth callback resilience | d0732d1 | 2026-07-01 | handle ?code / ?token_hash&type / #hash link shapes; fixes invite acceptance, no template edit |
 
 ## 5b. LATEST SESSION NOTE
+- 2026-07-01: Director 2.0 — merged #7 + #8; invite->accept->set-password confirmed e2e; prod d0732d1 READY, 0 runtime errors. Auth phase closed.
 - 2026-07-01: Cold-start bootstrap. Received design handoff zip + two logo PNGs, read the full handoff (Member phone-first loop + responsive Treasurer/Admin console, "Ledger" visual direction locked with final design tokens, EN/RU i18n, fixed-demo FX rates to replace). Confirmed genuine greenfield — no canonical store existed. Audited MCPs: Supabase connected (org `twbszfyctshpcyyzizsp`, no project for this app yet), Vercel connected (team not yet bound). Drafted this file. Operator named the Director persona: **Choose Life Director 1.0**. Next: operator's autowire directions (repo + Code Agent delivery), OCR vendor decision, then scaffold repo + Supabase project (cost-gated) + Vercel project.
 
 ## 6. INFRASTRUCTURE STATE (Pro)
@@ -73,6 +73,7 @@
 - Storage buckets in use: `receipt-photos`, `signatures` (both private).
 - GitHub repo + default branch: `ikuniversal/choose-life-treasurer-` (private), default `main` — now has real content (scaffold PR #1 merged at `a323d0e`, no longer empty).
 - Hosting (Vercel project + prod domain): project `choose-life-treasurer` (`prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m`, team `team_IHCTzTPcdY47mLkznoU0idjD` / roof-clean-pros-projects). Framework auto-detected: Next.js. First production deployment READY (`dpl_8TX783mjTyvwpQVgpW7ambacL9mv`). Domains: choose-life-treasurer.vercel.app + 2 auto-generated aliases. Verified live via `get_project`, not just reported.
+- Vercel env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` (secret admin key, server-only). **`SUPABASE_SECRET_KEY` functionally confirmed** — Admin invite works end-to-end.
 - CI workflows + quality gates: `.github/workflows/ci.yml` — install + lint + typecheck + build on PR/push to `main` (green on PR #1).
 - **Prod-ahead-of-repo drift:** none (nothing exists yet — reconciled by default)
 - **MCP / tooling state:**
