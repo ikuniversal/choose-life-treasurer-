@@ -17,7 +17,10 @@
   "member": {
     "tagline": "Capture a receipt from your phone.",
     "newReceipt": "New receipt",
-    "noReceiptNote": "No-receipt note"
+    "noReceiptNote": "No-receipt note",
+    "ledgerTitle": "Your ledger",
+    "empty": "No receipts yet.",
+    "signedOut": "Sign in to view your receipts."
   },
   "console": {
     "title": "Treasurer Console",
