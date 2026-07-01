@@ -169,12 +169,13 @@ IN-FLIGHT / HANDED FORWARD:
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order):** core_schema_and_rls · harden_rls_helper_functions ·
-  revoke_anon_execute_role_helpers · rls_initplan_optimization_and_missing_indexes ·
-  create_storage_buckets. (Verified live, unchanged this session — no new migration
-  needed for Projects/Groups slice 1.)
+- **Migrations (in order, 7 total — verified live via list_migrations):**
+  core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
+  rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
+  add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat.
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
-  org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, fx_rates.
+  org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
+  fx_rates.
   Enums: app_role (admin/treasurer/member), item_status (pending/reviewed/approved/
   rejected), task_status, expense_category (7). Helper fns: is_admin(), is_treasurer_of(),
   is_member_of(). receipts cols incl. receipt_date, photo_path, additional_info (note),
@@ -185,6 +186,11 @@ IN-FLIGHT / HANDED FORWARD:
     submission_deadline (date, nullable), created_at, updated_at. Has a
     `groups_set_updated_at` trigger (verified live) — app code must NOT set updated_at
     manually, let the trigger handle it.
+  - **group_messages** — per-group chat (id, group_id FK CASCADE — joins the gated delete
+    family, sender_id, body non-empty check, created_at; index (group_id, created_at)); RLS
+    from birth: insert self+(member-of-group OR admin), select member-of-group OR admin;
+    APPEND-ONLY (no update/delete policies, matching comments). Director-authored +
+    simulated-JWT verified (non-member blind, admin sees). Advisors unchanged.
 - **⚠️ FK DELETE BEHAVIOR — CASCADE, not RESTRICT (verified live this session):**
   `projects → groups` = CASCADE. `groups → receipts`, `groups → no_receipt_notes`,
   `groups → tasks`, `groups → user_roles` = ALL CASCADE. Practical effect: deleting one
@@ -398,8 +404,9 @@ FEATURE ROADMAP
    Delete deferred — Director-gated on CASCADE-FK guard decision (§6/§8/§9/§12).
 3. Member Capture → Verify → Save. ✅ DONE (#10).
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
-5. ← IN PROGRESS: notes ✅ DONE (#18). Remaining: tasks, comments/chat (clarification
-   pending), currency converter.
+5. ← IN PROGRESS: notes ✅ (#18), tasks ✅ (#20). Comments/chat IN PROGRESS (operator
+   chose: item comments + group chat, refresh-to-see v1, Realtime deferred). Remaining:
+   currency converter.
 6. Cross-cutting: real duplicate detection, PDF/CSV export, deadline enforcement, real
    Azure OCR wiring, i18n real-seed + logo drop-in (once assets land), Projects/Groups
    guarded delete.
