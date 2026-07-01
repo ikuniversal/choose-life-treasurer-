@@ -1,20 +1,38 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Camera, FileText } from "lucide-react";
+import { Camera, FileText, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/status-pill";
 import { getMemberLedger } from "@/lib/data/member-ledger";
+import { canAccessConsole, getSessionUser } from "@/lib/auth";
 
 export default async function MemberHomePage() {
-  const [t, tStatus, ledger] = await Promise.all([
+  const [t, tStatus, ledger, user] = await Promise.all([
     getTranslations("member"),
     getTranslations("status"),
     getMemberLedger(),
+    getSessionUser(),
   ]);
+
+  // Console entry — only for treasurers/admins (reuses PR #5 role detection).
+  const showConsole = canAccessConsole(user);
 
   return (
     <div className="flex flex-col gap-6 pt-2">
       <p className="text-body">{t("tagline")}</p>
+
+      {showConsole && (
+        <Link
+          href="/console"
+          className="flex items-center justify-between rounded-card border border-hairline bg-card px-4 py-3 text-sm font-medium text-olive transition-colors hover:bg-hairline-row"
+        >
+          <span className="flex items-center gap-2">
+            <LayoutDashboard className="h-5 w-5" aria-hidden />
+            {t("goToConsole")}
+          </span>
+          <span aria-hidden>→</span>
+        </Link>
+      )}
 
       <div className="flex flex-col gap-3">
         <Button asChild size="lg" className="w-full">
