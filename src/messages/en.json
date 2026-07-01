@@ -85,6 +85,25 @@
     "lodging": "Lodging",
     "other": "Other"
   },
+  "review": {
+    "title": "Review queue",
+    "empty": "Nothing to review.",
+    "submittedBy": "Submitted by",
+    "note": "Note",
+    "photo": "Photo",
+    "viewPhoto": "View photo",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectReason": "Reason for rejection",
+    "rejectPlaceholder": "Explain why (required)",
+    "confirmReject": "Confirm reject",
+    "cancel": "Cancel",
+    "approveSelected": "Approve selected",
+    "selected": "{count} selected",
+    "reasonRequired": "A rejection reason is required.",
+    "forbidden": "You don't have permission to review.",
+    "failed": "Action failed. Please try again."
+  },
   "roles": {
     "admin": "Admin",
     "treasurer": "Treasurer",
