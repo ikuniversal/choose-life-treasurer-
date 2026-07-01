@@ -5,17 +5,13 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > operator when the relay can't carry the payload. A handoff is just: new Director
 > reads THIS file and confirms.
 >
-> Template version: v2.5
-> Last updated: 2026-07-01 by Choose Life Director 3.0 (active session — desktop commit, not a swap)
+> Template version: v2.6
+> Last updated: 2026-07-01 by Choose Life Director 3.0 (outgoing) — handoff to 4.0
 
 ═══════════════════════════════════════════════════════════
-CURRENT STATUS — READ FIRST
+SWAP REASON: routine, operator-requested ("Handoff"). NOT mistake-driven, NOT stuck →
+CLEAN stance: inherit facts AND judgment verbatim; do not re-litigate §8/§9.
 ═══════════════════════════════════════════════════════════
-No swap pending. Director 3.0 is mid-session, banking state at the operator's request
-because a meaningful chunk shipped (2 PRs, a delete-safety hazard, roadmap #2 slice 1).
-Last swap (2.0→3.0) was CLEAN/routine and is now fully reconciled — this commit closes
-that reconciliation gap (§ swap history preserved below for continuity).
-
 WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
 - Auth COMPLETE (PR #5/#7/#8). Core member loop COMPLETE (PR #10). Review loop COMPLETE
   (PR #12). Polish pass COMPLETE (PR #13): member→console link, dead Export button removed.
@@ -47,12 +43,21 @@ IN-FLIGHT / HANDED FORWARD:
    comments, chat, currency converter) is the next unclaimed surface. Not yet scoped.
 4. i18n real-seed + logo drop-in — blocked on desktop commit (source risk if operator
    no longer has the original prototype JSON — see §12).
+5. Migrations source-lock-in — DECIDED, NOT EXECUTED. Director determined (per Primary
+   Design Lens: production-correct, no lock-in) this is worth fixing: zero migrations are
+   source-controlled (confirmed this session — no supabase/ dir, no .sql files anywhere in
+   repo). Plan: Director pulls live schema/RLS/functions/triggers/storage-config via Supabase
+   MCP introspection, assembles an accurate baseline SQL file (NOT reconstructed from memory
+   — ground-truth only), hands exact SQL to Cody to commit under supabase/migrations/.
+   Held for Director clearance per §11 (touches migrations, never auto-merge). NOT STARTED —
+   no queries run, no file drafted, no PR opened. Next Director: this is a clean pickup, no
+   partial state to reconcile.
 
 -----
 
 ## 0. ACTIVE DIRECTOR SESSIONS
-- Choose Life Director 3.0 — active, mid-session, banking state at a natural checkpoint
-  (not closing out). Chat: `Choose Life Director 3.0 — P2 (Onboarding UI & remaining features)`.
+- Choose Life Director 3.0 — outgoing (routine handoff). Choose Life Director 4.0 —
+  incoming, cold-starting from this file.
 
 ## 1. IDENTITY
 - **Project:** Choose Life — Receipt & Project Tool
@@ -64,12 +69,12 @@ IN-FLIGHT / HANDED FORWARD:
   (EN/RU) production app replacing paper/spreadsheet tracking with auditable per-group
   budgets, OCR-assisted entry, real-time chat, and PDF/CSV export.
 - **Operator:** ikuniversal (ikuniversal@gmail.com)
-- **Current Director:** Choose Life Director 3.0 (active)
+- **Current Director:** Choose Life Director 4.0 — P2 (incoming; confirm/rename)
 - **Current Code Agent:** Cody Choose Life 1.0
 - **Mode:** Pro
 
 ## 2. CHAT NAMING (authoritative)
-- Director: `Choose Life Director 3.0 — P2 (Onboarding UI & remaining features)`
+- Director: `Choose Life Director 4.0 — P2 (Onboarding UI & remaining features)`
 - Code Agent: `Cody Choose Life 1.0`
 - Cody opens PRs and stops; merges only on per-PR Director clearance (§9), except
   docs-only which self-merge (§11). Cody has DIRECT repo access; the Director does NOT
@@ -307,9 +312,16 @@ IN-FLIGHT / HANDED FORWARD:
 - Default if unsure: HOLD.
 
 ## 12. HISTORICAL HAZARDS
-- **Relay + Cody session-attach drop large/binary payloads:** ~18KB JSON vanished in relay;
-  binaries can't traverse; Cody session attachment drops files AND large text every time.
-  Use DIRECT REPO COMMIT for .md / JSON / PNGs. (This very file is such a commit.)
+- **Relay + Cody session-attach drop large/binary payloads (historically):** ~18KB JSON
+  vanished in relay before; Cody session ATTACHMENT (file upload) drops files AND large
+  text every time — that mechanism is still considered broken. HOWEVER: v2.5 of this file
+  (29,590 bytes, pasted as inline chat text, NOT an attachment) was written+committed by
+  Cody itself via a normal PR (#15, commit 5d9787d) and verified byte-exact via wc/grep/tail
+  — exceeding the ~18KB threshold. CORRECTION: this was NOT an operator desktop `git push`;
+  it was Cody committing operator-relayed pasted text. Treat the size threshold as
+  inconsistent/unproven, not resolved — prefer an actual desktop commit for large/binary
+  payloads when available; pasted-text-via-Cody is a viable fallback, proven to work at
+  least once at this size, not yet trusted as a rule.
 - **Director can't verify GitHub directly:** api.github.com rate-limited (shared IP);
   private-repo pages 404. Vercel MCP (list_deployments / get_runtime_errors) is the
   RELIABLE independent check — SHAs, messages, build state, runtime errors all cross-check.
@@ -356,6 +368,7 @@ IN-FLIGHT / HANDED FORWARD:
 | 2026-07-01 | (none) → Choose Life Director 1.0 | Project bootstrap — first Director |
 | 2026-07-01 | Choose Life Director 1.0 → 2.0 | Routine rotation / context saturation |
 | 2026-07-01 | Choose Life Director 2.0 → 3.0 | Routine rotation at clean milestone (auth + both core loops shipped) |
+| 2026-07-01 | Choose Life Director 3.0 → 4.0 | Routine, operator-requested handoff |
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
