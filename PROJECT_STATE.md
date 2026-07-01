@@ -5,12 +5,11 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > operator when the relay can't carry the payload. A handoff is just: new Director
 > reads THIS file and confirms.
 >
-> Template version: v2.6
-> Last updated: 2026-07-01 by Choose Life Director 3.0 (outgoing) — handoff to 4.0
+> Template version: v2.7
+> Last updated: 2026-07-01 by Choose Life Director 4.0 (outgoing) — handoff to 5.0
 
 ═══════════════════════════════════════════════════════════
-SWAP REASON: routine, operator-requested ("Handoff"). NOT mistake-driven, NOT stuck →
-CLEAN stance: inherit facts AND judgment verbatim; do not re-litigate §8/§9.
+SWAP REASON: routine, operator-requested, immediate (operator asked for a handoff right after 4.0 cold-started, before any task was given). NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. IMPORTANT: no work was performed during the 4.0 session — zero new PRs, zero new decisions, zero schema changes. Everything below this point is identical in substance to the v2.6 (3.0→4.0) bank; only this section and the identity/swap-log sections changed. Do not assume something was missed — nothing happened in between.
 ═══════════════════════════════════════════════════════════
 WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
 - Auth COMPLETE (PR #5/#7/#8). Core member loop COMPLETE (PR #10). Review loop COMPLETE
@@ -56,8 +55,7 @@ IN-FLIGHT / HANDED FORWARD:
 -----
 
 ## 0. ACTIVE DIRECTOR SESSIONS
-- Choose Life Director 3.0 — outgoing (routine handoff). Choose Life Director 4.0 —
-  incoming, cold-starting from this file.
+- Choose Life Director 4.0 — outgoing (routine, immediate handoff, no work performed). Choose Life Director 5.0 — incoming, cold-starting from this file.
 
 ## 1. IDENTITY
 - **Project:** Choose Life — Receipt & Project Tool
@@ -69,12 +67,12 @@ IN-FLIGHT / HANDED FORWARD:
   (EN/RU) production app replacing paper/spreadsheet tracking with auditable per-group
   budgets, OCR-assisted entry, real-time chat, and PDF/CSV export.
 - **Operator:** ikuniversal (ikuniversal@gmail.com)
-- **Current Director:** Choose Life Director 4.0 — P2 (incoming; confirm/rename)
+- **Current Director:** Choose Life Director 5.0 — P2 (incoming; confirm/rename)
 - **Current Code Agent:** Cody Choose Life 1.0
 - **Mode:** Pro
 
 ## 2. CHAT NAMING (authoritative)
-- Director: `Choose Life Director 4.0 — P2 (Onboarding UI & remaining features)`
+- Director: `Choose Life Director 5.0 — P2 (Onboarding UI & remaining features)`
 - Code Agent: `Cody Choose Life 1.0`
 - Cody opens PRs and stops; merges only on per-PR Director clearance (§9), except
   docs-only which self-merge (§11). Cody has DIRECT repo access; the Director does NOT
@@ -369,6 +367,7 @@ IN-FLIGHT / HANDED FORWARD:
 | 2026-07-01 | Choose Life Director 1.0 → 2.0 | Routine rotation / context saturation |
 | 2026-07-01 | Choose Life Director 2.0 → 3.0 | Routine rotation at clean milestone (auth + both core loops shipped) |
 | 2026-07-01 | Choose Life Director 3.0 → 4.0 | Routine, operator-requested handoff |
+| 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
