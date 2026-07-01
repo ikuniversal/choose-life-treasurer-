@@ -35,6 +35,7 @@ export default async function ConsoleLayout({
   const assignments = consoleAssignments(user);
   const active = await getActiveContext(assignments);
   const activeKey = active ? contextKey(active) : "";
+  const isAdmin = !!user && user.assignments.some((a) => a.role === "admin");
 
   return (
     <div className="flex min-h-full flex-col bg-canvas min-[880px]:flex-row">
@@ -42,7 +43,7 @@ export default async function ConsoleLayout({
       <aside className="hidden w-64 shrink-0 flex-col gap-6 bg-sidebar p-4 min-[880px]:flex">
         <span className="text-sm font-semibold text-canvas">{t("title")}</span>
         <ContextSwitcher assignments={assignments} activeKey={activeKey} />
-        <ConsoleNav variant="sidebar" />
+        <ConsoleNav variant="sidebar" isAdmin={isAdmin} />
         <div className="mt-auto flex items-center justify-between gap-2">
           <LocaleSwitcher className="border-white/15" />
           <SignOutButton />
@@ -52,7 +53,7 @@ export default async function ConsoleLayout({
       {/* Tab-strip — below 880px */}
       <div className="flex flex-col gap-2 border-b border-hairline px-4 py-2 min-[880px]:hidden">
         <div className="flex items-center justify-between gap-3">
-          <ConsoleNav variant="strip" />
+          <ConsoleNav variant="strip" isAdmin={isAdmin} />
           <div className="flex items-center gap-2">
             <LocaleSwitcher />
             <SignOutButton />
