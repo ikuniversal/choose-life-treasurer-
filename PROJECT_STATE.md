@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.7
-> Last updated: 2026-07-01 by Choose Life Director 5.0 (active) — slices 3+2 + 2 migrations banked
+> Last updated: 2026-07-01 by Choose Life Director 5.0 (active) — roadmap #5 COMPLETE
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, immediate (operator asked for a handoff right after 4.0 cold-started, before any task was given). NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. IMPORTANT: no work was performed during the 4.0 session — zero new PRs, zero new decisions, zero schema changes. Everything below this point is identical in substance to the v2.6 (3.0→4.0) bank; only this section and the identity/swap-log sections changed. Do not assume something was missed — nothing happened in between.
@@ -22,7 +22,12 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   operator-merged on green after Director clearance). Comments+chat UI shipped with
   data-layer-only verification — operator waived device pass; RLS/data proven HIGH via
   simulated-JWT tests; UI rendering unverified, first real use is the de facto UI check.
-- App live: https://choose-life-treasurer.vercel.app · prod = 3bb1e27 (merge #22), READY.
+  Roadmap #5 slice 4 (currency converter) COMPLETE (PR #24, f154687) → ROADMAP #5 FULLY
+  COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
+- App live: https://choose-life-treasurer.vercel.app · prod = f154687 (merge #24), READY.
+- ⚠️ Converter math spot-check by operator PENDING (expected: 500 MDL → $28.50) — the
+  feature is client-side math with zero data layer; this check is its entire verification.
+  Update this line when confirmed.
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP this
   session (verified 0 rows remaining). ⚠️ NEW test data was created during operator smoke
   test of PR #14: project "Belts" (id 53ffda50-…) → group "Camp" (id 5e759172-…,
@@ -136,6 +141,7 @@ IN-FLIGHT / HANDED FORWARD:
 | 18 | No-receipt notes: file + review (roadmap #5.1) | 26a9e03 | 2026-07-01 | /no-receipt member flow (desc, date, 2 signer names, 2 real canvas pads → PNG to signatures/{group_id}/, insert w/ status pending, trigger owns updated_at) + /console/review Notes section (signed-URL sigs, approve/reject+reason); UI/server-actions only, zero new RLS/migration (all pre-existing, Director-verified before dispatch); e2e verified on prod: operator device test + Director DB/storage cross-check (row+2 PNGs+trigger+RLS paths all correct) |
 | 20 | Tasks: create/assign→done→approve (#5.3) | a29516d | 2026-07-01 | /tasks member list + mark-done; /console/tasks roster picker via NEW get_group_member_names RPC, create, approve; e2e on prod (3-leg device test + Director DB cross-check + simulated-JWT transition proof) |
 | 22 | Item comments + group chat (#5.2) | 3bb1e27 | 2026-07-01 | Append-only comment threads on receipts/notes (console review + member ledger); per-group chat member /chat + /console/chat, latest-50 + load-older, manual refresh, NO Realtime; names via RPC; types refreshed; data/RLS layer verified via 5 simulated-JWT tests (thread round-trip, cross-group blind, admin chat insert, constraint negative); UI unverified (operator waived) |
+| 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' freshness stamp; RLS-respecting authed SELECT, fetch once per view; ZERO writes; usd_equivalent locked-at-submission untouched; operator math spot-check pending |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-01 (Director 5.0): cold-started from v2.7, verified handoff vs live (zero drift:
@@ -151,6 +157,11 @@ IN-FLIGHT / HANDED FORWARD:
   #20 device test debugged via auth sign-in log (pre-merge 404, wrong-account). #22 verified
   internally at operator instruction — all 5 RLS tests pass, zero residue. Test task deleted
   post-verify. Operator merges on green after Director clearance = working pattern.
+  Closed roadmap #5 with #24 (converter). Full session: cold-start zero-drift verification
+  → 4 feature slices shipped + cleared → 2 Director-authored migrations (RPC + chat, both
+  simulated-JWT verified) → all banks current. Open at close: converter spot-check, 4
+  storage files, Belts/Camp decision, source-lock-in (7 migrations), i18n desktop commit,
+  Vercel MCP reconnect for next Director.
 - 2026-07-01 (Director 1.0): empty repo → live app. Scaffold (#1), Supabase wiring (#4),
   real Auth (#5) + docs. Authored DB schema + RLS + 2 buckets via MCP. Created Vercel
   project; fixed prod 500 (env only in .env.local). Seeded admin + Moldova/2 groups +
@@ -399,6 +410,10 @@ IN-FLIGHT / HANDED FORWARD:
   individually provable post-hoc. (c) same-microsecond group_messages have nondeterministic
   order (random-UUID tiebreak) — cosmetic, unreachable at current scale. (d) comments+chat
   UI never device-tested — if a UI failure surfaces, the data layer beneath is already proven.
+- **fx_rates are DAY-ONE DEMO VALUES** (all seeded 2026-07-01 05:58 UTC). Before real
+  treasurer use the org needs a rate-update habit: manual admin update (write policy exists,
+  no UI) or an auto-fetch job — roadmap #6 candidate. The converter's "Rates as of" stamp
+  keeps staleness visible to users meanwhile.
 - **Smoke-testing on live prod creates real rows:** operator's PR #14 smoke test created a
   real "Belts"/"Camp" project+group in production data, not a sandboxed test. No branch/
   staging DB is currently used for smoke tests — worth considering a Supabase branch
@@ -428,11 +443,11 @@ FEATURE ROADMAP
    Delete deferred — Director-gated on CASCADE-FK guard decision (§6/§8/§9/§12).
 3. Member Capture → Verify → Save. ✅ DONE (#10).
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
-5. notes ✅ (#18) · tasks ✅ (#20) · comments+chat ✅ (#22, UI unverified). Remaining:
-   currency converter ONLY.
-6. Cross-cutting: real duplicate detection, PDF/CSV export, deadline enforcement, real
-   Azure OCR wiring, i18n real-seed + logo drop-in (once assets land), Projects/Groups
-   guarded delete.
+5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20,
+   #22, #24).
+6. Cross-cutting (next unclaimed): real duplicate detection, PDF/CSV export, deadline
+   enforcement, real Azure OCR wiring, i18n real-seed + logo drop-in, Projects/Groups
+   guarded delete, real FX rates.
 
 POLISH / CLEANUP — DONE THIS SESSION:
 - ✅ Member Home → Console link (#13).
