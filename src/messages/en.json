@@ -13,7 +13,8 @@
     "console": "Console",
     "review": "Review",
     "budgets": "Budgets",
-    "users": "Users"
+    "users": "Users",
+    "projects": "Projects"
   },
   "member": {
     "tagline": "Capture a receipt from your phone.",
@@ -85,6 +86,29 @@
     "transport": "Transport",
     "lodging": "Lodging",
     "other": "Other"
+  },
+  "projects": {
+    "title": "Projects & Groups",
+    "newProject": "New project",
+    "projectName": "Project name",
+    "create": "Create",
+    "rename": "Rename",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "addGroup": "Add group",
+    "groupName": "Group name",
+    "spendingLimit": "Spending limit",
+    "deadline": "Submission deadline",
+    "noProjects": "No projects yet.",
+    "noGroups": "No groups yet.",
+    "noLimit": "No limit",
+    "noDeadline": "No deadline",
+    "nameRequired": "Name is required.",
+    "badLimit": "Spending limit must be 0 or more.",
+    "badDate": "Enter a valid date.",
+    "forbidden": "Only Admins can manage projects.",
+    "failed": "Action failed. Please try again."
   },
   "review": {
     "title": "Review queue",
