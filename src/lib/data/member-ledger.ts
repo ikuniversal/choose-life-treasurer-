@@ -6,6 +6,7 @@ type ItemStatus = Database["public"]["Enums"]["item_status"];
 export interface LedgerItem {
   id: string;
   kind: "receipt" | "note";
+  groupId: string;
   /** vendor (receipt) or description (note) — UGC, NEVER translated. */
   title: string;
   /** ISO date (receipt_date | note_date). */
@@ -49,13 +50,13 @@ export async function getMemberLedger(): Promise<MemberLedger> {
   const [receiptsRes, notesRes] = await Promise.all([
     supabase
       .from("receipts")
-      .select("id, vendor, receipt_date, amount, currency, status")
+      .select("id, group_id, vendor, receipt_date, amount, currency, status")
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
       .order("receipt_date", { ascending: false }),
     supabase
       .from("no_receipt_notes")
-      .select("id, description, note_date, status")
+      .select("id, group_id, description, note_date, status")
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
       .order("note_date", { ascending: false }),
@@ -64,6 +65,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
   const receipts: LedgerItem[] = (receiptsRes.data ?? []).map((r) => ({
     id: r.id,
     kind: "receipt",
+    groupId: r.group_id,
     title: r.vendor,
     date: r.receipt_date,
     amount: r.amount,
@@ -74,6 +76,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
   const notes: LedgerItem[] = (notesRes.data ?? []).map((n) => ({
     id: n.id,
     kind: "note",
+    groupId: n.group_id,
     title: n.description,
     date: n.note_date,
     amount: null,

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { CommentThread } from "@/components/comment-thread";
 import {
   approveReceipt,
   bulkApprove,
@@ -184,6 +185,11 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
                   </Button>
                 </div>
               )}
+              <CommentThread
+                kind="receipt"
+                parentId={item.id}
+                groupId={item.groupId}
+              />
             </div>
           </li>
         ))}

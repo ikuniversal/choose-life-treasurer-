@@ -10,6 +10,7 @@ export interface ReviewItem {
   currency: string;
   usdEquivalent: number | null;
   category: Category;
+  groupId: string;
   groupName: string | null;
   submitterName: string | null;
   receiptDate: string;
@@ -63,6 +64,7 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
         currency: r.currency,
         usdEquivalent: r.usd_equivalent,
         category: r.category,
+        groupId: r.group_id,
         groupName: r.groups?.name ?? null,
         submitterName: nameById.get(r.submitted_by) ?? null,
         receiptDate: r.receipt_date,

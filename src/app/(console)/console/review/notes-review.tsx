@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { CommentThread } from "@/components/comment-thread";
 import { approveNote, rejectNote } from "@/lib/note-actions";
 import type { NoteReviewItem } from "@/lib/data/note-review";
 
@@ -128,6 +129,11 @@ export function NotesReview({ items }: { items: NoteReviewItem[] }) {
                 </Button>
               </div>
             )}
+            <CommentThread
+              kind="note"
+              parentId={item.id}
+              groupId={item.groupId}
+            />
           </li>
         ))}
       </ul>

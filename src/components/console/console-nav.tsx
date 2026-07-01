@@ -8,6 +8,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   ListChecks,
+  MessageCircle,
   PiggyBank,
   Users,
 } from "lucide-react";
@@ -29,6 +30,7 @@ export function ConsoleNav({
     { href: "/console", label: t("console"), icon: LayoutDashboard },
     { href: "/console/review", label: t("review"), icon: ClipboardCheck },
     { href: "/console/tasks", label: t("tasks"), icon: ListChecks },
+    { href: "/console/chat", label: t("chat"), icon: MessageCircle },
     { href: "/console/budgets", label: t("budgets"), icon: PiggyBank },
     ...(isAdmin
       ? [
