@@ -2,6 +2,9 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Camera, Home, Receipt } from "lucide-react";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { NoAccess } from "@/components/auth/no-access";
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { getSessionUser, hasAnyRole } from "@/lib/auth";
 
 // Member shell — phone-first. Content is a fluid column capped at the design's
 // 312px (var --spacing-member → max-w-member). A drop shadow is allowed here:
@@ -11,6 +14,11 @@ export default async function MemberLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Middleware already redirects unauthenticated traffic to /sign-in; a signed-in
+  // user with zero roles gets the clear no-access state rather than an empty app.
+  const user = await getSessionUser();
+  if (!hasAnyRole(user)) return <NoAccess />;
+
   const t = await getTranslations("nav");
   const tabs = [
     { href: "/", label: t("home"), icon: Home },
@@ -23,7 +31,10 @@ export default async function MemberLayout({
       <div className="flex w-full max-w-member flex-1 flex-col">
         <header className="flex items-center justify-between px-4 py-3">
           <span className="text-sm font-semibold text-ink">Choose Life</span>
-          <LocaleSwitcher />
+          <div className="flex items-center gap-2">
+            <LocaleSwitcher />
+            <SignOutButton />
+          </div>
         </header>
 
         <main className="flex-1 px-4 pb-24">{children}</main>
