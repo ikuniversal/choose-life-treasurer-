@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "status": "PLACEHOLDER — not the approved 197-key seed",
+    "note": "The verbatim EN STR-dictionary export (197 keys) did not arrive in the Code Agent environment through the operator relay. These keys exist only to make the scaffold render and to prove the next-intl wiring. Replace this whole file with the approved en.json when it lands — do NOT hand-translate. Resolved collisions to preserve on merge: dueWord, chatReadOnlyNote (console wording won)."
+  },
+  "app": {
+    "name": "Choose Life Receipts"
+  },
+  "nav": {
+    "home": "Home",
+    "capture": "Capture",
+    "receipts": "Receipts",
+    "console": "Console",
+    "review": "Review",
+    "budgets": "Budgets"
+  },
+  "member": {
+    "tagline": "Capture a receipt from your phone.",
+    "newReceipt": "New receipt",
+    "noReceiptNote": "No-receipt note"
+  },
+  "console": {
+    "title": "Treasurer Console",
+    "pendingReview": "Pending review",
+    "export": "Export"
+  },
+  "status": {
+    "pending": "Pending",
+    "assigned": "Assigned",
+    "reviewed": "Reviewed",
+    "done": "Done",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "common": {
+    "dueWord": "Due",
+    "chatReadOnlyNote": "This conversation is read-only."
+  }
+}

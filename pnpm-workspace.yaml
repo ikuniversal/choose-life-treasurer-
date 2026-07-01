@@ -1,0 +1,13 @@
+# Native postinstall build scripts are intentionally not run. None are needed
+# to build or run the app (Next ships its own swc; next/image falls back
+# without a native sharp). This keeps install deterministic in CI.
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  sharp: false
+  unrs-resolver: false
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - sharp
+  - unrs-resolver

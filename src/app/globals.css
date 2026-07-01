@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+/*
+ * Choose Life — "Ledger" design tokens (LOCKED, final).
+ * Values are verbatim from the approved design handoff. Do not reinterpret.
+ * Flat / hairline surfaces — no drop shadows except the phone frame, modals,
+ * and the console detail panel (applied locally, not globally).
+ */
+@theme {
+  /* Surfaces */
+  --color-canvas: #faf7f1; /* light app canvas */
+  --color-capture: #26211b; /* member capture / dark screen bg */
+  --color-sidebar: #29251d; /* console dark sidebar bg */
+  --color-card: #ffffff;
+  --color-bubble: #efe8da; /* member chat bubble */
+
+  /* Ink / text */
+  --color-ink: #29251d; /* headings */
+  --color-body: #33291f; /* body copy */
+  --color-muted: #8f877a;
+  --color-faint: #b6ac9c;
+  --color-faint-2: #a89e8e;
+
+  /* Hairlines */
+  --color-hairline: #e8e1d3; /* structural */
+  --color-hairline-row: #efe8da; /* list rows */
+
+  /* Brand / semantic */
+  --color-olive: #7d6a2f; /* primary, links, values */
+  --color-amber: #c79a45; /* accent */
+  --color-approve: #7aa257;
+  --color-reject: #c0613f;
+
+  /* Status — Pending / Assigned */
+  --color-status-pending-dot: #c79a45;
+  --color-status-pending-bg: #f4e9d4;
+  --color-status-pending-fg: #8a6a33;
+  /* Status — Reviewed / Done */
+  --color-status-reviewed-dot: #7089a4;
+  --color-status-reviewed-bg: #e3e9ef;
+  --color-status-reviewed-fg: #4d6175;
+  /* Status — Approved */
+  --color-status-approved-dot: #7aa257;
+  --color-status-approved-bg: #e6efe0;
+  --color-status-approved-fg: #4f6a3c;
+  /* Status — Rejected */
+  --color-status-rejected-dot: #c0613f;
+  --color-status-rejected-bg: #f1ddd5;
+  --color-status-rejected-fg: #8a4733;
+
+  /* Type — IBM Plex Sans (UI), IBM Plex Mono (amounts/codes), Caveat (signatures ONLY) */
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-signature: var(--font-caveat), cursive;
+
+  /* Radii */
+  --radius-input: 10px; /* inputs 8–14 */
+  --radius-card: 12px; /* cards 8–14 */
+  --radius-btn: 11px; /* buttons 10–13 */
+  --radius-pill: 999px; /* pills / composer */
+  --radius-swatch: 2px; /* status swatch */
+
+  /* Member content column (phone-first fluid width) */
+  --spacing-member: 312px;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
