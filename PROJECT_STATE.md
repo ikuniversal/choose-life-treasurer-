@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.7
-> Last updated: 2026-07-01 by Choose Life Director 5.0 (active) — Slice 1 banked
+> Last updated: 2026-07-01 by Choose Life Director 5.0 (active) — slices 3+2 + 2 migrations banked
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, immediate (operator asked for a handoff right after 4.0 cold-started, before any task was given). NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. IMPORTANT: no work was performed during the 4.0 session — zero new PRs, zero new decisions, zero schema changes. Everything below this point is identical in substance to the v2.6 (3.0→4.0) bank; only this section and the identity/swap-log sections changed. Do not assume something was missed — nothing happened in between.
@@ -17,8 +17,12 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   Projects & Groups management — SLICE 1 COMPLETE (PR #14): list/create/edit for projects
   and groups, admin-only, on existing RLS. NO delete (see hazard below) — deferred slice.
   Roadmap #5 slice 1 (no-receipt notes: member file w/ dual canvas signatures + console
-  review) COMPLETE (PR #18, 26a9e03).
-- App live: https://choose-life-treasurer.vercel.app · prod = 26a9e03 (merge #18), READY.
+  review) COMPLETE (PR #18, 26a9e03). Roadmap #5 slice 3 (tasks) COMPLETE (PR #20, a29516d).
+  Slice 2 (item comments + group chat, refresh-to-see v1) COMPLETE (PR #22, 3bb1e27,
+  operator-merged on green after Director clearance). Comments+chat UI shipped with
+  data-layer-only verification — operator waived device pass; RLS/data proven HIGH via
+  simulated-JWT tests; UI rendering unverified, first real use is the de facto UI check.
+- App live: https://choose-life-treasurer.vercel.app · prod = 3bb1e27 (merge #22), READY.
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP this
   session (verified 0 rows remaining). ⚠️ NEW test data was created during operator smoke
   test of PR #14: project "Belts" (id 53ffda50-…) → group "Camp" (id 5e759172-…,
@@ -130,6 +134,8 @@ IN-FLIGHT / HANDED FORWARD:
 | 13 | Polish: member→console link + remove dead Export button | 0c13ed1 | 2026-07-01 | (member) home shows console entry link admin/treasurer-only (reused PR #5 canAccessConsole, no new auth path); removed non-functional console Export placeholder + unused import; UI-only; verified: independent Vercel READY check + 0 runtime errors + operator confirmed live render/route on prod |
 | 14 | Projects & Groups management, slice 1 (roadmap #2) | 58f2b38 | 2026-07-01 | /console/projects admin-only (mirrors #7 gating); list/create/rename project; create/edit group (name, spending_limit≥0, submission_deadline), all via existing RLS (projects_admin_write/groups_admin_write, is_admin()); updated_at via existing groups_set_updated_at trigger (verified, not set manually); NO delete (FKs cascade — deferred, see §6/§8/§12); UI/server-actions only, no schema/migration/RLS/env/seed; verified e2e on prod (real create+edit round-trip confirmed via direct DB read: row present, correct values, trigger fired) |
 | 18 | No-receipt notes: file + review (roadmap #5.1) | 26a9e03 | 2026-07-01 | /no-receipt member flow (desc, date, 2 signer names, 2 real canvas pads → PNG to signatures/{group_id}/, insert w/ status pending, trigger owns updated_at) + /console/review Notes section (signed-URL sigs, approve/reject+reason); UI/server-actions only, zero new RLS/migration (all pre-existing, Director-verified before dispatch); e2e verified on prod: operator device test + Director DB/storage cross-check (row+2 PNGs+trigger+RLS paths all correct) |
+| 20 | Tasks: create/assign→done→approve (#5.3) | a29516d | 2026-07-01 | /tasks member list + mark-done; /console/tasks roster picker via NEW get_group_member_names RPC, create, approve; e2e on prod (3-leg device test + Director DB cross-check + simulated-JWT transition proof) |
+| 22 | Item comments + group chat (#5.2) | 3bb1e27 | 2026-07-01 | Append-only comment threads on receipts/notes (console review + member ledger); per-group chat member /chat + /console/chat, latest-50 + load-older, manual refresh, NO Realtime; names via RPC; types refreshed; data/RLS layer verified via 5 simulated-JWT tests (thread round-trip, cross-group blind, admin chat insert, constraint negative); UI unverified (operator waived) |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-01 (Director 5.0): cold-started from v2.7, verified handoff vs live (zero drift:
@@ -140,7 +146,11 @@ IN-FLIGHT / HANDED FORWARD:
   surfaces need zero new RLS/migrations; comments are append-only by policy — no
   update/delete). Shipped #18 (notes). Operator merged #18 pre-clearance/pre-CI-relay
   (known §12 pattern) — post-hoc Director verification passed on all points. Test note
-  MCP-deleted post-verification (dependency-checked, 0 comments).
+  MCP-deleted post-verification (dependency-checked, 0 comments). Shipped #20 + #22.
+  Authored get_group_member_names + group_messages migrations (both simulated-JWT verified).
+  #20 device test debugged via auth sign-in log (pre-merge 404, wrong-account). #22 verified
+  internally at operator instruction — all 5 RLS tests pass, zero residue. Test task deleted
+  post-verify. Operator merges on green after Director clearance = working pattern.
 - 2026-07-01 (Director 1.0): empty repo → live app. Scaffold (#1), Supabase wiring (#4),
   real Auth (#5) + docs. Authored DB schema + RLS + 2 buckets via MCP. Created Vercel
   project; fixed prod 500 (env only in .env.local). Seeded admin + Moldova/2 groups +
@@ -173,6 +183,8 @@ IN-FLIGHT / HANDED FORWARD:
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat.
+  Last two both Director-authored via MCP this session. Source-lock-in backlog now covers
+  all 7 unmirrored migrations (none source-controlled — see IN-FLIGHT item 5, held per §11).
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -186,11 +198,15 @@ IN-FLIGHT / HANDED FORWARD:
     submission_deadline (date, nullable), created_at, updated_at. Has a
     `groups_set_updated_at` trigger (verified live) — app code must NOT set updated_at
     manually, let the trigger handle it.
-  - **group_messages** — per-group chat (id, group_id FK CASCADE — joins the gated delete
-    family, sender_id, body non-empty check, created_at; index (group_id, created_at)); RLS
-    from birth: insert self+(member-of-group OR admin), select member-of-group OR admin;
-    APPEND-ONLY (no update/delete policies, matching comments). Director-authored +
-    simulated-JWT verified (non-member blind, admin sees). Advisors unchanged.
+  - **get_group_member_names(p_group_id)** — SECURITY DEFINER RPC returning {user_id,
+    full_name} of a group's roster to callers who are admin/treasurer/member of it; pinned
+    search_path, execute revoked from public+anon by name, granted authenticated;
+    simulated-JWT verified; 4th accepted-residual definer WARN.
+  - **group_messages** — per-group chat (id, group_id FK CASCADE — joins gated delete
+    family, sender_id, body w/ non-empty check, created_at; index (group_id, created_at));
+    RLS from birth: insert self+(group member OR admin), select group member OR admin;
+    APPEND-ONLY like comments; simulated-JWT verified incl. cross-group blindness +
+    constraint negative.
 - **⚠️ FK DELETE BEHAVIOR — CASCADE, not RESTRICT (verified live this session):**
   `projects → groups` = CASCADE. `groups → receipts`, `groups → no_receipt_notes`,
   `groups → tasks`, `groups → user_roles` = ALL CASCADE. Practical effect: deleting one
@@ -287,6 +303,8 @@ IN-FLIGHT / HANDED FORWARD:
 - **Reuse role-gating, don't reinvent:** console-only routes (users, review, projects) all
   mirror the SAME admin/treasurer gating pattern established in PR #5/#7. New console pages
   reuse it; they don't grow their own auth check. (Established through #7, #12, #14.)
+- **Name resolution via get_group_member_names RPC ONLY** — never widen profiles RLS
+  (contact privacy); profiles SELECT stays self-or-admin. (PR #20; gap caught pre-dispatch.)
 - **Check RLS before dispatching, not after:** for admin-CRUD console features, verify live
   policies via MCP FIRST — if existing admin-write policies already cover the need (as with
   projects/groups), ship UI-only with zero new migration. Only author new RLS when a gap is
@@ -375,6 +393,12 @@ IN-FLIGHT / HANDED FORWARD:
   A delete button here — if ever added carelessly — could silently destroy an entire
   project's receipts, tasks, and role assignments with no DB-level stop. See §6/§8/§9.
   This is why PR #14 shipped with explicitly NO delete UI.
+- **Slice 2/3 accepted residuals:** (a) tasks_update_assignee permits assignee any-column
+  updates on own task via direct API; UI constrains to mark-done; column-restricting =
+  Director-gated migration if ever needed. (b) tasks have no audit trail; status hops not
+  individually provable post-hoc. (c) same-microsecond group_messages have nondeterministic
+  order (random-UUID tiebreak) — cosmetic, unreachable at current scale. (d) comments+chat
+  UI never device-tested — if a UI failure surfaces, the data layer beneath is already proven.
 - **Smoke-testing on live prod creates real rows:** operator's PR #14 smoke test created a
   real "Belts"/"Camp" project+group in production data, not a sandboxed test. No branch/
   staging DB is currently used for smoke tests — worth considering a Supabase branch
@@ -404,9 +428,8 @@ FEATURE ROADMAP
    Delete deferred — Director-gated on CASCADE-FK guard decision (§6/§8/§9/§12).
 3. Member Capture → Verify → Save. ✅ DONE (#10).
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
-5. ← IN PROGRESS: notes ✅ (#18), tasks ✅ (#20). Comments/chat IN PROGRESS (operator
-   chose: item comments + group chat, refresh-to-see v1, Realtime deferred). Remaining:
-   currency converter.
+5. notes ✅ (#18) · tasks ✅ (#20) · comments+chat ✅ (#22, UI unverified). Remaining:
+   currency converter ONLY.
 6. Cross-cutting: real duplicate detection, PDF/CSV export, deadline enforcement, real
    Azure OCR wiring, i18n real-seed + logo drop-in (once assets land), Projects/Groups
    guarded delete.
