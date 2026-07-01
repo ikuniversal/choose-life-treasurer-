@@ -50,10 +50,9 @@
 - **Code Agent delivery:** operator relay — no direct GitHub/Cody MCP exists (confirmed: this session's Cody message itself arrived via operator relay).
 
 ## 4. IN-FLIGHT WORK
-- **Repo creation** — not started; pending operator's autowire directions.
-- **Supabase project** — not created. Supabase MCP is connected (org `twbszfyctshpcyyzizsp`); creating a project is a cost-incurring op — will run `get_cost` + present the confirmation before creating.
-- **Vercel project** — not created; Vercel MCP connected, team binding pending.
-- **OCR provider decision** — SETTLED: Azure AI Document Intelligence (see §3).
+- **Repo / Supabase project / Vercel project** — all created and live (see §6). Reconciled out of in-flight.
+- **Supabase wiring → Cody directive DISPATCHED (this PR).** Wire `@supabase/supabase-js` + `@supabase/ssr` and real queries into the `(member)` ledger against `receipts` + `no_receipt_notes`, using generated `Database` types. Graceful empty state when no session (auth still stubbed). **Auth wiring (`lib/auth.ts`) is the PR after this one.**
+- **OCR provider decision** — SETTLED: Azure AI Document Intelligence (see §3); SDK wiring is a later follow-up.
 - **i18n seed + logos → NEW follow-up PR.** PR #1 is merged/closed, so the real `en.json`/`ru.json` (197 keys) and `CLeng.png`/`CLlogo1.png` land via a fresh follow-up PR, not an amendment to #1. Blocker unchanged: the text relay drops large payloads and binaries can't relay through text at all — still needs direct-to-Cody-environment delivery or a direct commit. Placeholder EN/RU keys + missing icons remain flagged in-repo (`public/icons/README.md`).
 
 ## 5. RECENT SHIPPED WORK
@@ -65,10 +64,10 @@
 - 2026-07-01: Cold-start bootstrap. Received design handoff zip + two logo PNGs, read the full handoff (Member phone-first loop + responsive Treasurer/Admin console, "Ledger" visual direction locked with final design tokens, EN/RU i18n, fixed-demo FX rates to replace). Confirmed genuine greenfield — no canonical store existed. Audited MCPs: Supabase connected (org `twbszfyctshpcyyzizsp`, no project for this app yet), Vercel connected (team not yet bound). Drafted this file. Operator named the Director persona: **Choose Life Director 1.0**. Next: operator's autowire directions (repo + Code Agent delivery), OCR vendor decision, then scaffold repo + Supabase project (cost-gated) + Vercel project.
 
 ## 6. INFRASTRUCTURE STATE (Pro)
-- Backend provider + project ref + plan: none yet
-- Latest applied migration version: n/a
+- Backend provider + project ref + plan: Supabase, project ref `avmygueukigqbqhftuic`.
+- **Database schema live:** `projects` / `groups` / `user_roles` / `receipts` / `no_receipt_notes` / `tasks` / `comments` / `fx_rates`, full RLS (3-role model). Latest migrations: `core_schema_and_rls`, `harden_rls_helper_functions`, `revoke_anon_execute_role_helpers`, `rls_initplan_optimization_and_missing_indexes`, `create_storage_buckets`. `get_advisors`: security clean (1 accepted residual — role-check fns are self-referential; RPC exposure to `authenticated` isn't a leak); performance clean except 1 deferred cosmetic item (overlapping admin/scoped policies — non-urgent at this app's scale).
 - Active edge function versions: n/a
-- Storage buckets in use: n/a (will need buckets for receipt photos + signatures)
+- Storage buckets in use: `receipt-photos`, `signatures` (both private).
 - GitHub repo + default branch: `ikuniversal/choose-life-treasurer-` (private), default `main` — now has real content (scaffold PR #1 merged at `a323d0e`, no longer empty).
 - Hosting (Vercel project + prod domain): project `choose-life-treasurer` (`prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m`, team `team_IHCTzTPcdY47mLkznoU0idjD` / roof-clean-pros-projects). Framework auto-detected: Next.js. First production deployment READY (`dpl_8TX783mjTyvwpQVgpW7ambacL9mv`). Domains: choose-life-treasurer.vercel.app + 2 auto-generated aliases. Verified live via `get_project`, not just reported.
 - CI workflows + quality gates: `.github/workflows/ci.yml` — install + lint + typecheck + build on PR/push to `main` (green on PR #1).
@@ -87,7 +86,11 @@
 - Flag any step that genuinely requires a computer rather than improvising.
 
 ## 8. BANKED ARCHITECTURAL PRECEDENTS
-- **Schema/migrations:** none yet.
+- **Schema/migrations:**
+  - RLS helper functions (`is_admin`/`is_treasurer_of`/`is_member_of`) must pin `search_path` AND explicitly `REVOKE EXECUTE` from `anon` **by name** — Supabase grants new public-schema functions EXECUTE directly to `anon`/`authenticated` by default, not just via inherited PUBLIC; revoking from PUBLIC alone does not remove anon's access.
+  - Wrap `auth.uid()`/`auth.role()` calls in RLS policies as `(select auth.uid())` — evaluated once per query instead of once per row.
+  - `usd_equivalent` is computed and stored at receipt submission time (locked historical value), not derived live on read — exchange rates fluctuate; approved receipts shouldn't silently revalue.
+  - Duplicate detection (`is_duplicate` column exists) — actual detection logic (amount+date+vendor match within group) is deferred to its own follow-up pass, not bundled into foundational schema.
 - **Code/types:** none yet.
 - **Deployment:** none yet.
 - **Storage:** receipt photos + signatures will need dedicated Supabase Storage buckets with per-group RLS-equivalent access — design when schema is authored.
