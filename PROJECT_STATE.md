@@ -104,6 +104,7 @@
 - **Signatures:** must be real canvas-based touch/drawn capture in production — the cursive-text placeholder in the design files is not to be carried into the build.
 - **OCR provider:** Azure AI Document Intelligence (Receipt model), abstracted behind `lib/ocr/index.ts` — never call the Azure SDK directly outside that module.
 - **Cody dispatch protocol:** no direct MCP/GitHub path exists; Director produces single "Send this to Cody" blocks, operator relays both directions, until a more automated wiring is set up.
+- **Autowire/cron dispatch pipeline** (relay table + pg_net/pg_cron polling + GitHub repository_dispatch, per the 2026-07-01 kit): evaluated, **DECLINED by operator** — recurring Anthropic API cost per dispatch (Claude Code Action) plus an always-on unattended loop wasn't worth it. Do not re-propose without the operator explicitly revisiting it. State at declination: pg_net/pg_cron not installed, no relay table/functions, no `gh_read_token`/`gh_dispatch_token` in Vault — clean slate if ever reconsidered. Continuing with the existing operator-relay dispatch model.
 
 ## 10. PRE-APPROVED BUNDLES
 - `scaffold-app(name)` → repo init → stack scaffold → Supabase project → base schema → deploy skeleton → verify → report.
