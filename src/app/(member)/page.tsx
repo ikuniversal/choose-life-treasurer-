@@ -4,6 +4,7 @@ import { Camera, FileText, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/status-pill";
 import { CommentThread } from "@/components/comment-thread";
+import { CurrencyConverter } from "@/components/currency-converter";
 import { getMemberLedger } from "@/lib/data/member-ledger";
 import { canAccessConsole, getSessionUser } from "@/lib/auth";
 
@@ -49,6 +50,9 @@ export default async function MemberHomePage() {
           </Link>
         </Button>
       </div>
+
+      {/* Convert local spend → USD before capturing a receipt (read-only). */}
+      <CurrencyConverter />
 
       <section className="flex flex-col gap-2">
         <h2 className="text-sm font-medium text-muted">{t("ledgerTitle")}</h2>
