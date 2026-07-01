@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ClipboardCheck, LayoutDashboard, PiggyBank, Users } from "lucide-react";
+import {
+  ClipboardCheck,
+  FolderKanban,
+  LayoutDashboard,
+  PiggyBank,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Console navigation. Renders as a vertical rail inside the ≥880px sidebar and
@@ -23,7 +29,10 @@ export function ConsoleNav({
     { href: "/console/review", label: t("review"), icon: ClipboardCheck },
     { href: "/console/budgets", label: t("budgets"), icon: PiggyBank },
     ...(isAdmin
-      ? [{ href: "/console/users", label: t("users"), icon: Users }]
+      ? [
+          { href: "/console/projects", label: t("projects"), icon: FolderKanban },
+          { href: "/console/users", label: t("users"), icon: Users },
+        ]
       : []),
   ];
 
