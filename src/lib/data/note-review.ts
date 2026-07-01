@@ -8,6 +8,7 @@ export interface NoteReviewItem {
   signer2Name: string | null;
   signer1Url: string | null;
   signer2Url: string | null;
+  groupId: string;
   groupName: string | null;
   submitterName: string | null;
 }
@@ -63,6 +64,7 @@ export async function getNoteReviewQueue(): Promise<NoteReviewItem[]> {
         signer2Name: r.signer2_name,
         signer1Url,
         signer2Url,
+        groupId: r.group_id,
         groupName: r.groups?.name ?? null,
         submitterName: nameById.get(r.submitted_by) ?? null,
       };

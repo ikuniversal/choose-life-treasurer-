@@ -15,7 +15,8 @@
     "budgets": "Budgets",
     "users": "Users",
     "projects": "Projects",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "chat": "Chat"
   },
   "member": {
     "tagline": "Capture a receipt from your phone.",
@@ -188,6 +189,33 @@
     "assigned": "Assigned",
     "done": "Done",
     "approved": "Approved"
+  },
+  "comments": {
+    "toggle": "Comments",
+    "placeholder": "Write a comment…",
+    "post": "Post",
+    "posting": "Posting…",
+    "empty": "No comments yet.",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "required": "Write something first.",
+    "notSignedIn": "Please sign in again.",
+    "failed": "Couldn't load or post. Try again."
+  },
+  "chat": {
+    "title": "Chat",
+    "group": "Group",
+    "placeholder": "Message…",
+    "send": "Send",
+    "sending": "Sending…",
+    "empty": "No messages yet.",
+    "loadOlder": "Load older",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "noGroup": "You are not in a group yet.",
+    "required": "Write something first.",
+    "notSignedIn": "Please sign in again.",
+    "failed": "Couldn't load or send. Try again."
   },
   "roles": {
     "admin": "Admin",

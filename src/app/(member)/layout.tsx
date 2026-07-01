@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Camera, Home, ListChecks, Receipt } from "lucide-react";
+import { Camera, Home, ListChecks, MessageCircle, Receipt } from "lucide-react";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { NoAccess } from "@/components/auth/no-access";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -24,6 +24,7 @@ export default async function MemberLayout({
     { href: "/", label: t("home"), icon: Home },
     { href: "/capture", label: t("capture"), icon: Camera },
     { href: "/tasks", label: t("tasks"), icon: ListChecks },
+    { href: "/chat", label: t("chat"), icon: MessageCircle },
     { href: "/receipts", label: t("receipts"), icon: Receipt },
   ];
 
