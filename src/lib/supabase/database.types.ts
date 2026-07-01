@@ -373,6 +373,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_group_member_names: {
+        Args: { p_group_id: string }
+        Returns: {
+          full_name: string
+          user_id: string
+        }[]
+      }
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       is_member_of: { Args: { p_group_id: string }; Returns: boolean }
       is_treasurer_of: { Args: { p_group_id: string }; Returns: boolean }

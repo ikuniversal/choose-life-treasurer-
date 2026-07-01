@@ -14,7 +14,8 @@
     "review": "Review",
     "budgets": "Budgets",
     "users": "Users",
-    "projects": "Projects"
+    "projects": "Projects",
+    "tasks": "Tasks"
   },
   "member": {
     "tagline": "Capture a receipt from your phone.",
@@ -159,6 +160,34 @@
     "reasonRequired": "A rejection reason is required.",
     "forbidden": "You don't have permission to review.",
     "failed": "Action failed. Please try again."
+  },
+  "tasks": {
+    "myTitle": "My tasks",
+    "consoleTitle": "Tasks",
+    "empty": "No tasks.",
+    "due": "Due",
+    "noDue": "No due date",
+    "createdBy": "Created by",
+    "assignee": "Assignee",
+    "group": "Group",
+    "title": "Title",
+    "dueDate": "Due date",
+    "create": "Create task",
+    "creating": "Creating…",
+    "markDone": "Mark done",
+    "approve": "Approve",
+    "newTask": "New task",
+    "required": "Title and assignee are required.",
+    "badDate": "Enter a valid date.",
+    "forbidden": "You don't have permission.",
+    "failed": "Action failed. Please try again.",
+    "noGroups": "No groups.",
+    "noRoster": "No members in this group yet."
+  },
+  "taskStatus": {
+    "assigned": "Assigned",
+    "done": "Done",
+    "approved": "Approved"
   },
   "roles": {
     "admin": "Admin",
