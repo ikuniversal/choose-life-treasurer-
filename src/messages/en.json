@@ -21,7 +21,8 @@
     "noReceiptNote": "No-receipt note",
     "ledgerTitle": "Your ledger",
     "empty": "No receipts yet.",
-    "signedOut": "Sign in to view your receipts."
+    "signedOut": "Sign in to view your receipts.",
+    "goToConsole": "Treasurer console"
   },
   "console": {
     "title": "Treasurer Console",
