@@ -27,6 +27,34 @@
     "pendingReview": "Pending review",
     "export": "Export"
   },
+  "auth": {
+    "signInTitle": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "signInButton": "Sign in",
+    "signingIn": "Signing in…",
+    "forgotPassword": "Forgot password?",
+    "resetTitle": "Reset password",
+    "resetIntro": "Enter your email and we'll send a reset link.",
+    "resetButton": "Send reset link",
+    "resetSent": "If that email exists, a reset link is on its way.",
+    "backToSignIn": "Back to sign in",
+    "updateTitle": "Set a new password",
+    "newPassword": "New password",
+    "updateButton": "Update password",
+    "updated": "Password updated. You're signed in.",
+    "signOut": "Sign out",
+    "genericError": "Something went wrong. Please try again.",
+    "invalidCredentials": "Invalid email or password.",
+    "linkInvalid": "That link is invalid or has expired.",
+    "noAccessTitle": "No access assigned yet",
+    "noAccessBody": "Your account has no role yet. Please contact your Admin to be added to a group."
+  },
+  "roles": {
+    "admin": "Admin",
+    "treasurer": "Treasurer",
+    "member": "Member"
+  },
   "status": {
     "pending": "Pending",
     "assigned": "Assigned",
