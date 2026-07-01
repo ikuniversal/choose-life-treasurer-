@@ -54,14 +54,12 @@
 - **Supabase project** — not created. Supabase MCP is connected (org `twbszfyctshpcyyzizsp`); creating a project is a cost-incurring op — will run `get_cost` + present the confirmation before creating.
 - **Vercel project** — not created; Vercel MCP connected, team binding pending.
 - **OCR provider decision** — SETTLED: Azure AI Document Intelligence (see §3).
-- **PR #1** — scaffold complete per Cody's report; **held pending verification, NOT yet cleared.** Director attempted independent check via bash_tool→api.github.com (blocked: shared-sandbox IP rate-limited) and web_fetch on the PR/repo pages (404 — consistent with private-repo-no-auth, not evidence of a problem). Awaiting operator spot-check of the Files + Checks tabs to clear.
-- **i18n seed files** — 197 EN/RU keys delivered directly to Cody this turn via relay — pending confirmation it landed. **NOTE (Cody):** payload was NOT present in the relayed turn — still not on disk. next-intl is wired with clearly-marked placeholder namespaces; verbatim seeding stays blocked until the JSON actually arrives.
-- **Logo assets** — `CLeng.png`, `CLlogo1.png` still NOT transmitted; binary, can't relay through the Director. Operator to share the `design_handoff` folder directly with Cody's environment. Manifest references icons not yet committed (see `public/icons/README.md`) — build unaffected.
+- **i18n seed + logos → NEW follow-up PR.** PR #1 is merged/closed, so the real `en.json`/`ru.json` (197 keys) and `CLeng.png`/`CLlogo1.png` land via a fresh follow-up PR, not an amendment to #1. Blocker unchanged: the text relay drops large payloads and binaries can't relay through text at all — still needs direct-to-Cody-environment delivery or a direct commit. Placeholder EN/RU keys + missing icons remain flagged in-repo (`public/icons/README.md`).
 
 ## 5. RECENT SHIPPED WORK
 | # | Title | SHA | Date | One-liner |
 |---|-------|-----|------|-----------|
-| _(none yet)_ | | | | |
+| PR #1 | merge `a323d0e` | 2026-07-01 | Initial Next.js 16 / React 19 / Tailwind v4 / shadcn scaffold — (member)/(console) route groups, locked design tokens via `globals.css @theme`, next-intl wired (placeholder EN/RU keys), `lib/ocr/index.ts` interface stub, PWA manifest, CI workflow (install+lint+typecheck+build). Merged by operator directly on green CI (verified: Cody GitHub-MCP readback, run 28495894599 conclusion=success). |
 
 ## 5b. LATEST SESSION NOTE
 - 2026-07-01: Cold-start bootstrap. Received design handoff zip + two logo PNGs, read the full handoff (Member phone-first loop + responsive Treasurer/Admin console, "Ledger" visual direction locked with final design tokens, EN/RU i18n, fixed-demo FX rates to replace). Confirmed genuine greenfield — no canonical store existed. Audited MCPs: Supabase connected (org `twbszfyctshpcyyzizsp`, no project for this app yet), Vercel connected (team not yet bound). Drafted this file. Operator named the Director persona: **Choose Life Director 1.0**. Next: operator's autowire directions (repo + Code Agent delivery), OCR vendor decision, then scaffold repo + Supabase project (cost-gated) + Vercel project.
@@ -71,9 +69,9 @@
 - Latest applied migration version: n/a
 - Active edge function versions: n/a
 - Storage buckets in use: n/a (will need buckets for receipt photos + signatures)
-- GitHub repo + default branch: none yet
+- GitHub repo + default branch: `ikuniversal/choose-life-treasurer-` (private), default `main` — now has real content (scaffold PR #1 merged at `a323d0e`, no longer empty).
 - Hosting (Vercel project + prod domain): none yet
-- CI workflows + quality gates: none yet
+- CI workflows + quality gates: `.github/workflows/ci.yml` — install + lint + typecheck + build on PR/push to `main` (green on PR #1).
 - **Prod-ahead-of-repo drift:** none (nothing exists yet — reconciled by default)
 - **MCP / tooling state:**
   - Supabase MCP — connected and audited (org `twbszfyctshpcyyzizsp`, 9 existing unrelated projects, none for Choose Life). Director can operate Postgres/migrations/edge functions/advisors directly once a project is created.
