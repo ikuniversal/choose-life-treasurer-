@@ -7,6 +7,7 @@ import {
   ClipboardCheck,
   FolderKanban,
   LayoutDashboard,
+  ListChecks,
   PiggyBank,
   Users,
 } from "lucide-react";
@@ -27,6 +28,7 @@ export function ConsoleNav({
   const items = [
     { href: "/console", label: t("console"), icon: LayoutDashboard },
     { href: "/console/review", label: t("review"), icon: ClipboardCheck },
+    { href: "/console/tasks", label: t("tasks"), icon: ListChecks },
     { href: "/console/budgets", label: t("budgets"), icon: PiggyBank },
     ...(isAdmin
       ? [
