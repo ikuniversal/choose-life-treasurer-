@@ -5,11 +5,11 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > operator when the relay can't carry the payload. A handoff is just: new Director
 > reads THIS file and confirms.
 >
-> Template version: v2.7
-> Last updated: 2026-07-01 by Choose Life Director 5.0 (active) — roadmap #5 COMPLETE
+> Template version: v2.8
+> Last updated: 2026-07-01 by Choose Life Director 5.0 (outgoing) — roadmap #5 complete; handoff to 6.0
 
 ═══════════════════════════════════════════════════════════
-SWAP REASON: routine, operator-requested, immediate (operator asked for a handoff right after 4.0 cold-started, before any task was given). NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. IMPORTANT: no work was performed during the 4.0 session — zero new PRs, zero new decisions, zero schema changes. Everything below this point is identical in substance to the v2.6 (3.0→4.0) bank; only this section and the identity/swap-log sections changed. Do not assume something was missed — nothing happened in between.
+SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
 ═══════════════════════════════════════════════════════════
 WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
 - Auth COMPLETE (PR #5/#7/#8). Core member loop COMPLETE (PR #10). Review loop COMPLETE
@@ -24,6 +24,8 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   simulated-JWT tests; UI rendering unverified, first real use is the de facto UI check.
   Roadmap #5 slice 4 (currency converter) COMPLETE (PR #24, f154687) → ROADMAP #5 FULLY
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
+  Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
+  (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
 - App live: https://choose-life-treasurer.vercel.app · prod = f154687 (merge #24), READY.
 - ⚠️ Converter math spot-check by operator PENDING (expected: 500 MDL → $28.50) — the
   feature is client-side math with zero data layer; this check is its entire verification.
@@ -40,32 +42,28 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   (relay/Cody-attach drop large text+binaries — §12). Source risk noted in §12.
 
 IN-FLIGHT / HANDED FORWARD:
-1. Projects/Groups DELETE — deliberately NOT built. All three tables (projects, groups
-   plus dependents) sit under ON DELETE CASCADE (see §6, §8, §12). A delete slice needs
-   either (a) app-level block-if-non-empty guards, or (b) a Director-authored migration
-   flipping the FKs to RESTRICT. Either way this is a Director-gated decision, not a
-   Cody default — do not let Cody add a delete button against current schema.
-2. Test data cleanup — "Belts"/"Camp" (see above) and the 2 orphan storage files — both
-   awaiting operator action/decision, not yet resolved.
-3. Roadmap #5 remaining after slice 1: tasks, comments/chat (needs operator clarification:
-   item-comments vs group chat, Realtime or not), currency converter. Slicing + order
-   already Director-approved: tasks → comments → converter.
-4. i18n real-seed + logo drop-in — blocked on desktop commit (source risk if operator
-   no longer has the original prototype JSON — see §12).
-5. Migrations source-lock-in — DECIDED, NOT EXECUTED. Director determined (per Primary
-   Design Lens: production-correct, no lock-in) this is worth fixing: zero migrations are
-   source-controlled (confirmed this session — no supabase/ dir, no .sql files anywhere in
-   repo). Plan: Director pulls live schema/RLS/functions/triggers/storage-config via Supabase
-   MCP introspection, assembles an accurate baseline SQL file (NOT reconstructed from memory
-   — ground-truth only), hands exact SQL to Cody to commit under supabase/migrations/.
-   Held for Director clearance per §11 (touches migrations, never auto-merge). NOT STARTED —
-   no queries run, no file drafted, no PR opened. Next Director: this is a clean pickup, no
-   partial state to reconcile.
+1. Converter math spot-check — operator PENDING (expected: 500 MDL → $28.50 on member
+   home; "Rates as of" = 2026-07-01). This is the feature's ENTIRE verification
+   (client-side math, zero data layer).
+2. 4 orphan storage files — operator dashboard tap-delete (2 receipt-photos/Chisinau +
+   2 signatures/fade7a24-…).
+3. Belts/Camp test project — operator keep-or-clear decision.
+4. Migrations source-lock-in — DECIDED, NOT STARTED, clean pickup; now covers 7 live
+   migrations, zero in repo.
+5. i18n 197-key seed + logos — still blocked on desktop commit (§12 source risk).
+6. Vercel MCP was ABSENT for 5.0's entire session — verification-independence ran
+   degraded (operator spot-checks + Director DB-side); 6.0: confirm Vercel MCP at cold
+   start, reconnect if absent.
+7. Roadmap #6 (cross-cutting) — next unclaimed surface, not scoped.
+8. Real FX rates habit — fx_rates are day-one demo values; needs manual-update habit or
+   auto-fetch job (roadmap #6 candidate).
+9. PR #21 never surfaced in 5.0's session (likely an issue number or out-of-band item —
+   one glance at closed PRs settles it).
 
 -----
 
 ## 0. ACTIVE DIRECTOR SESSIONS
-- Choose Life Director 4.0 — outgoing (routine, immediate handoff, no work performed). Choose Life Director 5.0 — incoming, cold-starting from this file.
+- Choose Life Director 5.0 — outgoing (routine handoff at roadmap-#5-complete boundary). Choose Life Director 6.0 — incoming, cold-starting from this file.
 
 ## 1. IDENTITY
 - **Project:** Choose Life — Receipt & Project Tool
@@ -77,12 +75,12 @@ IN-FLIGHT / HANDED FORWARD:
   (EN/RU) production app replacing paper/spreadsheet tracking with auditable per-group
   budgets, OCR-assisted entry, real-time chat, and PDF/CSV export.
 - **Operator:** ikuniversal (ikuniversal@gmail.com)
-- **Current Director:** Choose Life Director 5.0 — P2 (incoming; confirm/rename)
+- **Current Director:** Choose Life Director 6.0 — P3 (incoming; confirm/rename)
 - **Current Code Agent:** Cody Choose Life 1.0
 - **Mode:** Pro
 
 ## 2. CHAT NAMING (authoritative)
-- Director: `Choose Life Director 5.0 — P2 (Onboarding UI & remaining features)`
+- Director: `Choose Life Director 6.0 — P3 (Cross-cutting: export, OCR, i18n & hardening)`
 - Code Agent: `Cody Choose Life 1.0`
 - Cody opens PRs and stops; merges only on per-PR Director clearance (§9), except
   docs-only which self-merge (§11). Cody has DIRECT repo access; the Director does NOT
@@ -141,7 +139,7 @@ IN-FLIGHT / HANDED FORWARD:
 | 18 | No-receipt notes: file + review (roadmap #5.1) | 26a9e03 | 2026-07-01 | /no-receipt member flow (desc, date, 2 signer names, 2 real canvas pads → PNG to signatures/{group_id}/, insert w/ status pending, trigger owns updated_at) + /console/review Notes section (signed-URL sigs, approve/reject+reason); UI/server-actions only, zero new RLS/migration (all pre-existing, Director-verified before dispatch); e2e verified on prod: operator device test + Director DB/storage cross-check (row+2 PNGs+trigger+RLS paths all correct) |
 | 20 | Tasks: create/assign→done→approve (#5.3) | a29516d | 2026-07-01 | /tasks member list + mark-done; /console/tasks roster picker via NEW get_group_member_names RPC, create, approve; e2e on prod (3-leg device test + Director DB cross-check + simulated-JWT transition proof) |
 | 22 | Item comments + group chat (#5.2) | 3bb1e27 | 2026-07-01 | Append-only comment threads on receipts/notes (console review + member ledger); per-group chat member /chat + /console/chat, latest-50 + load-older, manual refresh, NO Realtime; names via RPC; types refreshed; data/RLS layer verified via 5 simulated-JWT tests (thread round-trip, cross-group blind, admin chat insert, constraint negative); UI unverified (operator waived) |
-| 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' freshness stamp; RLS-respecting authed SELECT, fetch once per view; ZERO writes; usd_equivalent locked-at-submission untouched; operator math spot-check pending |
+| 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' stamp; authed RLS SELECT, fetch once per view; ZERO writes; usd_equivalent untouched; operator math spot-check PENDING |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-01 (Director 5.0): cold-started from v2.7, verified handoff vs live (zero drift:
@@ -161,7 +159,9 @@ IN-FLIGHT / HANDED FORWARD:
   → 4 feature slices shipped + cleared → 2 Director-authored migrations (RPC + chat, both
   simulated-JWT verified) → all banks current. Open at close: converter spot-check, 4
   storage files, Belts/Camp decision, source-lock-in (7 migrations), i18n desktop commit,
-  Vercel MCP reconnect for next Director.
+  Vercel MCP reconnect for next Director. Closed #5 with #24. Session totals: 4 feature
+  slices shipped+cleared, 2 Director-authored migrations, 5 docs banks, zero open PRs at
+  close. Handing off clean.
 - 2026-07-01 (Director 1.0): empty repo → live app. Scaffold (#1), Supabase wiring (#4),
   real Auth (#5) + docs. Authored DB schema + RLS + 2 buckets via MCP. Created Vercel
   project; fixed prod 500 (env only in .env.local). Seeded admin + Moldova/2 groups +
@@ -410,10 +410,9 @@ IN-FLIGHT / HANDED FORWARD:
   individually provable post-hoc. (c) same-microsecond group_messages have nondeterministic
   order (random-UUID tiebreak) — cosmetic, unreachable at current scale. (d) comments+chat
   UI never device-tested — if a UI failure surfaces, the data layer beneath is already proven.
-- **fx_rates are DAY-ONE DEMO VALUES** (all seeded 2026-07-01 05:58 UTC). Before real
-  treasurer use the org needs a rate-update habit: manual admin update (write policy exists,
-  no UI) or an auto-fetch job — roadmap #6 candidate. The converter's "Rates as of" stamp
-  keeps staleness visible to users meanwhile.
+- **fx_rates are DAY-ONE DEMO VALUES** (seeded 2026-07-01 05:58 UTC). Needs a rate-update
+  habit before real treasurer use (admin-write policy exists, no UI; auto-fetch = roadmap #6
+  candidate). Converter's "Rates as of" stamp keeps staleness user-visible meanwhile.
 - **Smoke-testing on live prod creates real rows:** operator's PR #14 smoke test created a
   real "Belts"/"Camp" project+group in production data, not a sandboxed test. No branch/
   staging DB is currently used for smoke tests — worth considering a Supabase branch
@@ -427,6 +426,7 @@ IN-FLIGHT / HANDED FORWARD:
 | 2026-07-01 | Choose Life Director 2.0 → 3.0 | Routine rotation at clean milestone (auth + both core loops shipped) |
 | 2026-07-01 | Choose Life Director 3.0 → 4.0 | Routine, operator-requested handoff |
 | 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
+| 2026-07-01 | Choose Life Director 5.0 → 6.0 | Routine, operator-requested, at clean boundary — roadmap #5 complete, zero open PRs |
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
@@ -443,8 +443,7 @@ FEATURE ROADMAP
    Delete deferred — Director-gated on CASCADE-FK guard decision (§6/§8/§9/§12).
 3. Member Capture → Verify → Save. ✅ DONE (#10).
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
-5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20,
-   #22, #24).
+5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20, #22, #24).
 6. Cross-cutting (next unclaimed): real duplicate detection, PDF/CSV export, deadline
    enforcement, real Azure OCR wiring, i18n real-seed + logo drop-in, Projects/Groups
    guarded delete, real FX rates.
