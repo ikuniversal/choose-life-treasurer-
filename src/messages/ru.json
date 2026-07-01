@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "status": "PLACEHOLDER — not the approved 197-key seed",
+    "note": "The verbatim RU STR-dictionary export (197 keys) did not arrive in the Code Agent environment through the operator relay. These keys exist only to make the scaffold render and to prove the next-intl wiring. Replace this whole file with the approved ru.json when it lands — do NOT hand-translate. Resolved collisions to preserve on merge: dueWord, chatReadOnlyNote (console wording won)."
+  },
+  "app": {
+    "name": "Choose Life Receipts"
+  },
+  "nav": {
+    "home": "Главная",
+    "capture": "Съёмка",
+    "receipts": "Чеки",
+    "console": "Консоль",
+    "review": "Проверка",
+    "budgets": "Бюджеты"
+  },
+  "member": {
+    "tagline": "Сфотографируйте чек с телефона.",
+    "newReceipt": "Новый чек",
+    "noReceiptNote": "Заметка без чека"
+  },
+  "console": {
+    "title": "Консоль казначея",
+    "pendingReview": "Ожидают проверки",
+    "export": "Экспорт"
+  },
+  "status": {
+    "pending": "Ожидает",
+    "assigned": "Назначено",
+    "reviewed": "Проверено",
+    "done": "Готово",
+    "approved": "Одобрено",
+    "rejected": "Отклонено"
+  },
+  "common": {
+    "dueWord": "Срок",
+    "chatReadOnlyNote": "Этот разговор доступен только для чтения."
+  }
+}
