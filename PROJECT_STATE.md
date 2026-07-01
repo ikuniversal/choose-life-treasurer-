@@ -54,9 +54,9 @@
 - **Supabase project** — not created. Supabase MCP is connected (org `twbszfyctshpcyyzizsp`); creating a project is a cost-incurring op — will run `get_cost` + present the confirmation before creating.
 - **Vercel project** — not created; Vercel MCP connected, team binding pending.
 - **OCR provider decision** — SETTLED: Azure AI Document Intelligence (see §3).
-- **i18n seed files** — extracted from design_handoff STR dictionaries (197 EN/RU keys, verbatim, 2 trivial wording collisions resolved) — delivered by Director. **NOTE (Cody):** files did NOT arrive in the Code Agent environment via the relay — not on disk. Verbatim i18n seeding is blocked until they land in the repo.
-- **Cody scaffold directive** — drafted, held pending: (a) Supabase project cost confirmation ($10/mo, org on Pro plan), (b) repo existence/ownership.
-- **Logo assets received** — `CLeng.png` (cross-in-circle emblem) and `CLlogo1.png` (wordmark), both white/monochrome. Fine for the dark sidebar (`#29251d`) / capture screen (`#26211b`); will need a dark or full-color variant for the light canvas (`#faf7f1`) before launch — not blocking.
+- **PR #1** — scaffold complete per Cody's report; **held pending verification, NOT yet cleared.** Director attempted independent check via bash_tool→api.github.com (blocked: shared-sandbox IP rate-limited) and web_fetch on the PR/repo pages (404 — consistent with private-repo-no-auth, not evidence of a problem). Awaiting operator spot-check of the Files + Checks tabs to clear.
+- **i18n seed files** — 197 EN/RU keys delivered directly to Cody this turn via relay — pending confirmation it landed. **NOTE (Cody):** payload was NOT present in the relayed turn — still not on disk. next-intl is wired with clearly-marked placeholder namespaces; verbatim seeding stays blocked until the JSON actually arrives.
+- **Logo assets** — `CLeng.png`, `CLlogo1.png` still NOT transmitted; binary, can't relay through the Director. Operator to share the `design_handoff` folder directly with Cody's environment. Manifest references icons not yet committed (see `public/icons/README.md`) — build unaffected.
 
 ## 5. RECENT SHIPPED WORK
 | # | Title | SHA | Date | One-liner |
@@ -93,6 +93,7 @@
 - **Code/types:** none yet.
 - **Deployment:** none yet.
 - **Storage:** receipt photos + signatures will need dedicated Supabase Storage buckets with per-group RLS-equivalent access — design when schema is authored.
+- **Stack version:** landed on Next 16 / React 19 / Tailwind v4 at scaffold time — approved (current stable > artificially pinned older major, per Primary Design Lens). Tailwind v4 config lives in `src/app/globals.css` via `@theme`, NOT `tailwind.config.js` — don't look for a config file that isn't there.
 - **Process/discipline:** Design tokens (colors, type scale, radii, spacing) in the design handoff README are FINAL — implement directly, do not re-derive or reinterpret.
 - **Project-specific:** Visual direction is locked to "Ledger" (exploration 1c in `Member Receipts (3 directions).dc.html`); the 1a/1b directions are reference-only, never implement them.
 
@@ -115,7 +116,7 @@
 - Default if unsure: HOLD for clearance.
 
 ## 12. HISTORICAL HAZARDS
-- _(none yet)_
+- **Director cannot independently verify GitHub.** No GitHub MCP; unauthenticated bash_tool calls to `api.github.com` are unreliable (shared-sandbox IP hits GitHub's public rate limit), and private-repo pages 404 regardless of auth. PR/CI verification currently depends on operator spot-check OR explicit acceptance of Cody's self-report — record which was used per shipped PR in §5 going forward.
 
 ## 13. SWAP LOG
 | Date | From → To | Reason |
@@ -123,8 +124,8 @@
 | 2026-07-01 | (none) → Choose Life Director 1.0 | Project bootstrap — first Director |
 
 ## 14. REPO + CODE-AGENT DELIVERY
-- How the repo was created: <<pending>>
+- **Repo confirmed:** github.com/ikuniversal/choose-life-treasurer- (private — operator-owned, Cody has direct write access). PR #1 open, scaffold complete per Cody's report — **NOT yet cleared.**
 - How the Code Agent connects: operator relay (see §3).
-- Pipeline verification: <<not yet run>>
-- Governance: location still pending — set once repo exists.
+- Pipeline verification: CI workflow present (lint + typecheck + build); status pending operator spot-check (see §12 hazard).
+- Governance: location still pending — set once i18n/logo assets land and PR #1 clears.
 - **Verification note:** Director has no GitHub MCP; PR/CI status and merges relay through the Code Agent or the operator once wired.
