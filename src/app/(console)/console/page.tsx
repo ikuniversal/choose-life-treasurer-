@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { CurrencyConverter } from "@/components/currency-converter";
 
 export default async function ConsoleHomePage() {
   const t = await getTranslations("console");
@@ -11,6 +12,11 @@ export default async function ConsoleHomePage() {
         <h2 className="text-sm font-medium text-muted">{t("pendingReview")}</h2>
         <p className="mt-2 font-mono text-3xl text-olive">0</p>
       </section>
+
+      {/* Same read-only FX converter members use — handy during review. */}
+      <div className="max-w-sm">
+        <CurrencyConverter />
+      </div>
     </div>
   );
 }

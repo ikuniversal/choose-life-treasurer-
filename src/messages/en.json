@@ -217,6 +217,17 @@
     "notSignedIn": "Please sign in again.",
     "failed": "Couldn't load or send. Try again."
   },
+  "converter": {
+    "title": "Currency converter",
+    "amount": "Amount",
+    "from": "From",
+    "to": "To",
+    "swap": "Swap",
+    "result": "Result",
+    "asOf": "Rates as of {date}",
+    "loading": "Loading rates…",
+    "failed": "Couldn't load rates."
+  },
   "roles": {
     "admin": "Admin",
     "treasurer": "Treasurer",
