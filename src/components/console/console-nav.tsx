@@ -3,18 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ClipboardCheck, LayoutDashboard, PiggyBank } from "lucide-react";
+import { ClipboardCheck, LayoutDashboard, PiggyBank, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Console navigation. Renders as a vertical rail inside the ≥880px sidebar and
 // as a horizontal tab-strip below that breakpoint — same links, one source.
-export function ConsoleNav({ variant }: { variant: "sidebar" | "strip" }) {
+// The Users & Roles link is Admin-only (Treasurers reach the console but not it).
+export function ConsoleNav({
+  variant,
+  isAdmin,
+}: {
+  variant: "sidebar" | "strip";
+  isAdmin: boolean;
+}) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const items = [
     { href: "/console", label: t("console"), icon: LayoutDashboard },
     { href: "/console/review", label: t("review"), icon: ClipboardCheck },
     { href: "/console/budgets", label: t("budgets"), icon: PiggyBank },
+    ...(isAdmin
+      ? [{ href: "/console/users", label: t("users"), icon: Users }]
+      : []),
   ];
 
   return (

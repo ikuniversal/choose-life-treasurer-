@@ -12,7 +12,8 @@
     "receipts": "Receipts",
     "console": "Console",
     "review": "Review",
-    "budgets": "Budgets"
+    "budgets": "Budgets",
+    "users": "Users"
   },
   "member": {
     "tagline": "Capture a receipt from your phone.",
@@ -54,6 +55,27 @@
     "admin": "Admin",
     "treasurer": "Treasurer",
     "member": "Member"
+  },
+  "users": {
+    "title": "Users & Roles",
+    "invite": "Invite user",
+    "fullName": "Full name",
+    "email": "Email",
+    "role": "Role",
+    "group": "Group",
+    "globalOption": "No group (global)",
+    "inviteButton": "Send invite",
+    "inviting": "Sending…",
+    "invited": "Invite sent.",
+    "remove": "Remove",
+    "noUsers": "No users yet.",
+    "noRoles": "No roles",
+    "forbidden": "Only Admins can invite users.",
+    "missing": "Fill in name, email and role.",
+    "groupRequired": "Select a group for this role.",
+    "inviteFailed": "Could not send the invite.",
+    "profileFailed": "Invite sent, but the profile could not be created.",
+    "roleFailed": "Invite sent, but the role could not be assigned."
   },
   "status": {
     "pending": "Pending",
