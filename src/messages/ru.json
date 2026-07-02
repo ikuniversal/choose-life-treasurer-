@@ -269,7 +269,28 @@
     "typeBoth": "Чеки и заметки",
     "typeReceipts": "Только чеки",
     "typeNotes": "Только заметки",
-    "download": "Скачать CSV"
+    "download": "Скачать CSV",
+    "downloadPdf": "Скачать PDF"
+  },
+  "exportPdf": {
+    "title": "Choose Life — Отчёт о расходах",
+    "scope": "Область",
+    "allGroups": "Все группы",
+    "range": "Период",
+    "anyRange": "Все даты",
+    "generated": "Сформировано",
+    "colDate": "Дата",
+    "colSubmitter": "Отправитель",
+    "colDescription": "Продавец / описание",
+    "colCategory": "Категория",
+    "colAmount": "Сумма",
+    "colUsd": "USD",
+    "colStatus": "Статус",
+    "late": "ПРОСРОЧЕНО",
+    "totals": "Итого",
+    "usdTotal": "Итого USD",
+    "empty": "Нет записей, соответствующих фильтрам.",
+    "page": "Страница"
   },
   "deadline": {
     "label": "Крайний срок: {date}",

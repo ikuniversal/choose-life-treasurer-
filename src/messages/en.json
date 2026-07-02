@@ -269,7 +269,28 @@
     "typeBoth": "Receipts & notes",
     "typeReceipts": "Receipts only",
     "typeNotes": "Notes only",
-    "download": "Download CSV"
+    "download": "Download CSV",
+    "downloadPdf": "Download PDF"
+  },
+  "exportPdf": {
+    "title": "Choose Life — Expense Report",
+    "scope": "Scope",
+    "allGroups": "All groups",
+    "range": "Date range",
+    "anyRange": "All dates",
+    "generated": "Generated",
+    "colDate": "Date",
+    "colSubmitter": "Submitter",
+    "colDescription": "Vendor / description",
+    "colCategory": "Category",
+    "colAmount": "Amount",
+    "colUsd": "USD",
+    "colStatus": "Status",
+    "late": "LATE",
+    "totals": "Totals",
+    "usdTotal": "USD total",
+    "empty": "No items match these filters.",
+    "page": "Page"
   },
   "deadline": {
     "label": "Deadline: {date}",

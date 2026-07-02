@@ -71,12 +71,23 @@ export default async function ExportPage() {
           </select>
         </label>
 
-        <button
-          type="submit"
-          className="mt-1 h-10 rounded-btn bg-olive px-4 text-sm font-medium text-canvas"
-        >
-          {t("download")}
-        </button>
+        {/* Two submit buttons share the same filters via formAction. */}
+        <div className="mt-1 flex gap-2">
+          <button
+            type="submit"
+            formAction="/console/export/download"
+            className="h-10 rounded-btn bg-olive px-4 text-sm font-medium text-canvas"
+          >
+            {t("download")}
+          </button>
+          <button
+            type="submit"
+            formAction="/console/export/pdf"
+            className="h-10 rounded-btn border border-hairline bg-card px-4 text-sm font-medium text-body hover:bg-hairline-row"
+          >
+            {t("downloadPdf")}
+          </button>
+        </div>
       </form>
     </div>
   );

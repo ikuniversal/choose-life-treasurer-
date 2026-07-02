@@ -172,6 +172,38 @@ export async function getExportRows(
   return rows;
 }
 
+// Shared filter parsing for the export route handlers (CSV + PDF), so the two
+// download endpoints never diverge on how they read the same form.
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+export function parseExportFilters(p: URLSearchParams): ExportFilters {
+  const group = p.get("group");
+  const from = p.get("from");
+  const to = p.get("to");
+  const type = p.get("type");
+  const status = p.get("status");
+  return {
+    groupId: group && group !== "all" ? group : null,
+    from: from && DATE_RE.test(from) ? from : null,
+    to: to && DATE_RE.test(to) ? to : null,
+    status:
+      status === "pending" || status === "approved" || status === "rejected"
+        ? status
+        : "all",
+    type: type === "receipts" || type === "notes" ? type : "both",
+  };
+}
+
+// Filesystem-safe slug of a group name for download filenames.
+export function slugifyGroup(s: string): string {
+  return (
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "group"
+  );
+}
+
 // Ordered CSV cell values for one row, matching EXPORT_HEADER.
 export function exportRowToCells(r: ExportRow): string[] {
   return [
