@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #5 verified & closed; roadmap #6 opened, CSV export dispatched
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slice 1 (CSV export) shipped; next = real FX
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,7 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = f154687 (merge #24), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = 4abfa4f (merge #29), READY.
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -100,9 +100,9 @@ restored; the 5.0 degradation no longer applies).
   DIRECT REPO COMMIT for those (§12).
 
 ## 4. IN-FLIGHT WORK (keep live)
-- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6
-  OPENED — slice 1 CSV export DISPATCHED (feature PR open, HELD for clearance). prod =
-  f154687 (#24). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
+- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6 slice 1
+  CSV export SHIPPED (#29, 4abfa4f); next slice = real FX admin rate-edit UI. prod =
+  4abfa4f (#29). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
 - Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12); now
   roadmap #6 slice 4.
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -131,13 +131,19 @@ restored; the 5.0 degradation no longer applies).
 | 18 | No-receipt notes: file + review (roadmap #5.1) | 26a9e03 | 2026-07-01 | /no-receipt member flow (desc, date, 2 signer names, 2 real canvas pads → PNG to signatures/{group_id}/, insert w/ status pending, trigger owns updated_at) + /console/review Notes section (signed-URL sigs, approve/reject+reason); UI/server-actions only, zero new RLS/migration (all pre-existing, Director-verified before dispatch); e2e verified on prod: operator device test + Director DB/storage cross-check (row+2 PNGs+trigger+RLS paths all correct) |
 | 20 | Tasks: create/assign→done→approve (#5.3) | a29516d | 2026-07-01 | /tasks member list + mark-done; /console/tasks roster picker via NEW get_group_member_names RPC, create, approve; e2e on prod (3-leg device test + Director DB cross-check + simulated-JWT transition proof) |
 | 22 | Item comments + group chat (#5.2) | 3bb1e27 | 2026-07-01 | Append-only comment threads on receipts/notes (console review + member ledger); per-group chat member /chat + /console/chat, latest-50 + load-older, manual refresh, NO Realtime; names via RPC; types refreshed; data/RLS layer verified via 5 simulated-JWT tests (thread round-trip, cross-group blind, admin chat insert, constraint negative); UI unverified (operator waived) |
-| 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' stamp; authed RLS SELECT, fetch once per view; ZERO writes; usd_equivalent untouched; operator math spot-check PENDING |
+| 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' stamp; authed RLS SELECT, fetch once per view; ZERO writes; usd_equivalent untouched; operator math spot-check CONFIRMED (500 MDL → $28.50) |
+| 29 | CSV export console (roadmap #6.1) | 4abfa4f | 2026-07-01 | /console/export filterable CSV of receipts+notes (group / date range / status / type) via RLS-respecting client ONLY (admin=all, treasurer=own; no secret client, zero writes); submitter names via get_group_member_names RPC ONLY; columns incl. usd_equivalent (stored, never recomputed); RFC-4180 quoting + CRLF + UTF-8 BOM (Excel), attachment filename export_{group|all}_{from}_{to}.csv; GET route handler re-checks console access (bypasses layout gate); restores the dead Export button removed in #13. Verified: CI green + independent Vercel preview + operator e2e (Excel open, comma+quote vendor quoting intact, amounts vs stored values correct) |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
   4a2c4cd at start. Closed roadmap #5 verification (converter spot-check CONFIRMED),
   deleted Belts/Camp test data via MCP (0 rows), resolved handoff loose ends (PR #21 = docs
   bank; Vercel MCP reconnected). Opened roadmap #6 and dispatched slice 1 (CSV export).
+  Cleared + merged #29 (CSV export, 4abfa4f): CI green + independent Vercel preview check
+  (675601b, scope confirmed) + operator e2e on preview. e2e used a Director-authored
+  SYNTHETIC receipt (comma+quote vendor, to prove RFC-4180 quoting) on the PR preview;
+  amounts/usd_equivalent verified vs stored values; synthetic row MCP-deleted post-test,
+  receipts back to 0, zero residue.
 - 2026-07-01 (Director 5.0): cold-started from v2.7, verified handoff vs live (zero drift:
   schema, CASCADE FKs, migrations, buckets, advisors). NOTE: Vercel MCP absent this session
   (capability drift vs §6 toolkit) — verification-independence degraded to
@@ -244,10 +250,8 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = f154687 (merge #24), READY
-  (per CURRENT STATUS header). ⚠️ Current deployment id + runtime-error recheck PENDING
-  Vercel-MCP reconnect (§ IN-FLIGHT 6); prior banked id dpl_8KJPrdzm4KLu43mNSwe7KjtyL4iu
-  was #14's deployment (58f2b38) — now stale.
+  https://choose-life-treasurer.vercel.app. Latest prod = 4abfa4f (merge #29), READY
+  (Vercel MCP reconnected this session; independent preview check ran on #29's preview).
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -441,8 +445,8 @@ FEATURE ROADMAP
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
 5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20, #22, #24).
 6. Cross-cutting — OPENED (Director 6.0), approved slice order:
-   1. Export — CSV then PDF. ← IN PROGRESS: CSV export (slice 1) DISPATCHED. PDF = later PR.
-   2. Real FX — admin rate-edit UI (fx_rates admin-write policy exists; no UI yet).
+   1. Export — CSV ✅ DONE (#29, 4abfa4f). PDF = later PR (still slice 1 scope).
+   2. ← NEXT: Real FX — admin rate-edit UI (fx_rates admin-write policy exists; no UI yet).
    3. Deadline enforcement (submission_deadline).
    4. Guarded delete (Projects/Groups) — Director-gated on CASCADE-FK guard (§6/§8/§9/§12).
    5. Azure OCR wiring — BLOCKED on operator keys.
@@ -451,8 +455,8 @@ FEATURE ROADMAP
 
 POLISH / CLEANUP — DONE:
 - ✅ Member Home → Console link (#13).
-- ✅ Console dashboard "Export" button — confirmed dead placeholder, removed (#13);
-  a real Export surface returns with roadmap #6 slice 1 (CSV).
+- ✅ Console dashboard "Export" button — dead placeholder removed (#13); a real Export
+  surface now shipped at /console/export (roadmap #6 slice 1, CSV — #29).
 - ✅ Test receipt "Ifogbb" — deleted via MCP, verified 0 rows.
 - ✅ "Belts"/"Camp" smoke-test project+group — DELETED via MCP (0 rows), Director 6.0.
 
