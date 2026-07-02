@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slices 1–3 (CSV, FX editor, deadline) shipped; next = guarded delete
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slices 1–4 (CSV, FX editor, deadline, guarded delete) shipped; CASCADE hazard retired
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,7 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = afd7b16 (merge #33), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = 9c8f478 (merge #35), READY.
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -101,10 +101,10 @@ restored; the 5.0 degradation no longer applies).
 
 ## 4. IN-FLIGHT WORK (keep live)
 - Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6 slices 1
-  CSV (#29) + 2 FX editor (#31) + 3 deadline UI (#33) SHIPPED; next slice = guarded delete.
-  prod = afd7b16 (#33). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
-- Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12); now
-  roadmap #6 slice 4.
+  CSV (#29) + 2 FX editor (#31) + 3 deadline UI (#33) + 4 guarded delete (#35) SHIPPED — all
+  4 buildable slices done. prod = 9c8f478 (#35). Auth + capture + review + polish all live.
+- Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
+  /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
   storage files (2 receipt-photos/Chisinau + 2 signatures/fade7a24-…, operator dashboard
   tap-delete — see CURRENT STATUS above).
@@ -135,6 +135,7 @@ restored; the 5.0 degradation no longer applies).
 | 29 | CSV export console (roadmap #6.1) | 4abfa4f | 2026-07-01 | /console/export filterable CSV of receipts+notes (group / date range / status / type) via RLS-respecting client ONLY (admin=all, treasurer=own; no secret client, zero writes); submitter names via get_group_member_names RPC ONLY; columns incl. usd_equivalent (stored, never recomputed); RFC-4180 quoting + CRLF + UTF-8 BOM (Excel), attachment filename export_{group|all}_{from}_{to}.csv; GET route handler re-checks console access (bypasses layout gate); restores the dead Export button removed in #13. Verified: CI green + independent Vercel preview + operator e2e (Excel open, comma+quote vendor quoting intact, amounts vs stored values correct) |
 | 31 | Admin FX rate editor (roadmap #6.2) | f90ca5e | 2026-07-02 | /console/rates admin-ONLY (is_admin gate, mirrors #7; stricter than canAccessConsole) inline edit of rate_to_usd via RLS-respecting client (fx_rates_admin_write; no secret client); validation numeric/>0/max-6-dp; USD row LOCKED at 1.0 (cross-rate base); fx_rates has NO updated_at trigger → action sets updated_at=now() EXPLICITLY so converter 'Rates as of' advances; 30-day stale banner; nav Rates entry admin-only. Verified: CI green + independent Vercel preview + operator 4-leg e2e (MDL saved, USD locked, 0/negative rejected, 'Rates as of' advanced) + Director DB cross-check (MDL 0.057→0.056, updated_at→2026-07-02, USD untouched). Residual: treasurer-redirect leg untested (no treasurer account; mirrors proven #7 gating, write path policy-enforced) |
 | 33 | Deadline enforcement UI (roadmap #6.3) | afd7b16 | 2026-07-02 | Surfaces tamper-proof is_late (DB BEFORE-INSERT trigger from group's submission_deadline; app never sets/sends it). types refreshed (receipts.is_late + no_receipt_notes.is_late). /capture + /no-receipt show "Deadline: {date}" + amber "passed → LATE" notice (submit still allowed; server UTC today prop → pure render); LATE badge on member ledger + /console/review (receipts+notes); /console/export CSV is_late column after status; new LateBadge + getMemberGroups(). Verified: CI green + independent Vercel preview + operator device check (passed notice renders) + data layer HIGH (trigger: spoof insert forced true, simulated-JWT member insert forced true, null-deadline false — all rolled back). WAIVED residual (operator, #22 precedent): LATE badge + CSV is_late RENDER not device-tested (presentational; flag beneath proven) |
+| 35 | Guarded delete UI — projects & groups (roadmap #6.4) | 9c8f478 | 2026-07-02 | /console/projects (admin-only) per-group + per-project Delete with inline confirm, over the live RESTRICT FKs. getProjects() returns per-group child counts (receipts/notes/tasks); non-empty → Delete disabled + "Contains N receipts, M notes, K tasks — cannot delete" (project: "Contains N groups"); empty → confirm (group notes member assignments + chat history CASCADE also removed) → delete via RLS admin_write client. deleteGroup/deleteProject map Postgres 23503 (RESTRICT, incl. add-after-count race) → friendly "cannotDelete", never raw. Verified: CI green + independent Vercel preview + operator 3-leg e2e (non-empty group/project disabled+count, empty DelTest group confirm→deleted, DB persistence confirmed) + Director data-layer proof (delete of group holding receipt refused 23503; empty succeeds; rolled back) |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
@@ -194,16 +195,18 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 9 total — verified live via list_migrations):**
+- **Migrations (in order, 10 total — verified live via list_migrations):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
   add_is_late_deadline_enforcement (is_late on receipts + no_receipt_notes; BEFORE INSERT
   trigger set_is_late(), SECURITY DEFINER pinned search_path, tamper-proof — overwrites any
   client-sent value) · revoke_authenticated_execute_set_is_late (advisor WARN remediated
-  same session — NOT an accepted residual). All Director-authored via MCP.
-  Source-lock-in backlog now covers all 9 unmirrored migrations (none source-controlled —
-  see IN-FLIGHT item, held per §11).
+  same session — NOT an accepted residual) · restrict_delete_on_data_bearing_fks
+  (receipts/notes/tasks→groups + groups→projects flipped CASCADE→RESTRICT; user_roles +
+  group_messages keep CASCADE by design — memberships/chat die with the group). All
+  Director-authored via MCP. Source-lock-in backlog now covers all 10 unmirrored migrations
+  (none source-controlled — see IN-FLIGHT item, held per §11).
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -228,14 +231,14 @@ restored; the 5.0 degradation no longer applies).
     RLS from birth: insert self+(group member OR admin), select group member OR admin;
     APPEND-ONLY like comments; simulated-JWT verified incl. cross-group blindness +
     constraint negative.
-- **⚠️ FK DELETE BEHAVIOR — CASCADE, not RESTRICT (verified live this session):**
-  `projects → groups` = CASCADE. `groups → receipts`, `groups → no_receipt_notes`,
-  `groups → tasks`, `groups → user_roles` = ALL CASCADE. Practical effect: deleting one
-  project can silently wipe every receipt, task, note, and role assignment under every
-  group in that project — the DB will not stop it. This is why PR #14 explicitly ships
-  NO delete UI (see §8, §12). Any future delete feature is Director-gated: either build
-  app-level "block if non-empty" guards, or author a migration flipping these FKs to
-  RESTRICT — do not let Cody default to a delete button against current schema.
+- **FK DELETE BEHAVIOR — data-bearing FKs now RESTRICT (CASCADE-wipe hazard RETIRED):**
+  `groups → receipts`, `groups → no_receipt_notes`, `groups → tasks`, and `projects → groups`
+  are ON DELETE **RESTRICT** (migration restrict_delete_on_data_bearing_fks). The DB now
+  physically refuses (23503) to delete a group or project that still holds data — the old
+  silent-wipe hazard is gone. `groups → user_roles` and `groups → group_messages` remain
+  CASCADE by design: a group's memberships + chat history die with it (intended). Guarded
+  delete UI is live on /console/projects (#35): counts children, disables when non-empty,
+  confirms when empty, maps 23503 → friendly message.
 - **RLS:** verified this session for the core loops —
   · receipts: insert (member of group + self), select (admin OR treasurer_of OR owner),
     update owner-while-pending, update treasurer/admin (approve/reject).
@@ -258,8 +261,8 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = afd7b16 (merge #33), READY
-  (Vercel MCP reconnected this session; independent preview checks ran on #29/#31/#33).
+  https://choose-life-treasurer.vercel.app. Latest prod = 9c8f478 (merge #35), READY
+  (Vercel MCP reconnected this session; independent preview checks ran on #29/#31/#33/#35).
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -328,12 +331,14 @@ restored; the 5.0 degradation no longer applies).
   policies via MCP FIRST — if existing admin-write policies already cover the need (as with
   projects/groups), ship UI-only with zero new migration. Only author new RLS when a gap is
   actually found. (Established PR #14.)
-- **CASCADE-delete tables get NO delete UI until guarded:** projects/groups (and by
-  extension any table with ON DELETE CASCADE toward user-data-bearing children) do not get
-  a delete feature shipped until either app-level non-empty guards exist or the FK is
-  changed to RESTRICT via a Director-authored migration. Never let a delete button ship
-  against schema that cascades silently into receipts/tasks/notes/roles. (Established PR
-  #14 — see §6, §12.)
+- **Delete-feature gate — DECIDED & SHIPPED (was: CASCADE-delete tables get NO delete UI):**
+  the guard mechanism is settled (operator chose DB-level RESTRICT over app-only guards) and
+  delivered: data-bearing FKs are RESTRICT (migration restrict_delete_on_data_bearing_fks),
+  and guarded delete UI is live on /console/projects (#35 — count-then-confirm, 23503→friendly
+  message). Standing rule for FUTURE delete features on other tables: still verify FK on-delete
+  behavior first; only ship a delete button once the DB refuses unsafe deletes (RESTRICT) or an
+  app-level non-empty guard exists. Never a raw cascade into user data. (Established PR #14,
+  resolved PR #35 — see §6, §9, §12.)
 
 ## 9. STANDING DECISIONS
 - **Merge authority:** Cody opens PRs + stops; Director clears per-PR after verifying; Cody
@@ -349,9 +354,9 @@ restored; the 5.0 degradation no longer applies).
 - **Autowire/cron dispatch pipeline:** evaluated, DECLINED by operator. Don't re-propose
   without explicit revisit.
 - **Cody dispatch:** operator relay; no direct bridge.
-- **Delete features on CASCADE-FK tables:** never ship without an explicit Director
-  decision on guard mechanism (see §8 precedent). Projects/Groups delete is currently
-  UNBUILT and gated on this decision.
+- **Delete features — guard decision MADE (RESTRICT) & SHIPPED:** Projects/Groups delete is
+  now BUILT (#35) on DB-level RESTRICT FKs (operator's chosen guard). The gate is lifted for
+  this surface. Any NEW delete feature elsewhere still needs the FK-behavior check first (§8).
 
 ## 10. PRE-APPROVED BUNDLES
 - `ship-feature(slug)` → branch → directive to Cody → CI → smoke/independent verify →
@@ -407,11 +412,13 @@ restored; the 5.0 degradation no longer applies).
 - **Capture needs group membership:** an org-wide admin (group_id null) sees "not assigned
   to a group" on /capture — by design (capture is a member action). Test capture as a
   group member; review as admin/treasurer.
-- **CASCADE deletes on projects/groups:** ALL FKs from groups (→receipts, →no_receipt_notes,
-  →tasks, →user_roles) and from projects (→groups) are ON DELETE CASCADE, verified live.
-  A delete button here — if ever added carelessly — could silently destroy an entire
-  project's receipts, tasks, and role assignments with no DB-level stop. See §6/§8/§9.
-  This is why PR #14 shipped with explicitly NO delete UI.
+- **CASCADE deletes on projects/groups — RETIRED (kept as history):** through PR #14–#33
+  the data-bearing FKs were ON DELETE CASCADE, so a careless delete could silently wipe a
+  project's receipts/tasks/notes/roles — which is why #14 shipped no delete UI. RESOLVED by
+  restrict_delete_on_data_bearing_fks + guarded delete UI (#35): receipts/notes/tasks→groups
+  and groups→projects are now RESTRICT (DB refuses non-empty deletes, 23503). Only
+  user_roles + group_messages still CASCADE (memberships/chat die with the group, intended).
+  See §6/§8/§9.
 - **Slice 2/3 accepted residuals:** (a) tasks_update_assignee permits assignee any-column
   updates on own task via direct API; UI constrains to mark-done; column-restricting =
   Director-gated migration if ever needed. (b) tasks have no audit trail; status hops not
@@ -464,10 +471,12 @@ FEATURE ROADMAP
    1. Export — CSV ✅ DONE (#29, 4abfa4f). PDF = later PR (still slice 1 scope).
    2. Real FX — admin rate-edit UI ✅ DONE (#31, f90ca5e). /console/rates, USD locked.
    3. Deadline enforcement ✅ DONE (#33, afd7b16). Soft LATE flag (is_late trigger + UI).
-   4. ← NEXT: Guarded delete (Projects/Groups) — Director-gated on CASCADE-FK guard (§6/§8/§9/§12).
+   4. Guarded delete (Projects/Groups) ✅ DONE (#35, 9c8f478). RESTRICT FKs + count-then-confirm UI.
+   Remaining (all 4 buildable slices shipped):
+   • PDF export — later PR, unblocked (extends #29 CSV surface).
+   • Real duplicate detection — unblocked, unslotted.
    5. Azure OCR wiring — BLOCKED on operator keys.
    6. i18n real-seed + logo drop-in — BLOCKED on desktop commit.
-   (Also parked, unslotted: real duplicate detection.)
 
 POLISH / CLEANUP — DONE:
 - ✅ Member Home → Console link (#13).
