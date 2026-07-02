@@ -17,7 +17,8 @@
     "projects": "Projects",
     "tasks": "Tasks",
     "chat": "Chat",
-    "export": "Export"
+    "export": "Export",
+    "rates": "Rates"
   },
   "member": {
     "tagline": "Capture a receipt from your phone.",
@@ -228,6 +229,22 @@
     "asOf": "Rates as of {date}",
     "loading": "Loading rates…",
     "failed": "Couldn't load rates."
+  },
+  "rates": {
+    "title": "Exchange rates",
+    "intro": "Rate to USD per currency. Edits update the \"Rates as of\" stamp shown to everyone.",
+    "rate": "Rate to USD",
+    "updated": "Updated",
+    "today": "today",
+    "daysAgo": "{days}d ago",
+    "baseLocked": "Base (locked)",
+    "save": "Save",
+    "saving": "Saving…",
+    "staleWarning": "Rates haven't been updated in over 30 days — refresh them so conversions stay accurate.",
+    "badRate": "Enter a rate greater than 0 (max 6 decimals).",
+    "usdLocked": "USD is the base rate and can't be changed.",
+    "forbidden": "Only Admins can edit rates.",
+    "failed": "Action failed. Please try again."
   },
   "export": {
     "title": "Export",
