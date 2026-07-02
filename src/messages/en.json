@@ -16,7 +16,8 @@
     "users": "Users",
     "projects": "Projects",
     "tasks": "Tasks",
-    "chat": "Chat"
+    "chat": "Chat",
+    "export": "Export"
   },
   "member": {
     "tagline": "Capture a receipt from your phone.",
@@ -227,6 +228,24 @@
     "asOf": "Rates as of {date}",
     "loading": "Loading rates…",
     "failed": "Couldn't load rates."
+  },
+  "export": {
+    "title": "Export",
+    "intro": "Download receipts and notes as a CSV. Scope follows your access.",
+    "group": "Group",
+    "allGroups": "All groups",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "status": "Status",
+    "statusAll": "All statuses",
+    "statusPending": "Pending",
+    "statusApproved": "Approved",
+    "statusRejected": "Rejected",
+    "type": "Item type",
+    "typeBoth": "Receipts & notes",
+    "typeReceipts": "Receipts only",
+    "typeNotes": "Notes only",
+    "download": "Download CSV"
   },
   "roles": {
     "admin": "Admin",
