@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-01 by Choose Life Director 5.0 (outgoing) — roadmap #5 complete; handoff to 6.0
+> Last updated: 2026-07-01 by Choose Life Director 5.0 (outgoing) — roadmap #5 complete; handoff to 6.0 (§4/§6 reconciled to header)
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -105,19 +105,16 @@ IN-FLIGHT / HANDED FORWARD:
   DIRECT REPO COMMIT for those (§12).
 
 ## 4. IN-FLIGHT WORK (keep live)
-- No open feature PRs. Auth + capture + review + polish + Projects/Groups-slice-1 loops
-  all shipped and live.
+- No open feature PRs. Auth + capture + review + polish + Projects/Groups-slice-1 + ALL of
+  roadmap #5 (notes/tasks/comments/chat/converter) shipped and live. prod = f154687 (#24).
+- Roadmap #5 COMPLETE (#18/#20/#22/#24). Next unclaimed surface: roadmap #6 (cross-cutting) —
+  not scoped (see FEATURE ROADMAP + IN-FLIGHT items 7/8).
 - Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12).
 - Test data pending resolution: "Belts"/"Camp" smoke-test rows (operator to decide keep/
-  clear) + 2 orphan/linked storage files (operator dashboard tap-delete, link in §CURRENT
-  STATUS above).
+  clear) + 4 orphan storage files (2 receipt-photos/Chisinau + 2 signatures/fade7a24-…,
+  operator dashboard tap-delete — see CURRENT STATUS above).
 - i18n 197-key seed + logo PNGs — STILL BLOCKED, need desktop direct commit (source risk:
   see §12). App runs on placeholder next-intl keys; PWA manifest icons missing.
-- Roadmap #5 remaining after slice 1: tasks, comments/chat (needs operator clarification:
-  item-comments vs group chat, Realtime or not), currency converter. Slicing + order
-  already Director-approved: tasks → comments → converter.
-- Test data: no_receipt_notes test row deleted (verified 0 rows); 2 signature PNGs pending
-  operator dashboard delete.
 
 ## 5. RECENT SHIPPED WORK
 | # | Title | Merge SHA | Date | One-liner |
@@ -248,9 +245,10 @@ IN-FLIGHT / HANDED FORWARD:
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 58f2b38 (merge #14),
-  dpl_8KJPrdzm4KLu43mNSwe7KjtyL4iu, READY, 0 runtime errors (confirmed, 1h window,
-  this session).
+  https://choose-life-treasurer.vercel.app. Latest prod = f154687 (merge #24), READY
+  (per CURRENT STATUS header). ⚠️ Current deployment id + runtime-error recheck PENDING
+  Vercel-MCP reconnect (§ IN-FLIGHT 6); prior banked id dpl_8KJPrdzm4KLu43mNSwe7KjtyL4iu
+  was #14's deployment (58f2b38) — now stale.
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
