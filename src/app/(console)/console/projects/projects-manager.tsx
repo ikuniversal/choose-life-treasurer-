@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import {
   createGroup,
   createProject,
+  deleteGroup,
+  deleteProject,
   renameProject,
   updateGroup,
   type ProjectResult,
@@ -25,6 +27,12 @@ export function ProjectsManager({ projects }: { projects: ProjectRow[] }) {
   const [renameId, setRenameId] = useState<string | null>(null);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
   const [addGroupFor, setAddGroupFor] = useState<string | null>(null);
+  const [confirmDeleteGroupId, setConfirmDeleteGroupId] = useState<string | null>(
+    null,
+  );
+  const [confirmDeleteProjectId, setConfirmDeleteProjectId] = useState<
+    string | null
+  >(null);
 
   async function handle(
     result: Promise<ProjectResult>,
@@ -96,22 +104,70 @@ export function ProjectsManager({ projects }: { projects: ProjectRow[] }) {
                   </div>
                 </form>
               ) : (
-                <div className="flex items-center justify-between gap-3">
-                  {/* project name is UGC — never translated */}
-                  <h2 className="truncate font-semibold text-ink">
-                    {project.name}
-                  </h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setRenameId(project.id);
-                      setEditGroupId(null);
-                      setAddGroupFor(null);
-                    }}
-                  >
-                    {t("rename")}
-                  </Button>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-3">
+                    {/* project name is UGC — never translated */}
+                    <h2 className="truncate font-semibold text-ink">
+                      {project.name}
+                    </h2>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setRenameId(project.id);
+                          setEditGroupId(null);
+                          setAddGroupFor(null);
+                        }}
+                      >
+                        {t("rename")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={project.groups.length > 0}
+                        onClick={() => {
+                          setConfirmDeleteProjectId(project.id);
+                          setConfirmDeleteGroupId(null);
+                        }}
+                      >
+                        {t("delete")}
+                      </Button>
+                    </div>
+                  </div>
+                  {project.groups.length > 0 && (
+                    <p className="text-xs text-muted">
+                      {t("cannotDeleteProject", { groups: project.groups.length })}
+                    </p>
+                  )}
+                  {confirmDeleteProjectId === project.id && (
+                    <div className="flex flex-col gap-2 rounded-input bg-hairline-row/50 p-3">
+                      <p className="text-xs text-body">
+                        {t("deleteProjectConfirm")}
+                      </p>
+                      <form
+                        action={(fd) =>
+                          handle(deleteProject(fd), () =>
+                            setConfirmDeleteProjectId(null),
+                          )
+                        }
+                        className="flex gap-2"
+                      >
+                        <input type="hidden" name="id" value={project.id} />
+                        <Button type="submit" variant="reject" size="sm">
+                          {t("confirmDelete")}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setConfirmDeleteProjectId(null)}
+                        >
+                          {t("cancel")}
+                        </Button>
+                      </form>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -171,35 +227,92 @@ export function ProjectsManager({ projects }: { projects: ProjectRow[] }) {
                       </form>
                     </li>
                   ) : (
-                    <li
-                      key={group.id}
-                      className="flex items-center justify-between gap-3 py-2"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm text-ink">{group.name}</p>
-                        <p className="text-xs text-muted">
-                          <span className="font-mono">
-                            {group.spendingLimit != null
-                              ? group.spendingLimit.toFixed(2)
-                              : t("noLimit")}
-                          </span>
-                          {" · "}
-                          <span className="font-mono">
-                            {group.submissionDeadline ?? t("noDeadline")}
-                          </span>
-                        </p>
+                    <li key={group.id} className="flex flex-col gap-2 py-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm text-ink">
+                            {group.name}
+                          </p>
+                          <p className="text-xs text-muted">
+                            <span className="font-mono">
+                              {group.spendingLimit != null
+                                ? group.spendingLimit.toFixed(2)
+                                : t("noLimit")}
+                            </span>
+                            {" · "}
+                            <span className="font-mono">
+                              {group.submissionDeadline ?? t("noDeadline")}
+                            </span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditGroupId(group.id);
+                              setRenameId(null);
+                              setAddGroupFor(null);
+                            }}
+                          >
+                            {t("edit")}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={
+                              group.receiptCount +
+                                group.noteCount +
+                                group.taskCount >
+                              0
+                            }
+                            onClick={() => {
+                              setConfirmDeleteGroupId(group.id);
+                              setConfirmDeleteProjectId(null);
+                            }}
+                          >
+                            {t("delete")}
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditGroupId(group.id);
-                          setRenameId(null);
-                          setAddGroupFor(null);
-                        }}
-                      >
-                        {t("edit")}
-                      </Button>
+                      {group.receiptCount + group.noteCount + group.taskCount >
+                        0 && (
+                        <p className="text-xs text-muted">
+                          {t("cannotDeleteGroup", {
+                            receipts: group.receiptCount,
+                            notes: group.noteCount,
+                            tasks: group.taskCount,
+                          })}
+                        </p>
+                      )}
+                      {confirmDeleteGroupId === group.id && (
+                        <div className="flex flex-col gap-2 rounded-input bg-hairline-row/50 p-3">
+                          <p className="text-xs text-body">
+                            {t("deleteGroupWarn")}
+                          </p>
+                          <form
+                            action={(fd) =>
+                              handle(deleteGroup(fd), () =>
+                                setConfirmDeleteGroupId(null),
+                              )
+                            }
+                            className="flex gap-2"
+                          >
+                            <input type="hidden" name="id" value={group.id} />
+                            <Button type="submit" variant="reject" size="sm">
+                              {t("confirmDelete")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setConfirmDeleteGroupId(null)}
+                            >
+                              {t("cancel")}
+                            </Button>
+                          </form>
+                        </div>
+                      )}
                     </li>
                   ),
                 )}
