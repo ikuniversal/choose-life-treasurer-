@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-01 by Choose Life Director 5.0 (outgoing) — roadmap #5 complete; handoff to 6.0 (§4/§6 reconciled to header)
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #5 verified & closed; roadmap #6 opened, CSV export dispatched
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -27,14 +27,11 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
 - App live: https://choose-life-treasurer.vercel.app · prod = f154687 (merge #24), READY.
-- ⚠️ Converter math spot-check by operator PENDING (expected: 500 MDL → $28.50) — the
-  feature is client-side math with zero data layer; this check is its entire verification.
-  Update this line when confirmed.
-- Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP this
-  session (verified 0 rows remaining). ⚠️ NEW test data was created during operator smoke
-  test of PR #14: project "Belts" (id 53ffda50-…) → group "Camp" (id 5e759172-…,
-  spending_limit 200.00). Left in place on operator instruction (not cleared without
-  asking) — next Director: confirm with operator whether to keep or delete.
+- ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
+  verification fully closed (client-side math, zero data layer).
+- Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
+  0 rows). The "Belts"/"Camp" smoke-test project+group was DELETED by Director via MCP
+  (children counted 0 first; post-delete 0 rows). Test data now clean.
 - ⚠️ 4 orphan files PENDING operator dashboard tap-delete: 2 in receipt-photos (Chisinau
   path, historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke test —
   note row already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
@@ -42,28 +39,26 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   (relay/Cody-attach drop large text+binaries — §12). Source risk noted in §12.
 
 IN-FLIGHT / HANDED FORWARD:
-1. Converter math spot-check — operator PENDING (expected: 500 MDL → $28.50 on member
-   home; "Rates as of" = 2026-07-01). This is the feature's ENTIRE verification
-   (client-side math, zero data layer).
-2. 4 orphan storage files — operator dashboard tap-delete (2 receipt-photos/Chisinau +
-   2 signatures/fade7a24-…).
-3. Belts/Camp test project — operator keep-or-clear decision.
-4. Migrations source-lock-in — DECIDED, NOT STARTED, clean pickup; now covers 7 live
-   migrations, zero in repo.
-5. i18n 197-key seed + logos — still blocked on desktop commit (§12 source risk).
-6. Vercel MCP was ABSENT for 5.0's entire session — verification-independence ran
-   degraded (operator spot-checks + Director DB-side); 6.0: confirm Vercel MCP at cold
-   start, reconnect if absent.
-7. Roadmap #6 (cross-cutting) — next unclaimed surface, not scoped.
-8. Real FX rates habit — fx_rates are day-one demo values; needs manual-update habit or
-   auto-fetch job (roadmap #6 candidate).
-9. PR #21 never surfaced in 5.0's session (likely an issue number or out-of-band item —
-   one glance at closed PRs settles it).
+1. 4 orphan storage files — operator dashboard tap-delete (2 receipt-photos/Chisinau +
+   2 signatures/fade7a24-…). No storage-delete MCP tool exists.
+2. Migrations source-lock-in — DECIDED, NOT STARTED, clean pickup; covers 7 live
+   migrations, zero in repo. Held per §11.
+3. i18n 197-key seed + logos — still blocked on desktop commit (§12 source risk).
+4. Roadmap #6 (cross-cutting) — OPENED, Director-approved slice order: (1) export CSV→PDF ·
+   (2) real FX admin rate-edit UI · (3) deadline enforcement · (4) guarded delete
+   (Director-gated) · (5) Azure OCR (blocked: operator keys) · (6) i18n seed (blocked:
+   desktop commit). Slice 1 = CSV export, DISPATCHED (see FEATURE ROADMAP §6).
+
+RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
+roadmap #5 verification fully closed) · "Belts"/"Camp" test data DELETED via MCP (children
+counted 0 first; post-delete 0 rows) · PR #21 identified (docs bank, migrations-reconcile,
+merged — not a loose end) · Vercel MCP RECONNECTED this session (verification-independence
+restored; the 5.0 degradation no longer applies).
 
 -----
 
 ## 0. ACTIVE DIRECTOR SESSIONS
-- Choose Life Director 5.0 — outgoing (routine handoff at roadmap-#5-complete boundary). Choose Life Director 6.0 — incoming, cold-starting from this file.
+- Choose Life Director 6.0 — active (cold-started from v2.8, zero drift; closed roadmap #5 verification, opened roadmap #6). Choose Life Director 5.0 — outgoing, handed off clean.
 
 ## 1. IDENTITY
 - **Project:** Choose Life — Receipt & Project Tool
@@ -105,14 +100,14 @@ IN-FLIGHT / HANDED FORWARD:
   DIRECT REPO COMMIT for those (§12).
 
 ## 4. IN-FLIGHT WORK (keep live)
-- No open feature PRs. Auth + capture + review + polish + Projects/Groups-slice-1 + ALL of
-  roadmap #5 (notes/tasks/comments/chat/converter) shipped and live. prod = f154687 (#24).
-- Roadmap #5 COMPLETE (#18/#20/#22/#24). Next unclaimed surface: roadmap #6 (cross-cutting) —
-  not scoped (see FEATURE ROADMAP + IN-FLIGHT items 7/8).
-- Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12).
-- Test data pending resolution: "Belts"/"Camp" smoke-test rows (operator to decide keep/
-  clear) + 4 orphan storage files (2 receipt-photos/Chisinau + 2 signatures/fade7a24-…,
-  operator dashboard tap-delete — see CURRENT STATUS above).
+- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6
+  OPENED — slice 1 CSV export DISPATCHED (feature PR open, HELD for clearance). prod =
+  f154687 (#24). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
+- Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12); now
+  roadmap #6 slice 4.
+- Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
+  storage files (2 receipt-photos/Chisinau + 2 signatures/fade7a24-…, operator dashboard
+  tap-delete — see CURRENT STATUS above).
 - i18n 197-key seed + logo PNGs — STILL BLOCKED, need desktop direct commit (source risk:
   see §12). App runs on placeholder next-intl keys; PWA manifest icons missing.
 
@@ -139,6 +134,10 @@ IN-FLIGHT / HANDED FORWARD:
 | 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' stamp; authed RLS SELECT, fetch once per view; ZERO writes; usd_equivalent untouched; operator math spot-check PENDING |
 
 ## 5b. LATEST SESSION NOTES
+- 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
+  4a2c4cd at start. Closed roadmap #5 verification (converter spot-check CONFIRMED),
+  deleted Belts/Camp test data via MCP (0 rows), resolved handoff loose ends (PR #21 = docs
+  bank; Vercel MCP reconnected). Opened roadmap #6 and dispatched slice 1 (CSV export).
 - 2026-07-01 (Director 5.0): cold-started from v2.7, verified handoff vs live (zero drift:
   schema, CASCADE FKs, migrations, buckets, advisors). NOTE: Vercel MCP absent this session
   (capability drift vs §6 toolkit) — verification-independence degraded to
@@ -262,9 +261,8 @@ IN-FLIGHT / HANDED FORWARD:
     (2a2f3f3e-…, member/Balti), info@flatroofpros.com (193bd3a2-…, member/Balti). No
     treasurer account exists yet (real ones come via invite).
   · projects: Moldova (07956352-…) → groups Chisinau Outreach (fade7a24-…) + Balti Camp
-    (44580cea-…). NEW this session (operator smoke test of #14): project "Belts"
-    (53ffda50-…) → group "Camp" (5e759172-…, spending_limit 200.00, no deadline) — TEST
-    DATA, awaiting operator decision to keep or clear (see §CURRENT STATUS).
+    (44580cea-…). (The "Belts"/"Camp" smoke-test project+group from #14 was DELETED via
+    MCP this session — children counted 0 first, post-delete 0 rows; test data now clean.)
     fx_rates USD/EUR/MDL/KES/MXN/PLN (demo; EUR→USD ≈ 1.08).
   · receipts: 0 (the "Ifogbb" test receipt was DELETED via MCP this session, confirmed
     0 rows remaining — operator-cleared, dependency-checked first: 0 comment FKs).
@@ -442,17 +440,23 @@ FEATURE ROADMAP
 3. Member Capture → Verify → Save. ✅ DONE (#10).
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
 5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20, #22, #24).
-6. Cross-cutting (next unclaimed): real duplicate detection, PDF/CSV export, deadline
-   enforcement, real Azure OCR wiring, i18n real-seed + logo drop-in, Projects/Groups
-   guarded delete, real FX rates.
+6. Cross-cutting — OPENED (Director 6.0), approved slice order:
+   1. Export — CSV then PDF. ← IN PROGRESS: CSV export (slice 1) DISPATCHED. PDF = later PR.
+   2. Real FX — admin rate-edit UI (fx_rates admin-write policy exists; no UI yet).
+   3. Deadline enforcement (submission_deadline).
+   4. Guarded delete (Projects/Groups) — Director-gated on CASCADE-FK guard (§6/§8/§9/§12).
+   5. Azure OCR wiring — BLOCKED on operator keys.
+   6. i18n real-seed + logo drop-in — BLOCKED on desktop commit.
+   (Also parked, unslotted: real duplicate detection.)
 
-POLISH / CLEANUP — DONE THIS SESSION:
+POLISH / CLEANUP — DONE:
 - ✅ Member Home → Console link (#13).
-- ✅ Console dashboard "Export" button — confirmed dead placeholder, removed (#13).
+- ✅ Console dashboard "Export" button — confirmed dead placeholder, removed (#13);
+  a real Export surface returns with roadmap #6 slice 1 (CSV).
 - ✅ Test receipt "Ifogbb" — deleted via MCP, verified 0 rows.
+- ✅ "Belts"/"Camp" smoke-test project+group — DELETED via MCP (0 rows), Director 6.0.
 
 CLEANUP STILL PENDING (operator action):
 - 4 orphan storage files — dashboard tap-delete: 2 in receipt-photos (Chisinau path,
   historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke test; note row
   already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
-- "Belts"/"Camp" smoke-test project+group — keep or clear, operator's call (unchanged).
