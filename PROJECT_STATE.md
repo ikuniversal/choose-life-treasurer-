@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slice 1 (CSV export) shipped; next = real FX
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slices 1+2 (CSV export, FX editor) shipped; next = deadline enforcement
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,7 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = 4abfa4f (merge #29), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = f90ca5e (merge #31), READY.
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -101,8 +101,8 @@ restored; the 5.0 degradation no longer applies).
 
 ## 4. IN-FLIGHT WORK (keep live)
 - Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6 slice 1
-  CSV export SHIPPED (#29, 4abfa4f); next slice = real FX admin rate-edit UI. prod =
-  4abfa4f (#29). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
+  CSV export (#29) + slice 2 FX rate editor (#31) SHIPPED; next slice = deadline enforcement.
+  prod = f90ca5e (#31). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
 - Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12); now
   roadmap #6 slice 4.
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -133,6 +133,7 @@ restored; the 5.0 degradation no longer applies).
 | 22 | Item comments + group chat (#5.2) | 3bb1e27 | 2026-07-01 | Append-only comment threads on receipts/notes (console review + member ledger); per-group chat member /chat + /console/chat, latest-50 + load-older, manual refresh, NO Realtime; names via RPC; types refreshed; data/RLS layer verified via 5 simulated-JWT tests (thread round-trip, cross-group blind, admin chat insert, constraint negative); UI unverified (operator waived) |
 | 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' stamp; authed RLS SELECT, fetch once per view; ZERO writes; usd_equivalent untouched; operator math spot-check CONFIRMED (500 MDL → $28.50) |
 | 29 | CSV export console (roadmap #6.1) | 4abfa4f | 2026-07-01 | /console/export filterable CSV of receipts+notes (group / date range / status / type) via RLS-respecting client ONLY (admin=all, treasurer=own; no secret client, zero writes); submitter names via get_group_member_names RPC ONLY; columns incl. usd_equivalent (stored, never recomputed); RFC-4180 quoting + CRLF + UTF-8 BOM (Excel), attachment filename export_{group|all}_{from}_{to}.csv; GET route handler re-checks console access (bypasses layout gate); restores the dead Export button removed in #13. Verified: CI green + independent Vercel preview + operator e2e (Excel open, comma+quote vendor quoting intact, amounts vs stored values correct) |
+| 31 | Admin FX rate editor (roadmap #6.2) | f90ca5e | 2026-07-02 | /console/rates admin-ONLY (is_admin gate, mirrors #7; stricter than canAccessConsole) inline edit of rate_to_usd via RLS-respecting client (fx_rates_admin_write; no secret client); validation numeric/>0/max-6-dp; USD row LOCKED at 1.0 (cross-rate base); fx_rates has NO updated_at trigger → action sets updated_at=now() EXPLICITLY so converter 'Rates as of' advances; 30-day stale banner; nav Rates entry admin-only. Verified: CI green + independent Vercel preview + operator 4-leg e2e (MDL saved, USD locked, 0/negative rejected, 'Rates as of' advanced) + Director DB cross-check (MDL 0.057→0.056, updated_at→2026-07-02, USD untouched). Residual: treasurer-redirect leg untested (no treasurer account; mirrors proven #7 gating, write path policy-enforced) |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
@@ -250,8 +251,8 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 4abfa4f (merge #29), READY
-  (Vercel MCP reconnected this session; independent preview check ran on #29's preview).
+  https://choose-life-treasurer.vercel.app. Latest prod = f90ca5e (merge #31), READY
+  (Vercel MCP reconnected this session; independent preview checks ran on #29 and #31).
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -410,9 +411,12 @@ restored; the 5.0 degradation no longer applies).
   individually provable post-hoc. (c) same-microsecond group_messages have nondeterministic
   order (random-UUID tiebreak) — cosmetic, unreachable at current scale. (d) comments+chat
   UI never device-tested — if a UI failure surfaces, the data layer beneath is already proven.
-- **fx_rates are DAY-ONE DEMO VALUES** (seeded 2026-07-01 05:58 UTC). Needs a rate-update
-  habit before real treasurer use (admin-write policy exists, no UI; auto-fetch = roadmap #6
-  candidate). Converter's "Rates as of" stamp keeps staleness user-visible meanwhile.
+- **fx_rates staleness — PARTIALLY RETIRED** (was: all day-one demo values, seeded
+  2026-07-01 05:58 UTC). Admin edit UI now live at /console/rates (#31) — MDL holds a real
+  rate (0.056, updated 2026-07-02). EUR/KES/MXN/PLN are STILL day-one demo values — operator
+  to true them up via /console/rates. Note: fx_rates has NO updated_at trigger, so the edit
+  action sets updated_at=now() explicitly. Auto-fetch job remains a future candidate; the
+  converter's "Rates as of" stamp + the 30-day stale banner keep staleness visible meanwhile.
 - **Smoke-testing on live prod creates real rows:** operator's PR #14 smoke test created a
   real "Belts"/"Camp" project+group in production data, not a sandboxed test. No branch/
   staging DB is currently used for smoke tests — worth considering a Supabase branch
@@ -446,8 +450,8 @@ FEATURE ROADMAP
 5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20, #22, #24).
 6. Cross-cutting — OPENED (Director 6.0), approved slice order:
    1. Export — CSV ✅ DONE (#29, 4abfa4f). PDF = later PR (still slice 1 scope).
-   2. ← NEXT: Real FX — admin rate-edit UI (fx_rates admin-write policy exists; no UI yet).
-   3. Deadline enforcement (submission_deadline).
+   2. Real FX — admin rate-edit UI ✅ DONE (#31, f90ca5e). /console/rates, USD locked.
+   3. ← NEXT: Deadline enforcement (submission_deadline).
    4. Guarded delete (Projects/Groups) — Director-gated on CASCADE-FK guard (§6/§8/§9/§12).
    5. Azure OCR wiring — BLOCKED on operator keys.
    6. i18n real-seed + logo drop-in — BLOCKED on desktop commit.
