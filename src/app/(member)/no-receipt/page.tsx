@@ -1,23 +1,16 @@
 import { getTranslations } from "next-intl/server";
-import { getSessionUser } from "@/lib/auth";
+import { getMemberGroups } from "@/lib/data/member-groups";
 import { NoteForm } from "./note-form";
 
 export default async function NoReceiptPage() {
-  const [t, user] = await Promise.all([
+  const [t, groups] = await Promise.all([
     getTranslations("notes"),
-    getSessionUser(),
+    getMemberGroups(),
   ]);
 
-  // Same group rule as /capture: a member files against one of their groups; an
-  // org-wide admin (group_id null) has no group and sees the no-group state.
-  const seen = new Set<string>();
-  const groups: { id: string; name: string }[] = [];
-  for (const a of user?.assignments ?? []) {
-    if (a.groupId && !seen.has(a.groupId)) {
-      seen.add(a.groupId);
-      groups.push({ id: a.groupId, name: a.groupName ?? a.groupId });
-    }
-  }
+  // Server "today" (UTC) for the deadline-passed nudge — matches the DB trigger's
+  // server-side is_late stamping.
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="flex flex-col gap-5 pt-2">
@@ -27,7 +20,7 @@ export default async function NoReceiptPage() {
           {t("noGroup")}
         </p>
       ) : (
-        <NoteForm groups={groups} />
+        <NoteForm groups={groups} today={today} />
       )}
     </div>
   );

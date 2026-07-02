@@ -264,6 +264,11 @@
     "typeNotes": "Notes only",
     "download": "Download CSV"
   },
+  "deadline": {
+    "label": "Deadline: {date}",
+    "passed": "Deadline passed — this will be marked LATE",
+    "late": "LATE"
+  },
   "roles": {
     "admin": "Admin",
     "treasurer": "Treasurer",

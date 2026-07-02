@@ -1,13 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { getSessionUser } from "@/lib/auth";
+import { getMemberGroups } from "@/lib/data/member-groups";
 import { CaptureForm } from "./capture-form";
 
 export default async function CapturePage() {
-  const [t, user, supabase] = await Promise.all([
+  const [t, supabase, groups] = await Promise.all([
     getTranslations("capture"),
-    getSessionUser(),
     createClient(),
+    getMemberGroups(),
   ]);
 
   const { data: fx } = await supabase
@@ -16,15 +16,9 @@ export default async function CapturePage() {
     .order("currency");
   const currencies = (fx ?? []).map((r) => r.currency);
 
-  // Distinct groups the user belongs to (a receipt is filed against one of them).
-  const seen = new Set<string>();
-  const groups: { id: string; name: string }[] = [];
-  for (const a of user?.assignments ?? []) {
-    if (a.groupId && !seen.has(a.groupId)) {
-      seen.add(a.groupId);
-      groups.push({ id: a.groupId, name: a.groupName ?? a.groupId });
-    }
-  }
+  // Server "today" (UTC) for the deadline-passed nudge — aligns with how the DB
+  // trigger stamps is_late server-side.
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="flex flex-col gap-5 pt-2">
@@ -34,7 +28,7 @@ export default async function CapturePage() {
           {t("noGroup")}
         </p>
       ) : (
-        <CaptureForm groups={groups} currencies={currencies} />
+        <CaptureForm groups={groups} currencies={currencies} today={today} />
       )}
     </div>
   );

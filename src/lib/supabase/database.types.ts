@@ -154,6 +154,7 @@ export type Database = {
           description: string
           group_id: string
           id: string
+          is_late: boolean
           note_date: string
           reject_reason: string | null
           signer1_name: string
@@ -171,6 +172,7 @@ export type Database = {
           description: string
           group_id: string
           id?: string
+          is_late?: boolean
           note_date?: string
           reject_reason?: string | null
           signer1_name: string
@@ -188,6 +190,7 @@ export type Database = {
           description?: string
           group_id?: string
           id?: string
+          is_late?: boolean
           note_date?: string
           reject_reason?: string | null
           signer1_name?: string
@@ -262,6 +265,7 @@ export type Database = {
           group_id: string
           id: string
           is_duplicate: boolean
+          is_late: boolean
           photo_path: string | null
           receipt_date: string
           reject_reason: string | null
@@ -280,6 +284,7 @@ export type Database = {
           group_id: string
           id?: string
           is_duplicate?: boolean
+          is_late?: boolean
           photo_path?: string | null
           receipt_date: string
           reject_reason?: string | null
@@ -298,6 +303,7 @@ export type Database = {
           group_id?: string
           id?: string
           is_duplicate?: boolean
+          is_late?: boolean
           photo_path?: string | null
           receipt_date?: string
           reject_reason?: string | null
@@ -412,7 +418,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
       is_member_of: { Args: { p_group_id: string }; Returns: boolean }
       is_treasurer_of: { Args: { p_group_id: string }; Returns: boolean }
     }

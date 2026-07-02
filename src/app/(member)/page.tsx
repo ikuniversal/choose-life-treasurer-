@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Camera, FileText, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/status-pill";
+import { LateBadge } from "@/components/late-badge";
 import { CommentThread } from "@/components/comment-thread";
 import { CurrencyConverter } from "@/components/currency-converter";
 import { getMemberLedger } from "@/lib/data/member-ledger";
@@ -86,10 +87,13 @@ export default async function MemberHomePage() {
                         {item.amount.toFixed(2)} {item.currency}
                       </span>
                     )}
-                    <StatusPill
-                      status={item.status}
-                      label={tStatus(item.status)}
-                    />
+                    <div className="flex items-center gap-1.5">
+                      {item.isLate && <LateBadge />}
+                      <StatusPill
+                        status={item.status}
+                        label={tStatus(item.status)}
+                      />
+                    </div>
                   </div>
                 </div>
                 <CommentThread

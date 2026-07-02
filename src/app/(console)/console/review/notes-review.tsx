@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CommentThread } from "@/components/comment-thread";
+import { LateBadge } from "@/components/late-badge";
 import { approveNote, rejectNote } from "@/lib/note-actions";
 import type { NoteReviewItem } from "@/lib/data/note-review";
 
@@ -41,7 +42,10 @@ export function NotesReview({ items }: { items: NoteReviewItem[] }) {
             className="flex flex-col gap-3 rounded-card border border-hairline bg-card p-4"
           >
             {/* description / signer names are UGC — never translated */}
-            <p className="text-sm text-ink">{item.description}</p>
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm text-ink">{item.description}</p>
+              {item.isLate && <LateBadge />}
+            </div>
             <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted">
               <span className="font-mono">{item.noteDate}</span>
               {item.groupName && <span>· {item.groupName}</span>}

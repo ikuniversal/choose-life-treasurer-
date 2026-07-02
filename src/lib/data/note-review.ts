@@ -11,6 +11,7 @@ export interface NoteReviewItem {
   groupId: string;
   groupName: string | null;
   submitterName: string | null;
+  isLate: boolean;
 }
 
 const SIGNATURES_BUCKET = "signatures";
@@ -25,7 +26,7 @@ export async function getNoteReviewQueue(): Promise<NoteReviewItem[]> {
   const { data: notes } = await supabase
     .from("no_receipt_notes")
     .select(
-      "id, description, note_date, signer1_name, signer2_name, signer1_signature_path, signer2_signature_path, group_id, submitted_by, groups(name)",
+      "id, description, note_date, signer1_name, signer2_name, signer1_signature_path, signer2_signature_path, group_id, submitted_by, is_late, groups(name)",
     )
     .eq("status", "pending")
     .order("created_at", { ascending: false });
@@ -67,6 +68,7 @@ export async function getNoteReviewQueue(): Promise<NoteReviewItem[]> {
         groupId: r.group_id,
         groupName: r.groups?.name ?? null,
         submitterName: nameById.get(r.submitted_by) ?? null,
+        isLate: r.is_late,
       };
     }),
   );
