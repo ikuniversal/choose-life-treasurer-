@@ -32,6 +32,7 @@ export interface ExportRow {
   currency: string;
   usdEquivalent: string;
   status: string;
+  isLate: string;
   rejectReason: string;
   createdAt: string;
 }
@@ -50,6 +51,7 @@ export const EXPORT_HEADER = [
   "currency",
   "usd_equivalent",
   "status",
+  "is_late",
   "reject_reason",
   "created_at",
 ] as const;
@@ -95,7 +97,7 @@ export async function getExportRows(
     let q = supabase
       .from("receipts")
       .select(
-        "id, group_id, submitted_by, receipt_date, vendor, category, amount, currency, usd_equivalent, status, reject_reason, created_at, groups(name, projects(name))",
+        "id, group_id, submitted_by, receipt_date, vendor, category, amount, currency, usd_equivalent, status, is_late, reject_reason, created_at, groups(name, projects(name))",
       );
     if (filters.groupId) q = q.eq("group_id", filters.groupId);
     if (filters.status !== "all") q = q.eq("status", filters.status);
@@ -119,6 +121,7 @@ export async function getExportRows(
         currency: r.currency,
         usdEquivalent: r.usd_equivalent === null ? "" : String(r.usd_equivalent),
         status: r.status,
+        isLate: String(r.is_late),
         rejectReason: r.reject_reason ?? "",
         createdAt: r.created_at,
       });
@@ -129,7 +132,7 @@ export async function getExportRows(
     let q = supabase
       .from("no_receipt_notes")
       .select(
-        "id, group_id, submitted_by, note_date, description, status, reject_reason, created_at, groups(name, projects(name))",
+        "id, group_id, submitted_by, note_date, description, status, is_late, reject_reason, created_at, groups(name, projects(name))",
       );
     if (filters.groupId) q = q.eq("group_id", filters.groupId);
     if (filters.status !== "all") q = q.eq("status", filters.status);
@@ -153,6 +156,7 @@ export async function getExportRows(
         currency: "",
         usdEquivalent: "",
         status: n.status,
+        isLate: String(n.is_late),
         rejectReason: n.reject_reason ?? "",
         createdAt: n.created_at,
       });
@@ -182,6 +186,7 @@ export function exportRowToCells(r: ExportRow): string[] {
     r.currency,
     r.usdEquivalent,
     r.status,
+    r.isLate,
     r.rejectReason,
     r.createdAt,
   ];

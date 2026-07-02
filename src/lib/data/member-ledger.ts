@@ -14,6 +14,7 @@ export interface LedgerItem {
   amount: number | null;
   currency: string | null;
   status: ItemStatus;
+  isLate: boolean;
 }
 
 export interface MemberLedger {
@@ -50,13 +51,13 @@ export async function getMemberLedger(): Promise<MemberLedger> {
   const [receiptsRes, notesRes] = await Promise.all([
     supabase
       .from("receipts")
-      .select("id, group_id, vendor, receipt_date, amount, currency, status")
+      .select("id, group_id, vendor, receipt_date, amount, currency, status, is_late")
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
       .order("receipt_date", { ascending: false }),
     supabase
       .from("no_receipt_notes")
-      .select("id, group_id, description, note_date, status")
+      .select("id, group_id, description, note_date, status, is_late")
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
       .order("note_date", { ascending: false }),
@@ -71,6 +72,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     amount: r.amount,
     currency: r.currency,
     status: r.status,
+    isLate: r.is_late,
   }));
 
   const notes: LedgerItem[] = (notesRes.data ?? []).map((n) => ({
@@ -82,6 +84,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     amount: null,
     currency: null,
     status: n.status,
+    isLate: n.is_late,
   }));
 
   const items = [...receipts, ...notes].sort((a, b) =>

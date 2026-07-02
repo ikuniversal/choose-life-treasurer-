@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { analyzeReceipt, saveReceipt } from "@/lib/receipt-actions";
 import { Constants } from "@/lib/supabase/database.types";
 import type { Database } from "@/lib/supabase/database.types";
+import type { MemberGroup } from "@/lib/data/member-groups";
 
 type Category = Database["public"]["Enums"]["expense_category"];
 const CATEGORIES = Constants.public.Enums.expense_category as readonly Category[];
@@ -21,12 +22,15 @@ const inputCls =
 export function CaptureForm({
   groups,
   currencies,
+  today,
 }: {
-  groups: { id: string; name: string }[];
+  groups: MemberGroup[];
   currencies: string[];
+  today: string;
 }) {
   const t = useTranslations("capture");
   const tCat = useTranslations("categories");
+  const tDeadline = useTranslations("deadline");
   const router = useRouter();
 
   const [phase, setPhase] = useState<Phase>("idle");
@@ -43,6 +47,9 @@ export function CaptureForm({
   const [note, setNote] = useState("");
 
   const busy = phase === "uploading" || phase === "analyzing" || phase === "saving";
+
+  const deadline = groups.find((g) => g.id === groupId)?.deadline ?? null;
+  const deadlinePassed = deadline !== null && deadline < today;
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -133,6 +140,19 @@ export function CaptureForm({
           ))}
         </select>
       </label>
+
+      {deadline && (
+        <div className="-mt-1 text-xs">
+          <span className="text-muted">
+            {tDeadline("label", { date: deadline })}
+          </span>
+          {deadlinePassed && (
+            <p className="mt-1 rounded-input bg-status-pending-bg px-2 py-1 text-status-pending-fg">
+              {tDeadline("passed")}
+            </p>
+          )}
+        </div>
+      )}
 
       {phase === "idle" && (
         <label className="flex flex-col gap-1.5">

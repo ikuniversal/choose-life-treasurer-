@@ -16,6 +16,7 @@ export interface ReviewItem {
   receiptDate: string;
   note: string | null;
   photoUrl: string | null;
+  isLate: boolean;
 }
 
 const RECEIPT_BUCKET = "receipt-photos";
@@ -30,7 +31,7 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
   const { data: receipts } = await supabase
     .from("receipts")
     .select(
-      "id, vendor, amount, currency, usd_equivalent, category, group_id, submitted_by, receipt_date, additional_info, photo_path, groups(name)",
+      "id, vendor, amount, currency, usd_equivalent, category, group_id, submitted_by, receipt_date, additional_info, photo_path, is_late, groups(name)",
     )
     .eq("status", "pending")
     .order("created_at", { ascending: false });
@@ -70,6 +71,7 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
         receiptDate: r.receipt_date,
         note: r.additional_info,
         photoUrl,
+        isLate: r.is_late,
       };
     }),
   );

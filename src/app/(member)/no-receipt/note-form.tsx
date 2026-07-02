@@ -10,6 +10,7 @@ import {
 } from "@/components/signature-pad";
 import { createClient } from "@/lib/supabase/client";
 import { saveNoReceiptNote } from "@/lib/note-actions";
+import type { MemberGroup } from "@/lib/data/member-groups";
 
 const SIGNATURES_BUCKET = "signatures";
 
@@ -18,13 +19,18 @@ const inputCls =
 
 export function NoteForm({
   groups,
+  today,
 }: {
-  groups: { id: string; name: string }[];
+  groups: MemberGroup[];
+  today: string;
 }) {
   const t = useTranslations("notes");
+  const tDeadline = useTranslations("deadline");
   const router = useRouter();
 
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
+  const deadline = groups.find((g) => g.id === groupId)?.deadline ?? null;
+  const deadlinePassed = deadline !== null && deadline < today;
   const [description, setDescription] = useState("");
   const [noteDate, setNoteDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
@@ -117,6 +123,19 @@ export function NoteForm({
             ))}
           </select>
         </label>
+      )}
+
+      {deadline && (
+        <div className="text-xs">
+          <span className="text-muted">
+            {tDeadline("label", { date: deadline })}
+          </span>
+          {deadlinePassed && (
+            <p className="mt-1 rounded-input bg-status-pending-bg px-2 py-1 text-status-pending-fg">
+              {tDeadline("passed")}
+            </p>
+          )}
+        </div>
       )}
 
       <label className="flex flex-col gap-1.5">
