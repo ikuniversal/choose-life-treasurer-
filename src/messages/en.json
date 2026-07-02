@@ -287,6 +287,7 @@
     "colUsd": "USD",
     "colStatus": "Status",
     "late": "LATE",
+    "dup": "DUP",
     "totals": "Totals",
     "usdTotal": "USD total",
     "empty": "No items match these filters.",
@@ -296,6 +297,9 @@
     "label": "Deadline: {date}",
     "passed": "Deadline passed — this will be marked LATE",
     "late": "LATE"
+  },
+  "duplicate": {
+    "badge": "Possible duplicate"
   },
   "roles": {
     "admin": "Admin",

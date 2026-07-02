@@ -33,6 +33,7 @@ export interface ExportRow {
   usdEquivalent: string;
   status: string;
   isLate: string;
+  isDuplicate: string;
   rejectReason: string;
   createdAt: string;
 }
@@ -52,6 +53,7 @@ export const EXPORT_HEADER = [
   "usd_equivalent",
   "status",
   "is_late",
+  "is_duplicate",
   "reject_reason",
   "created_at",
 ] as const;
@@ -97,7 +99,7 @@ export async function getExportRows(
     let q = supabase
       .from("receipts")
       .select(
-        "id, group_id, submitted_by, receipt_date, vendor, category, amount, currency, usd_equivalent, status, is_late, reject_reason, created_at, groups(name, projects(name))",
+        "id, group_id, submitted_by, receipt_date, vendor, category, amount, currency, usd_equivalent, status, is_late, is_duplicate, reject_reason, created_at, groups(name, projects(name))",
       );
     if (filters.groupId) q = q.eq("group_id", filters.groupId);
     if (filters.status !== "all") q = q.eq("status", filters.status);
@@ -122,6 +124,7 @@ export async function getExportRows(
         usdEquivalent: r.usd_equivalent === null ? "" : String(r.usd_equivalent),
         status: r.status,
         isLate: String(r.is_late),
+        isDuplicate: String(r.is_duplicate),
         rejectReason: r.reject_reason ?? "",
         createdAt: r.created_at,
       });
@@ -157,6 +160,7 @@ export async function getExportRows(
         usdEquivalent: "",
         status: n.status,
         isLate: String(n.is_late),
+        isDuplicate: "false",
         rejectReason: n.reject_reason ?? "",
         createdAt: n.created_at,
       });
@@ -219,6 +223,7 @@ export function exportRowToCells(r: ExportRow): string[] {
     r.usdEquivalent,
     r.status,
     r.isLate,
+    r.isDuplicate,
     r.rejectReason,
     r.createdAt,
   ];

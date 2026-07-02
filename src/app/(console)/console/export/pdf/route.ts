@@ -81,6 +81,7 @@ export async function GET(req: NextRequest) {
       colUsd: t("colUsd"),
       colStatus: t("colStatus"),
       late: t("late"),
+      dup: t("dup"),
       totals: t("totals"),
       usdTotal: t("usdTotal"),
       empty: t("empty"),

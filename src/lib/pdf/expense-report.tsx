@@ -59,6 +59,7 @@ export interface ReportLabels {
   colUsd: string;
   colStatus: string;
   late: string;
+  dup: string;
   totals: string;
   usdTotal: string;
   empty: string;
@@ -100,6 +101,7 @@ const s = StyleSheet.create({
   cUsd: { width: "10%", textAlign: "right" },
   cStatus: { width: "10%", textAlign: "right" },
   late: { color: "#8a6a33", fontWeight: "bold" },
+  dup: { color: "#4d6175", fontWeight: "bold" },
   empty: { marginTop: 16, color: "#8f877a" },
   totals: {
     marginTop: 14,
@@ -183,6 +185,9 @@ function ExpenseReport({
                   {r.status}
                   {r.isLate === "true" ? (
                     <Text style={s.late}> · {labels.late}</Text>
+                  ) : null}
+                  {r.isDuplicate === "true" ? (
+                    <Text style={s.dup}> · {labels.dup}</Text>
                   ) : null}
                 </Text>
               </View>
