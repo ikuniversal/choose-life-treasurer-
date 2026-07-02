@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slices 1+2 (CSV export, FX editor) shipped; next = deadline enforcement
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slices 1–3 (CSV, FX editor, deadline) shipped; next = guarded delete
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,7 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = f90ca5e (merge #31), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = afd7b16 (merge #33), READY.
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -100,9 +100,9 @@ restored; the 5.0 degradation no longer applies).
   DIRECT REPO COMMIT for those (§12).
 
 ## 4. IN-FLIGHT WORK (keep live)
-- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6 slice 1
-  CSV export (#29) + slice 2 FX rate editor (#31) SHIPPED; next slice = deadline enforcement.
-  prod = f90ca5e (#31). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
+- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6 slices 1
+  CSV (#29) + 2 FX editor (#31) + 3 deadline UI (#33) SHIPPED; next slice = guarded delete.
+  prod = afd7b16 (#33). Auth + capture + review + polish + Projects/Groups-slice-1 all live.
 - Projects/Groups DELETE — not started, Director-gated (CASCADE hazard, §6/§8/§12); now
   roadmap #6 slice 4.
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -134,6 +134,7 @@ restored; the 5.0 degradation no longer applies).
 | 24 | Currency converter (roadmap #5.4, FINAL) | f154687 | 2026-07-01 | Shared read-only widget (member home + console dashboard): USD cross-rate client-side math over fx_rates, swap, 'Rates as of' stamp; authed RLS SELECT, fetch once per view; ZERO writes; usd_equivalent untouched; operator math spot-check CONFIRMED (500 MDL → $28.50) |
 | 29 | CSV export console (roadmap #6.1) | 4abfa4f | 2026-07-01 | /console/export filterable CSV of receipts+notes (group / date range / status / type) via RLS-respecting client ONLY (admin=all, treasurer=own; no secret client, zero writes); submitter names via get_group_member_names RPC ONLY; columns incl. usd_equivalent (stored, never recomputed); RFC-4180 quoting + CRLF + UTF-8 BOM (Excel), attachment filename export_{group|all}_{from}_{to}.csv; GET route handler re-checks console access (bypasses layout gate); restores the dead Export button removed in #13. Verified: CI green + independent Vercel preview + operator e2e (Excel open, comma+quote vendor quoting intact, amounts vs stored values correct) |
 | 31 | Admin FX rate editor (roadmap #6.2) | f90ca5e | 2026-07-02 | /console/rates admin-ONLY (is_admin gate, mirrors #7; stricter than canAccessConsole) inline edit of rate_to_usd via RLS-respecting client (fx_rates_admin_write; no secret client); validation numeric/>0/max-6-dp; USD row LOCKED at 1.0 (cross-rate base); fx_rates has NO updated_at trigger → action sets updated_at=now() EXPLICITLY so converter 'Rates as of' advances; 30-day stale banner; nav Rates entry admin-only. Verified: CI green + independent Vercel preview + operator 4-leg e2e (MDL saved, USD locked, 0/negative rejected, 'Rates as of' advanced) + Director DB cross-check (MDL 0.057→0.056, updated_at→2026-07-02, USD untouched). Residual: treasurer-redirect leg untested (no treasurer account; mirrors proven #7 gating, write path policy-enforced) |
+| 33 | Deadline enforcement UI (roadmap #6.3) | afd7b16 | 2026-07-02 | Surfaces tamper-proof is_late (DB BEFORE-INSERT trigger from group's submission_deadline; app never sets/sends it). types refreshed (receipts.is_late + no_receipt_notes.is_late). /capture + /no-receipt show "Deadline: {date}" + amber "passed → LATE" notice (submit still allowed; server UTC today prop → pure render); LATE badge on member ledger + /console/review (receipts+notes); /console/export CSV is_late column after status; new LateBadge + getMemberGroups(). Verified: CI green + independent Vercel preview + operator device check (passed notice renders) + data layer HIGH (trigger: spoof insert forced true, simulated-JWT member insert forced true, null-deadline false — all rolled back). WAIVED residual (operator, #22 precedent): LATE badge + CSV is_late RENDER not device-tested (presentational; flag beneath proven) |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
@@ -193,19 +194,25 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 7 total — verified live via list_migrations):**
+- **Migrations (in order, 9 total — verified live via list_migrations):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
-  add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat.
-  Last two both Director-authored via MCP this session. Source-lock-in backlog now covers
-  all 7 unmirrored migrations (none source-controlled — see IN-FLIGHT item 5, held per §11).
+  add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
+  add_is_late_deadline_enforcement (is_late on receipts + no_receipt_notes; BEFORE INSERT
+  trigger set_is_late(), SECURITY DEFINER pinned search_path, tamper-proof — overwrites any
+  client-sent value) · revoke_authenticated_execute_set_is_late (advisor WARN remediated
+  same session — NOT an accepted residual). All Director-authored via MCP.
+  Source-lock-in backlog now covers all 9 unmirrored migrations (none source-controlled —
+  see IN-FLIGHT item, held per §11).
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
   Enums: app_role (admin/treasurer/member), item_status (pending/reviewed/approved/
   rejected), task_status, expense_category (7). Helper fns: is_admin(), is_treasurer_of(),
   is_member_of(). receipts cols incl. receipt_date, photo_path, additional_info (note),
-  usd_equivalent (nullable but locked at submit), reject_reason, is_duplicate.
+  usd_equivalent (nullable but locked at submit), reject_reason, is_duplicate, is_late.
+  is_late (boolean, not null, default false) on BOTH receipts + no_receipt_notes — locked at
+  submission by a BEFORE-INSERT trigger (usd_equivalent precedent); app never sets/sends it.
   ⚠️ NOTE for future UI: form 'date'→receipt_date, note→additional_info, storage→photo_path.
   - **projects cols:** id, name, created_at. Minimal — no description/status field yet.
   - **groups cols:** id, project_id, name, spending_limit (numeric, nullable),
@@ -251,8 +258,8 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = f90ca5e (merge #31), READY
-  (Vercel MCP reconnected this session; independent preview checks ran on #29 and #31).
+  https://choose-life-treasurer.vercel.app. Latest prod = afd7b16 (merge #33), READY
+  (Vercel MCP reconnected this session; independent preview checks ran on #29/#31/#33).
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -417,7 +424,12 @@ restored; the 5.0 degradation no longer applies).
   to true them up via /console/rates. Note: fx_rates has NO updated_at trigger, so the edit
   action sets updated_at=now() explicitly. Auto-fetch job remains a future candidate; the
   converter's "Rates as of" stamp + the 30-day stale banner keep staleness visible meanwhile.
-- **Smoke-testing on live prod creates real rows:** operator's PR #14 smoke test created a
+- **Deadline semantics = SOFT flag (operator decision):** submissions are NEVER blocked
+  past a group's submission_deadline — they're accepted and marked is_late=true. The
+  BEFORE-INSERT trigger compares current_date (UTC) to the group's deadline at insert; the
+  value is tamper-proof (client input overwritten). UI mirrors this: /capture + /no-receipt
+  warn "will be marked LATE" but still submit. Test config restored clean: Chisinau/Balti
+  submission_deadline back to null post-test (verified).
   real "Belts"/"Camp" project+group in production data, not a sandboxed test. No branch/
   staging DB is currently used for smoke tests — worth considering a Supabase branch
   (create_branch tool available) for future feature testing if this becomes noisy.
@@ -451,8 +463,8 @@ FEATURE ROADMAP
 6. Cross-cutting — OPENED (Director 6.0), approved slice order:
    1. Export — CSV ✅ DONE (#29, 4abfa4f). PDF = later PR (still slice 1 scope).
    2. Real FX — admin rate-edit UI ✅ DONE (#31, f90ca5e). /console/rates, USD locked.
-   3. ← NEXT: Deadline enforcement (submission_deadline).
-   4. Guarded delete (Projects/Groups) — Director-gated on CASCADE-FK guard (§6/§8/§9/§12).
+   3. Deadline enforcement ✅ DONE (#33, afd7b16). Soft LATE flag (is_late trigger + UI).
+   4. ← NEXT: Guarded delete (Projects/Groups) — Director-gated on CASCADE-FK guard (§6/§8/§9/§12).
    5. Azure OCR wiring — BLOCKED on operator keys.
    6. i18n real-seed + logo drop-in — BLOCKED on desktop commit.
    (Also parked, unslotted: real duplicate detection.)
