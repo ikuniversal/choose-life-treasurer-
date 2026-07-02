@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   ClipboardCheck,
+  Coins,
   Download,
   FolderKanban,
   LayoutDashboard,
@@ -37,6 +38,7 @@ export function ConsoleNav({
     ...(isAdmin
       ? [
           { href: "/console/projects", label: t("projects"), icon: FolderKanban },
+          { href: "/console/rates", label: t("rates"), icon: Coins },
           { href: "/console/users", label: t("users"), icon: Users },
         ]
       : []),
