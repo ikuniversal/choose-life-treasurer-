@@ -92,6 +92,39 @@ export async function createGroup(formData: FormData): Promise<ProjectResult> {
   return { ok: true };
 }
 
+// Delete a group. FKs from data-bearing children (receipts/notes/tasks) are now
+// ON DELETE RESTRICT, so the DB refuses if non-empty — we map that (Postgres
+// 23503) to a friendly "cannotDelete" even if a child was added after the UI's
+// count (race). user_roles + group_messages are ON DELETE CASCADE by design and
+// die with the group. Admin-write policy covers the delete.
+export async function deleteGroup(formData: FormData): Promise<ProjectResult> {
+  if (!(await callerIsAdmin())) return { error: "forbidden" };
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) return { error: "failed" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("groups").delete().eq("id", id);
+  if (error) return { error: error.code === "23503" ? "cannotDelete" : "failed" };
+
+  revalidatePath("/console/projects");
+  return { ok: true };
+}
+
+// Delete a project. groups → projects is ON DELETE RESTRICT, so a project holding
+// any group is refused (23503 → friendly message).
+export async function deleteProject(formData: FormData): Promise<ProjectResult> {
+  if (!(await callerIsAdmin())) return { error: "forbidden" };
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) return { error: "failed" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("projects").delete().eq("id", id);
+  if (error) return { error: error.code === "23503" ? "cannotDelete" : "failed" };
+
+  revalidatePath("/console/projects");
+  return { ok: true };
+}
+
 export async function updateGroup(formData: FormData): Promise<ProjectResult> {
   if (!(await callerIsAdmin())) return { error: "forbidden" };
   const id = String(formData.get("id") ?? "").trim();
