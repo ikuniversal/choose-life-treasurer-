@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   ClipboardCheck,
+  Download,
   FolderKanban,
   LayoutDashboard,
   ListChecks,
@@ -31,6 +32,7 @@ export function ConsoleNav({
     { href: "/console/review", label: t("review"), icon: ClipboardCheck },
     { href: "/console/tasks", label: t("tasks"), icon: ListChecks },
     { href: "/console/chat", label: t("chat"), icon: MessageCircle },
+    { href: "/console/export", label: t("export"), icon: Download },
     { href: "/console/budgets", label: t("budgets"), icon: PiggyBank },
     ...(isAdmin
       ? [
