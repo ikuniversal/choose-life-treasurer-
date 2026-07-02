@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 slices 1–4 (CSV, FX editor, deadline, guarded delete) shipped; CASCADE hazard retired
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 export COMPLETE (CSV+PDF) + FX/deadline/guarded-delete shipped; first new deps since scaffold
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,7 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = 9c8f478 (merge #35), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = 3b63bc5 (merge #37), READY.
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -93,6 +93,10 @@ restored; the 5.0 degradation no longer applies).
 - AI / OCR: Azure AI Document Intelligence (Receipt model) — chosen, NOT yet wired.
   Behind lib/ocr interface (stub returns mock / graceful "couldn't read → manual" fallback,
   confirmed working in the capture loop). Real Azure wiring is a future PR.
+- PDF: @react-pdf/renderer + dejavu-fonts-ttf (FIRST new deps since scaffold, Director-
+  approved, #37). PDF export at /console/export/pdf. next.config carries serverExternalPackages
+  (@react-pdf resolved at runtime, off webpack/wasm) + outputFileTracingIncludes (traces the
+  Cyrillic .ttf into the pdf serverless function). NO puppeteer/chromium.
 - CI: GitHub Actions — .github/workflows/ci.yml (install + lint + typecheck + build)
 - **Code Agent delivery:** Cody has DIRECT repo access (reads/writes/opens PRs itself).
   Director→Cody DIRECTIVE delivery is OPERATOR RELAY — no direct bridge. Large text
@@ -100,9 +104,9 @@ restored; the 5.0 degradation no longer applies).
   DIRECT REPO COMMIT for those (§12).
 
 ## 4. IN-FLIGHT WORK (keep live)
-- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6 slices 1
-  CSV (#29) + 2 FX editor (#31) + 3 deadline UI (#33) + 4 guarded delete (#35) SHIPPED — all
-  4 buildable slices done. prod = 9c8f478 (#35). Auth + capture + review + polish all live.
+- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6: export
+  COMPLETE (CSV #29 + PDF #37) + FX editor (#31) + deadline (#33) + guarded delete (#35)
+  SHIPPED. prod = 3b63bc5 (#37). Auth + capture + review + polish all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -136,6 +140,7 @@ restored; the 5.0 degradation no longer applies).
 | 31 | Admin FX rate editor (roadmap #6.2) | f90ca5e | 2026-07-02 | /console/rates admin-ONLY (is_admin gate, mirrors #7; stricter than canAccessConsole) inline edit of rate_to_usd via RLS-respecting client (fx_rates_admin_write; no secret client); validation numeric/>0/max-6-dp; USD row LOCKED at 1.0 (cross-rate base); fx_rates has NO updated_at trigger → action sets updated_at=now() EXPLICITLY so converter 'Rates as of' advances; 30-day stale banner; nav Rates entry admin-only. Verified: CI green + independent Vercel preview + operator 4-leg e2e (MDL saved, USD locked, 0/negative rejected, 'Rates as of' advanced) + Director DB cross-check (MDL 0.057→0.056, updated_at→2026-07-02, USD untouched). Residual: treasurer-redirect leg untested (no treasurer account; mirrors proven #7 gating, write path policy-enforced) |
 | 33 | Deadline enforcement UI (roadmap #6.3) | afd7b16 | 2026-07-02 | Surfaces tamper-proof is_late (DB BEFORE-INSERT trigger from group's submission_deadline; app never sets/sends it). types refreshed (receipts.is_late + no_receipt_notes.is_late). /capture + /no-receipt show "Deadline: {date}" + amber "passed → LATE" notice (submit still allowed; server UTC today prop → pure render); LATE badge on member ledger + /console/review (receipts+notes); /console/export CSV is_late column after status; new LateBadge + getMemberGroups(). Verified: CI green + independent Vercel preview + operator device check (passed notice renders) + data layer HIGH (trigger: spoof insert forced true, simulated-JWT member insert forced true, null-deadline false — all rolled back). WAIVED residual (operator, #22 precedent): LATE badge + CSV is_late RENDER not device-tested (presentational; flag beneath proven) |
 | 35 | Guarded delete UI — projects & groups (roadmap #6.4) | 9c8f478 | 2026-07-02 | /console/projects (admin-only) per-group + per-project Delete with inline confirm, over the live RESTRICT FKs. getProjects() returns per-group child counts (receipts/notes/tasks); non-empty → Delete disabled + "Contains N receipts, M notes, K tasks — cannot delete" (project: "Contains N groups"); empty → confirm (group notes member assignments + chat history CASCADE also removed) → delete via RLS admin_write client. deleteGroup/deleteProject map Postgres 23503 (RESTRICT, incl. add-after-count race) → friendly "cannotDelete", never raw. Verified: CI green + independent Vercel preview + operator 3-leg e2e (non-empty group/project disabled+count, empty DelTest group confirm→deleted, DB persistence confirmed) + Director data-layer proof (delete of group holding receipt refused 23503; empty succeeds; rolled back) |
+| 37 | PDF export (roadmap #6 export slice — PDF) | 3b63bc5 | 2026-07-02 | /console/export "Download PDF" beside CSV (same form/filters via formAction, same RLS data path incl. RPC-only names, same route-handler access re-check as #29). NEW DEPS (Director-approved, first since scaffold): @react-pdf/renderer + dejavu-fonts-ttf — full-Cyrillic TTF REGISTERED + EMBEDDED (data URI) so RU UGC renders (default PDF fonts = blanks). next.config: serverExternalPackages (@react-pdf off webpack/wasm) + outputFileTracingIncludes (bundles .ttf into pdf function). GET route streams application/pdf, report_{group|all}_{from}_{to}.pdf; formal layout (header/table/per-currency totals+USD total/page-footer); shared parseExportFilters+slugifyGroup extracted (CSV route refactored onto them). Verified: CI green + independent Vercel preview + Director sandbox replication (same deps, exact Cyrillic string, text-extraction round-trip PASS incl. «»/ё/em-dash — MEDIUM-HIGH) + Cody local font-embed pre-check. WAIVED residual (operator): deployed route PDF not device-opened — approach proven, exact deployed render is first-real-use |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
@@ -261,8 +266,8 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 9c8f478 (merge #35), READY
-  (Vercel MCP reconnected this session; independent preview checks ran on #29/#31/#33/#35).
+  https://choose-life-treasurer.vercel.app. Latest prod = 3b63bc5 (merge #37), READY
+  (Vercel MCP reconnected this session; independent preview checks ran on #29/#31/#33/#35/#37).
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -322,6 +327,17 @@ restored; the 5.0 degradation no longer applies).
   (vendor, comments, reject reasons, note text, names, project/group names) is NEVER
   translated.
 - **Signatures:** real canvas touch capture in production (not the cursive-text placeholder).
+- **PDF surfaces MUST embed a full-Cyrillic font:** default PDF fonts (Helvetica) have NO
+  Cyrillic glyphs → RU UGC renders blank. Register + EMBED a Cyrillic TTF (dejavu-fonts-ttf)
+  as a data URI. On Vercel this also needs next.config serverExternalPackages (@react-pdf off
+  the webpack/wasm path) + outputFileTracingIncludes (the .ttf is a data file, not an import,
+  so trace it into the route's function). The font-embed leg is a hard pass/fail. (Established #37.)
+- **Director sandbox-replication = accepted MEDIUM-HIGH verification:** when a route is
+  auth-gated (Director can't hit it directly) and the operator waives the device leg, the
+  Director may replicate the exact approach in a sandbox (same deps, same inputs, output
+  round-trip check) to clear it. Not a full device pass — the exact deployed render remains
+  first-real-use. (Established #37 — PDF font-embed proven via same @react-pdf/dejavu render +
+  text-extraction round-trip.)
 - **Reuse role-gating, don't reinvent:** console-only routes (users, review, projects) all
   mirror the SAME admin/treasurer gating pattern established in PR #5/#7. New console pages
   reuse it; they don't grow their own auth check. (Established through #7, #12, #14.)
@@ -468,15 +484,14 @@ FEATURE ROADMAP
 4. Treasurer review queue (approve/reject/bulk). ✅ DONE (#12). submit→review→approve closed.
 5. No-receipt notes, tasks, comments, chat, currency converter — ✅ COMPLETE (#18, #20, #22, #24).
 6. Cross-cutting — OPENED (Director 6.0), approved slice order:
-   1. Export — CSV ✅ DONE (#29, 4abfa4f). PDF = later PR (still slice 1 scope).
+   1. Export — ✅ COMPLETE: CSV (#29, 4abfa4f) + PDF (#37, 3b63bc5).
    2. Real FX — admin rate-edit UI ✅ DONE (#31, f90ca5e). /console/rates, USD locked.
    3. Deadline enforcement ✅ DONE (#33, afd7b16). Soft LATE flag (is_late trigger + UI).
    4. Guarded delete (Projects/Groups) ✅ DONE (#35, 9c8f478). RESTRICT FKs + count-then-confirm UI.
-   Remaining (all 4 buildable slices shipped):
-   • PDF export — later PR, unblocked (extends #29 CSV surface).
-   • Real duplicate detection — unblocked, unslotted.
-   5. Azure OCR wiring — BLOCKED on operator keys.
-   6. i18n real-seed + logo drop-in — BLOCKED on desktop commit.
+   Remaining:
+   • Real duplicate detection — unblocked, unslotted (next buildable candidate).
+   • Azure OCR wiring — BLOCKED on operator keys.
+   • i18n real-seed + logo drop-in — BLOCKED on desktop commit.
 
 POLISH / CLEANUP — DONE:
 - ✅ Member Home → Console link (#13).
