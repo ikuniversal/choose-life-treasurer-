@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 export COMPLETE (CSV+PDF) + FX/deadline/guarded-delete shipped; first new deps since scaffold
+> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 ALL buildable slices shipped (dup detection #39); migrations source-lock-in DONE (#40); only OCR + i18n blocked
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,7 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = 3b63bc5 (merge #37), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = 6f3c329 (merge #40), READY.
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -41,13 +41,13 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
 IN-FLIGHT / HANDED FORWARD:
 1. 4 orphan storage files — operator dashboard tap-delete (2 receipt-photos/Chisinau +
    2 signatures/fade7a24-…). No storage-delete MCP tool exists.
-2. Migrations source-lock-in — DECIDED, NOT STARTED, clean pickup; covers 7 live
-   migrations, zero in repo. Held per §11.
+2. Roadmap #6 (cross-cutting) — ALL buildable slices SHIPPED: export CSV (#29) + PDF (#37) ·
+   real FX (#31) · deadline (#33) · guarded delete (#35) · duplicate detection (#39). Only
+   BLOCKED items remain: Azure OCR (operator keys) · i18n 197-key seed + logos (desktop commit).
 3. i18n 197-key seed + logos — still blocked on desktop commit (§12 source risk).
-4. Roadmap #6 (cross-cutting) — OPENED, Director-approved slice order: (1) export CSV→PDF ·
-   (2) real FX admin rate-edit UI · (3) deadline enforcement · (4) guarded delete
-   (Director-gated) · (5) Azure OCR (blocked: operator keys) · (6) i18n seed (blocked:
-   desktop commit). Slice 1 = CSV export, DISPATCHED (see FEATURE ROADMAP §6).
+
+RESOLVED: Migrations source-lock-in — DONE (#40): all 11 live migrations mirrored verbatim
+into supabase/migrations/ (archival). Backlog retired; §6 "prod-ahead-of-repo drift" closed.
 
 RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
 roadmap #5 verification fully closed) · "Belts"/"Camp" test data DELETED via MCP (children
@@ -104,9 +104,10 @@ restored; the 5.0 degradation no longer applies).
   DIRECT REPO COMMIT for those (§12).
 
 ## 4. IN-FLIGHT WORK (keep live)
-- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6: export
-  COMPLETE (CSV #29 + PDF #37) + FX editor (#31) + deadline (#33) + guarded delete (#35)
-  SHIPPED. prod = 3b63bc5 (#37). Auth + capture + review + polish all live.
+- Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6: ALL
+  buildable slices SHIPPED — export CSV #29 + PDF #37 · FX #31 · deadline #33 · guarded
+  delete #35 · dup detection #39. Migrations source-lock-in DONE (#40, archival mirrors).
+  prod = 6f3c329 (#40). Auth + capture + review + polish all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -141,6 +142,8 @@ restored; the 5.0 degradation no longer applies).
 | 33 | Deadline enforcement UI (roadmap #6.3) | afd7b16 | 2026-07-02 | Surfaces tamper-proof is_late (DB BEFORE-INSERT trigger from group's submission_deadline; app never sets/sends it). types refreshed (receipts.is_late + no_receipt_notes.is_late). /capture + /no-receipt show "Deadline: {date}" + amber "passed → LATE" notice (submit still allowed; server UTC today prop → pure render); LATE badge on member ledger + /console/review (receipts+notes); /console/export CSV is_late column after status; new LateBadge + getMemberGroups(). Verified: CI green + independent Vercel preview + operator device check (passed notice renders) + data layer HIGH (trigger: spoof insert forced true, simulated-JWT member insert forced true, null-deadline false — all rolled back). WAIVED residual (operator, #22 precedent): LATE badge + CSV is_late RENDER not device-tested (presentational; flag beneath proven) |
 | 35 | Guarded delete UI — projects & groups (roadmap #6.4) | 9c8f478 | 2026-07-02 | /console/projects (admin-only) per-group + per-project Delete with inline confirm, over the live RESTRICT FKs. getProjects() returns per-group child counts (receipts/notes/tasks); non-empty → Delete disabled + "Contains N receipts, M notes, K tasks — cannot delete" (project: "Contains N groups"); empty → confirm (group notes member assignments + chat history CASCADE also removed) → delete via RLS admin_write client. deleteGroup/deleteProject map Postgres 23503 (RESTRICT, incl. add-after-count race) → friendly "cannotDelete", never raw. Verified: CI green + independent Vercel preview + operator 3-leg e2e (non-empty group/project disabled+count, empty DelTest group confirm→deleted, DB persistence confirmed) + Director data-layer proof (delete of group holding receipt refused 23503; empty succeeds; rolled back) |
 | 37 | PDF export (roadmap #6 export slice — PDF) | 3b63bc5 | 2026-07-02 | /console/export "Download PDF" beside CSV (same form/filters via formAction, same RLS data path incl. RPC-only names, same route-handler access re-check as #29). NEW DEPS (Director-approved, first since scaffold): @react-pdf/renderer + dejavu-fonts-ttf — full-Cyrillic TTF REGISTERED + EMBEDDED (data URI) so RU UGC renders (default PDF fonts = blanks). next.config: serverExternalPackages (@react-pdf off webpack/wasm) + outputFileTracingIncludes (bundles .ttf into pdf function). GET route streams application/pdf, report_{group|all}_{from}_{to}.pdf; formal layout (header/table/per-currency totals+USD total/page-footer); shared parseExportFilters+slugifyGroup extracted (CSV route refactored onto them). Verified: CI green + independent Vercel preview + Director sandbox replication (same deps, exact Cyrillic string, text-extraction round-trip PASS incl. «»/ё/em-dash — MEDIUM-HIGH) + Cody local font-embed pre-check. WAIVED residual (operator): deployed route PDF not device-opened — approach proven, exact deployed render is first-real-use |
+| 39 | Duplicate-detection UI (roadmap #6) | 8d8278a | 2026-07-02 | POSSIBLE DUPLICATE badge (blue, distinct from amber LATE), advisory/no-block, on /console/review receipt cards + member ledger receipt rows where is_duplicate; /console/export CSV is_duplicate column (after is_late) + PDF status "· DUP" marker. Surfaces the tamper-proof receipts.is_duplicate flag (BEFORE-INSERT trigger; app never sets/sends it; column pre-existed → no types change). UI/types only, no deps/schema/RLS. Operator merged DIRECTLY out-of-band; Director post-hoc verified (0 runtime errors since merge; UI/types-only vs pre-existing column, nothing schema-side to cross-check) |
+| 40 | Migrations source-lock-in (archival) | 6f3c329 | 2026-07-02 | supabase/migrations/ created with all 11 live migrations mirrored VERBATIM (archival only — NOT run/applied; live schema unchanged). Byte-audit vs Director manifest: every file = manifest + 1 (trailing newline manifest omits); 2 files further +2/+6 for UTF-8 multibyte glyphs (→, —) the manifest counted as single chars — complete, no truncation. Retires the source-lock-in backlog. Verified: CI green + independent Vercel preview + byte-deltas explained; on own branch claude/migrations-source-lock-in (two concurrent PRs can't share one head) |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
@@ -200,7 +203,8 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 10 total — verified live via list_migrations):**
+- **Migrations (in order, 11 total — verified live via list_migrations; ALL now mirrored in
+  supabase/migrations/ — source-lock-in RETIRED, #40):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
@@ -209,9 +213,11 @@ restored; the 5.0 degradation no longer applies).
   client-sent value) · revoke_authenticated_execute_set_is_late (advisor WARN remediated
   same session — NOT an accepted residual) · restrict_delete_on_data_bearing_fks
   (receipts/notes/tasks→groups + groups→projects flipped CASCADE→RESTRICT; user_roles +
-  group_messages keep CASCADE by design — memberships/chat die with the group). All
-  Director-authored via MCP. Source-lock-in backlog now covers all 10 unmirrored migrations
-  (none source-controlled — see IN-FLIGHT item, held per §11).
+  group_messages keep CASCADE by design — memberships/chat die with the group) ·
+  add_duplicate_detection_trigger (is_duplicate on receipts via BEFORE-INSERT set_is_duplicate(),
+  same group+amount+currency+receipt_date as a non-rejected receipt; tamper-proof). All
+  Director-authored via MCP; all 11 now committed verbatim as archival mirrors under
+  supabase/migrations/ (#40, 6f3c329) — NOT re-run, live schema unchanged.
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -266,8 +272,9 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 3b63bc5 (merge #37), READY
-  (Vercel MCP reconnected this session; independent preview checks ran on #29/#31/#33/#35/#37).
+  https://choose-life-treasurer.vercel.app. Latest prod = 6f3c329 (merge #40), READY
+  (independent preview checks ran on #29/#31/#33/#35/#37/#40; #39 was operator out-of-band —
+  Director post-hoc verified 0 runtime errors).
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -290,8 +297,9 @@ restored; the 5.0 degradation no longer applies).
     linked to the now-deleted Ifogbb receipt, 1 is an orphan from an abandoned capture
     retry) — DB row is gone but the physical files remain; PENDING operator dashboard
     tap-delete (no MCP storage-delete tool; raw SQL delete would strand files worse).
-- **Prod-ahead-of-repo drift:** migrations authored via MCP directly; NOT necessarily
-  mirrored as repo migration files — confirm and open a source-lock-in PR if not reconciled.
+- **Prod-ahead-of-repo drift — RECONCILED (#40):** all 11 live migrations are now mirrored
+  verbatim under supabase/migrations/ (archival). Going forward, any NEW Director-authored
+  migration should be mirrored there in the same session to keep repo == live.
 - **MCP / tooling:** Supabase MCP connected (DB/migrations/storage/advisors/logs/types —
   Director operates directly). Vercel MCP connected READ-ONLY (deployments, build logs,
   runtime errors — RELIABLE independent verification; NO env/redeploy writes, NO storage
@@ -467,6 +475,13 @@ restored; the 5.0 degradation no longer applies).
 | 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
 | 2026-07-01 | Choose Life Director 5.0 → 6.0 | Routine, operator-requested, at clean boundary — roadmap #5 complete, zero open PRs |
 
+- **Director 6.0 session summary (no swap — still active):** 6 features shipped (CSV export
+  #29 · FX rate editor #31 · deadline enforcement #33 · guarded delete #35 · PDF export #37
+  · duplicate detection #39) · 4 Director-authored migrations (is_late trigger · set_is_late
+  revoke · RESTRICT-delete FKs · is_duplicate trigger) · CASCADE-wipe hazard RETIRED (guarded
+  delete) · migrations source-lock-in RETIRED (#40, 11 archival mirrors) · zero residue
+  across all synthetic test data (Belts/Camp, synthetic receipts, DelTest group all cleaned).
+
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
 - Cody: DIRECT repo access; single long-lived branch claude/chat-session-e4mevb (resynced
@@ -488,8 +503,9 @@ FEATURE ROADMAP
    2. Real FX — admin rate-edit UI ✅ DONE (#31, f90ca5e). /console/rates, USD locked.
    3. Deadline enforcement ✅ DONE (#33, afd7b16). Soft LATE flag (is_late trigger + UI).
    4. Guarded delete (Projects/Groups) ✅ DONE (#35, 9c8f478). RESTRICT FKs + count-then-confirm UI.
-   Remaining:
-   • Real duplicate detection — unblocked, unslotted (next buildable candidate).
+   5. Duplicate detection ✅ DONE (#39, 8d8278a). Advisory POSSIBLE DUPLICATE badge + CSV/PDF.
+   ALL buildable slices SHIPPED. Also DONE: migrations source-lock-in (#40, archival mirrors).
+   Remaining (BLOCKED, parked — no action pending):
    • Azure OCR wiring — BLOCKED on operator keys.
    • i18n real-seed + logo drop-in — BLOCKED on desktop commit.
 
