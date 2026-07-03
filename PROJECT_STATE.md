@@ -475,6 +475,13 @@ restored; the 5.0 degradation no longer applies).
 | 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
 | 2026-07-01 | Choose Life Director 5.0 → 6.0 | Routine, operator-requested, at clean boundary — roadmap #5 complete, zero open PRs |
 
+- **Director 6.0 session summary (no swap — still active):** 6 features shipped (CSV export
+  #29 · FX rate editor #31 · deadline enforcement #33 · guarded delete #35 · PDF export #37
+  · duplicate detection #39) · 4 Director-authored migrations (is_late trigger · set_is_late
+  revoke · RESTRICT-delete FKs · is_duplicate trigger) · CASCADE-wipe hazard RETIRED (guarded
+  delete) · migrations source-lock-in RETIRED (#40, 11 archival mirrors) · zero residue
+  across all synthetic test data (Belts/Camp, synthetic receipts, DelTest group all cleaned).
+
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
 - Cody: DIRECT repo access; single long-lived branch claude/chat-session-e4mevb (resynced
