@@ -27,7 +27,8 @@
     "ledgerTitle": "Your ledger",
     "empty": "No receipts yet.",
     "signedOut": "Sign in to view your receipts.",
-    "goToConsole": "Treasurer console"
+    "goToConsole": "Treasurer console",
+    "viewEvidence": "View evidence"
   },
   "console": {
     "title": "Treasurer Console",
@@ -76,6 +77,9 @@
     "save": "Save receipt",
     "saving": "Saving…",
     "saved": "Receipt saved.",
+    "submitted": "Submitted",
+    "done": "Done",
+    "addAnother": "Add another",
     "startOver": "Start over",
     "uploadFailed": "Upload failed. Please try again.",
     "analyzeFailed": "Couldn't read the image, enter details manually.",

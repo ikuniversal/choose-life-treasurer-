@@ -17,12 +17,22 @@ export interface LedgerItem {
   isLate: boolean;
   /** receipts only (notes have no is_duplicate column) — advisory flag. */
   isDuplicate: boolean;
+  /** short-lived signed URL to the receipt photo, else null (notes have none). */
+  photoUrl: string | null;
+  /** true when the evidence is an image (render a thumbnail); false → doc icon. */
+  photoIsImage: boolean;
+  /** evidence file name (doc-icon label / img alt) — UGC, else null. */
+  photoName: string | null;
 }
 
 export interface MemberLedger {
   signedIn: boolean;
   items: LedgerItem[];
 }
+
+const RECEIPT_BUCKET = "receipt-photos";
+const SIGNED_URL_TTL = 60 * 10; // 10 minutes — same as /console/review (PR #43).
+const IMAGE_EXT = /\.(jpe?g|png|webp|heic)$/i;
 
 /**
  * The signed-in member's own receipts + no-receipt notes, scoped to their
@@ -54,7 +64,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     supabase
       .from("receipts")
       .select(
-        "id, group_id, vendor, receipt_date, amount, currency, status, is_late, is_duplicate",
+        "id, group_id, vendor, receipt_date, amount, currency, status, is_late, is_duplicate, photo_path",
       )
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
@@ -67,18 +77,42 @@ export async function getMemberLedger(): Promise<MemberLedger> {
       .order("note_date", { ascending: false }),
   ]);
 
-  const receipts: LedgerItem[] = (receiptsRes.data ?? []).map((r) => ({
-    id: r.id,
-    kind: "receipt",
-    groupId: r.group_id,
-    title: r.vendor,
-    date: r.receipt_date,
-    amount: r.amount,
-    currency: r.currency,
-    status: r.status,
-    isLate: r.is_late,
-    isDuplicate: r.is_duplicate,
-  }));
+  // A member has SELECT on their own receipt rows, so RLS grants the signed URL
+  // (receipt_photos_select → owner-of-linked-receipt). No new grant needed.
+  const receipts: LedgerItem[] = await Promise.all(
+    (receiptsRes.data ?? []).map(async (r) => {
+      let photoUrl: string | null = null;
+      if (r.photo_path) {
+        const { data, error } = await supabase.storage
+          .from(RECEIPT_BUCKET)
+          .createSignedUrl(r.photo_path, SIGNED_URL_TTL);
+        // Never swallow: if signing fails the row otherwise renders with no
+        // thumbnail and no trace. Surface it so the real cause is visible in
+        // server logs instead of a silent, evidence-less receipt.
+        if (error) {
+          console.error(
+            `[member-ledger] createSignedUrl failed for "${r.photo_path}": ${error.message}`,
+          );
+        }
+        photoUrl = data?.signedUrl ?? null;
+      }
+      return {
+        id: r.id,
+        kind: "receipt",
+        groupId: r.group_id,
+        title: r.vendor,
+        date: r.receipt_date,
+        amount: r.amount,
+        currency: r.currency,
+        status: r.status,
+        isLate: r.is_late,
+        isDuplicate: r.is_duplicate,
+        photoUrl,
+        photoIsImage: r.photo_path ? IMAGE_EXT.test(r.photo_path) : false,
+        photoName: r.photo_path ? (r.photo_path.split("/").pop() ?? null) : null,
+      };
+    }),
+  );
 
   const notes: LedgerItem[] = (notesRes.data ?? []).map((n) => ({
     id: n.id,
@@ -91,6 +125,10 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     status: n.status,
     isLate: n.is_late,
     isDuplicate: false,
+    // Notes carry no evidence file.
+    photoUrl: null,
+    photoIsImage: false,
+    photoName: null,
   }));
 
   const items = [...receipts, ...notes].sort((a, b) =>

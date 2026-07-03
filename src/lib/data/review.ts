@@ -60,9 +60,14 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
     rows.map(async (r) => {
       let photoUrl: string | null = null;
       if (r.photo_path) {
-        const { data } = await supabase.storage
+        const { data, error } = await supabase.storage
           .from(RECEIPT_BUCKET)
           .createSignedUrl(r.photo_path, SIGNED_URL_TTL);
+        if (error) {
+          console.error(
+            `[review] createSignedUrl failed for "${r.photo_path}": ${error.message}`,
+          );
+        }
         photoUrl = data?.signedUrl ?? null;
       }
       const photoName = r.photo_path

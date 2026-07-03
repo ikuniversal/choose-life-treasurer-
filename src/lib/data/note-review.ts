@@ -45,9 +45,14 @@ export async function getNoteReviewQueue(): Promise<NoteReviewItem[]> {
 
   async function signedUrl(path: string | null): Promise<string | null> {
     if (!path) return null;
-    const { data } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from(SIGNATURES_BUCKET)
       .createSignedUrl(path, SIGNED_URL_TTL);
+    if (error) {
+      console.error(
+        `[note-review] createSignedUrl failed for "${path}": ${error.message}`,
+      );
+    }
     return data?.signedUrl ?? null;
   }
 

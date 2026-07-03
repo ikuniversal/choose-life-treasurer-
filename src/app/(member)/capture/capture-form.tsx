@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { CheckCircle2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { analyzeReceipt, saveReceipt } from "@/lib/receipt-actions";
@@ -53,6 +54,22 @@ export function CaptureForm({
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
+  // Local preview of the chosen file (object URL for images) — drives the
+  // upload-confirmation card so the member visibly sees what was submitted.
+  const [preview, setPreview] = useState<{
+    url: string | null;
+    isImage: boolean;
+    name: string;
+  } | null>(null);
+  const [saved, setSaved] = useState<{
+    previewUrl: string | null;
+    isImage: boolean;
+    fileName: string;
+    vendor: string;
+    amount: string;
+    currency: string;
+    at: string;
+  } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
@@ -102,6 +119,13 @@ export function CaptureForm({
       return;
     }
     setPhotoPath(path);
+    // Keep a local preview of exactly what was uploaded (object URL for images)
+    // for the post-save confirmation card — no storage read-back needed.
+    setPreview({
+      url: isImage ? URL.createObjectURL(file) : null,
+      isImage,
+      name: file.name,
+    });
 
     // OCR only applies to images. A PDF / Word doc goes straight to manual entry —
     // a NORMAL path, not a failure, so no "couldn't read" message is shown.
@@ -155,19 +179,88 @@ export function CaptureForm({
       setPhase("verify");
       return;
     }
+    // Unmistakable confirmation before leaving the flow: the member sees the very
+    // photo/file they submitted plus vendor/amount and a timestamp. They tap
+    // through (or add another) — no silent redirect where the save is ambiguous.
+    setSaved({
+      previewUrl: preview?.url ?? null,
+      isImage: preview?.isImage ?? false,
+      fileName: preview?.name ?? "",
+      vendor,
+      amount,
+      currency,
+      at: new Date().toISOString(),
+    });
     setPhase("done");
-    router.push("/");
   }
 
   function startOver() {
+    if (preview?.url) URL.revokeObjectURL(preview.url);
     setPhase("idle");
     setError(null);
     setPhotoPath(null);
+    setPreview(null);
+    setSaved(null);
     setVendor("");
     setAmount("");
     setNote("");
     setDate(new Date().toISOString().slice(0, 10));
     if (fileRef.current) fileRef.current.value = "";
+  }
+
+  // Success confirmation — a persistent card shown after the receipt saves.
+  if (phase === "done" && saved) {
+    return (
+      <div className="flex flex-col gap-4 pt-2">
+        <div className="flex items-start gap-3 rounded-card border border-hairline bg-card p-4">
+          {saved.previewUrl && saved.isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={saved.previewUrl}
+              alt={saved.vendor || saved.fileName}
+              className="h-16 w-16 shrink-0 rounded-input border border-hairline object-cover"
+            />
+          ) : (
+            <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-input border border-hairline p-1 text-olive">
+              <FileText className="h-6 w-6" aria-hidden />
+              {/* file name is UGC — never translated */}
+              <span className="w-full truncate text-center text-[9px] text-muted">
+                {saved.fileName}
+              </span>
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 text-sm font-medium text-approve">
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
+              {t("submitted")}
+            </p>
+            {/* vendor is UGC — never translated */}
+            {saved.vendor && (
+              <p className="mt-1 truncate text-sm font-medium text-ink">
+                {saved.vendor}
+              </p>
+            )}
+            {saved.amount && (
+              <p className="font-mono text-sm text-olive">
+                {saved.amount} {saved.currency}
+              </p>
+            )}
+            <p className="mt-1 font-mono text-xs text-faint">
+              {new Date(saved.at).toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button type="button" onClick={() => router.push("/")}>
+            {t("done")}
+          </Button>
+          <Button type="button" variant="ghost" onClick={startOver}>
+            {t("addAnother")}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
