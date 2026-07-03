@@ -83,9 +83,17 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     (receiptsRes.data ?? []).map(async (r) => {
       let photoUrl: string | null = null;
       if (r.photo_path) {
-        const { data } = await supabase.storage
+        const { data, error } = await supabase.storage
           .from(RECEIPT_BUCKET)
           .createSignedUrl(r.photo_path, SIGNED_URL_TTL);
+        // Never swallow: if signing fails the row otherwise renders with no
+        // thumbnail and no trace. Surface it so the real cause is visible in
+        // server logs instead of a silent, evidence-less receipt.
+        if (error) {
+          console.error(
+            `[member-ledger] createSignedUrl failed for "${r.photo_path}": ${error.message}`,
+          );
+        }
         photoUrl = data?.signedUrl ?? null;
       }
       return {
