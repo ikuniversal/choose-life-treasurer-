@@ -4,6 +4,7 @@ import { Camera, FileText, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/status-pill";
 import { LateBadge } from "@/components/late-badge";
+import { DuplicateBadge } from "@/components/duplicate-badge";
 import { CommentThread } from "@/components/comment-thread";
 import { CurrencyConverter } from "@/components/currency-converter";
 import { getMemberLedger } from "@/lib/data/member-ledger";
@@ -88,6 +89,7 @@ export default async function MemberHomePage() {
                       </span>
                     )}
                     <div className="flex items-center gap-1.5">
+                      {item.isDuplicate && <DuplicateBadge />}
                       {item.isLate && <LateBadge />}
                       <StatusPill
                         status={item.status}

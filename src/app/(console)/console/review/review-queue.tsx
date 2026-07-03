@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CommentThread } from "@/components/comment-thread";
 import { LateBadge } from "@/components/late-badge";
+import { DuplicateBadge } from "@/components/duplicate-badge";
 import {
   approveReceipt,
   bulkApprove,
@@ -109,6 +110,7 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
                 <span className="flex items-center gap-2 truncate font-medium text-ink">
                   {item.vendor}
                   {item.isLate && <LateBadge />}
+                  {item.isDuplicate && <DuplicateBadge />}
                 </span>
                 <span className="font-mono text-sm text-olive">
                   {item.amount.toFixed(2)} {item.currency}

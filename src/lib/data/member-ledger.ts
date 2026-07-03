@@ -15,6 +15,8 @@ export interface LedgerItem {
   currency: string | null;
   status: ItemStatus;
   isLate: boolean;
+  /** receipts only (notes have no is_duplicate column) — advisory flag. */
+  isDuplicate: boolean;
 }
 
 export interface MemberLedger {
@@ -51,7 +53,9 @@ export async function getMemberLedger(): Promise<MemberLedger> {
   const [receiptsRes, notesRes] = await Promise.all([
     supabase
       .from("receipts")
-      .select("id, group_id, vendor, receipt_date, amount, currency, status, is_late")
+      .select(
+        "id, group_id, vendor, receipt_date, amount, currency, status, is_late, is_duplicate",
+      )
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
       .order("receipt_date", { ascending: false }),
@@ -73,6 +77,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     currency: r.currency,
     status: r.status,
     isLate: r.is_late,
+    isDuplicate: r.is_duplicate,
   }));
 
   const notes: LedgerItem[] = (notesRes.data ?? []).map((n) => ({
@@ -85,6 +90,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     currency: null,
     status: n.status,
     isLate: n.is_late,
+    isDuplicate: false,
   }));
 
   const items = [...receipts, ...notes].sort((a, b) =>
