@@ -19,7 +19,9 @@ export interface SaveState {
 
 // Runs the OCR boundary against an already-uploaded image. Downloads the bytes
 // via the RLS-scoped client (the caller can only read their own group's object)
-// and hands a Buffer to lib/ocr. Stub returns mock fields — no Azure wiring.
+// and hands a Buffer to lib/ocr (real Azure Document Intelligence). Any failure —
+// download error or an OCR miss — returns null, and the client falls through to
+// manual entry exactly as before.
 export async function analyzeReceipt(
   path: string,
 ): Promise<ReceiptExtraction | null> {
@@ -29,8 +31,13 @@ export async function analyzeReceipt(
     .download(path);
   if (error || !data) return null;
 
+  // Only images go to OCR; a PDF / Word attachment skips it (normal path, not a
+  // failure). Avoid even reading the bytes for non-images.
+  const contentType = data.type || "";
+  if (!contentType.startsWith("image/")) return null;
+
   const buffer = Buffer.from(await data.arrayBuffer());
-  return extractReceipt(buffer);
+  return extractReceipt(buffer, contentType);
 }
 
 export async function saveReceipt(formData: FormData): Promise<SaveState> {

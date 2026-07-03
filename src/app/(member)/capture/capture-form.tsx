@@ -14,6 +14,23 @@ type Category = Database["public"]["Enums"]["expense_category"];
 const CATEGORIES = Constants.public.Enums.expense_category as readonly Category[];
 const RECEIPT_BUCKET = "receipt-photos";
 
+// Receipt evidence: images (camera/library) OR a PDF / Word document. Matches the
+// bucket's allowed mime types (Director-applied). 10MB ceiling matches the bucket.
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const ALLOWED_MIME = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+const ACCEPT = ALLOWED_MIME.join(",");
+// Fallback when the browser reports an empty mime type (e.g. some HEIC pickers).
+const ALLOWED_EXT = /\.(jpe?g|png|webp|heic|pdf|docx?)$/i;
+const IMAGE_EXT = /\.(jpe?g|png|webp|heic)$/i;
+
 type Phase = "idle" | "uploading" | "analyzing" | "verify" | "saving" | "done";
 
 const inputCls =
@@ -55,8 +72,24 @@ export function CaptureForm({
     const file = e.target.files?.[0];
     if (!file || !groupId) return;
     setError(null);
-    setPhase("uploading");
 
+    // Client-side validation (server RLS + bucket mime allow-list are the real gate).
+    const typeOk = file.type
+      ? ALLOWED_MIME.includes(file.type)
+      : ALLOWED_EXT.test(file.name);
+    if (!typeOk) {
+      setError("badFileType");
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError("badFileSize");
+      return;
+    }
+    const isImage = file.type
+      ? file.type.startsWith("image/")
+      : IMAGE_EXT.test(file.name);
+
+    setPhase("uploading");
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const path = `${groupId}/${crypto.randomUUID()}.${ext}`;
     const supabase = createClient();
@@ -70,18 +103,22 @@ export function CaptureForm({
     }
     setPhotoPath(path);
 
-    setPhase("analyzing");
-    const res = await analyzeReceipt(path);
-    if (res) {
-      if (res.vendor) setVendor(res.vendor);
-      if (res.date) setDate(res.date);
-      if (res.amount != null) setAmount(String(res.amount));
-      if (res.currency && currencies.includes(res.currency))
-        setCurrency(res.currency);
-      if (res.category && CATEGORIES.includes(res.category as Category))
-        setCategory(res.category as Category);
-    } else {
-      setError("analyzeFailed");
+    // OCR only applies to images. A PDF / Word doc goes straight to manual entry —
+    // a NORMAL path, not a failure, so no "couldn't read" message is shown.
+    if (isImage) {
+      setPhase("analyzing");
+      const res = await analyzeReceipt(path);
+      if (res) {
+        if (res.vendor) setVendor(res.vendor);
+        if (res.date) setDate(res.date);
+        if (res.amount != null) setAmount(String(res.amount));
+        if (res.currency && currencies.includes(res.currency))
+          setCurrency(res.currency);
+        if (res.category && CATEGORIES.includes(res.category as Category))
+          setCategory(res.category as Category);
+      } else {
+        setError("analyzeFailed");
+      }
     }
     setPhase("verify");
   }
@@ -157,14 +194,16 @@ export function CaptureForm({
       {phase === "idle" && (
         <label className="flex flex-col gap-1.5">
           <span className="text-sm text-body">{t("photo")}</span>
+          {/* No `capture` attr → the OS shows its native picker (Camera / Photo
+              Library / Browse Files). Accepts images + PDF + Word. */}
           <input
             ref={fileRef}
             type="file"
-            accept="image/*"
-            capture="environment"
+            accept={ACCEPT}
             onChange={onFile}
             className="text-sm text-body file:mr-3 file:rounded-btn file:border-0 file:bg-olive file:px-4 file:py-2 file:text-sm file:text-canvas"
           />
+          <span className="text-xs text-faint">{t("fileHint")}</span>
         </label>
       )}
 
