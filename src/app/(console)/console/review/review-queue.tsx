@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CommentThread } from "@/components/comment-thread";
 import { LateBadge } from "@/components/late-badge";
@@ -83,7 +84,7 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
                 className="mt-1 h-4 w-4 accent-olive"
                 aria-label={item.vendor}
               />
-              {item.photoUrl ? (
+              {item.photoUrl && item.photoIsImage ? (
                 <a
                   href={item.photoUrl}
                   target="_blank"
@@ -96,6 +97,21 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
                     alt={item.vendor}
                     className="h-16 w-16 rounded-input border border-hairline object-cover"
                   />
+                </a>
+              ) : item.photoUrl ? (
+                // PDF / Word: a labeled download link, not an image thumbnail.
+                <a
+                  href={item.photoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={t("viewFile")}
+                  className="flex h-16 w-16 flex-col items-center justify-center gap-1 rounded-input border border-hairline p-1 text-olive"
+                >
+                  <FileText className="h-6 w-6" aria-hidden />
+                  {/* file name is UGC — never translated */}
+                  <span className="w-full truncate text-center text-[9px] text-muted">
+                    {item.photoName ?? t("viewFile")}
+                  </span>
                 </a>
               ) : (
                 <div className="flex h-16 w-16 items-center justify-center rounded-input border border-hairline text-xs text-faint">

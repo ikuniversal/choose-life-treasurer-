@@ -39,7 +39,10 @@ export interface ReceiptExtraction {
 }
 
 export interface OcrProvider {
-  extractReceipt(image: Buffer): Promise<ReceiptExtraction | null>;
+  extractReceipt(
+    image: Buffer,
+    contentType: string,
+  ): Promise<ReceiptExtraction | null>;
 }
 
 // Only prefill a field when Azure is at least this confident — never overwrite the
@@ -80,11 +83,16 @@ function confident(f: AzureField | undefined): AzureField | null {
 
 /**
  * Extract structured fields from a receipt image via Azure Document Intelligence.
- * Returns null on any failure → callers fall through to manual entry.
+ * Returns null on any failure → callers fall through to manual entry. The receipt
+ * model only reads IMAGES: for a PDF / Word attachment we SKIP the Azure call
+ * entirely (return null) — a normal path, not a failure.
  */
 export async function extractReceipt(
   image: Buffer,
+  contentType: string,
 ): Promise<ReceiptExtraction | null> {
+  if (!contentType.startsWith("image/")) return null; // non-image → manual entry
+
   const endpoint = process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT;
   const key = process.env.AZURE_DOCUMENT_INTELLIGENCE_KEY;
   if (!endpoint || !key) return null;

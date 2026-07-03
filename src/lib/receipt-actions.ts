@@ -31,8 +31,13 @@ export async function analyzeReceipt(
     .download(path);
   if (error || !data) return null;
 
+  // Only images go to OCR; a PDF / Word attachment skips it (normal path, not a
+  // failure). Avoid even reading the bytes for non-images.
+  const contentType = data.type || "";
+  if (!contentType.startsWith("image/")) return null;
+
   const buffer = Buffer.from(await data.arrayBuffer());
-  return extractReceipt(buffer);
+  return extractReceipt(buffer, contentType);
 }
 
 export async function saveReceipt(formData: FormData): Promise<SaveState> {

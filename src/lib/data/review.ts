@@ -15,13 +15,19 @@ export interface ReviewItem {
   submitterName: string | null;
   receiptDate: string;
   note: string | null;
+  /** short-lived signed URL to the evidence file (image OR PDF/Word), else null. */
   photoUrl: string | null;
+  /** true when the attachment is an image (render a thumbnail); false → download link. */
+  photoIsImage: boolean;
+  /** attachment file name (for the download-link label), else null. UGC — not translated. */
+  photoName: string | null;
   isLate: boolean;
   isDuplicate: boolean;
 }
 
 const RECEIPT_BUCKET = "receipt-photos";
 const SIGNED_URL_TTL = 60 * 10; // 10 minutes
+const IMAGE_EXT = /\.(jpe?g|png|webp|heic)$/i;
 
 // Pending receipts for review. RLS scopes automatically — a treasurer sees only
 // their groups, an admin sees all. Uses the RLS-respecting client throughout
@@ -59,6 +65,10 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
           .createSignedUrl(r.photo_path, SIGNED_URL_TTL);
         photoUrl = data?.signedUrl ?? null;
       }
+      const photoName = r.photo_path
+        ? (r.photo_path.split("/").pop() ?? null)
+        : null;
+      const photoIsImage = r.photo_path ? IMAGE_EXT.test(r.photo_path) : false;
       return {
         id: r.id,
         vendor: r.vendor,
@@ -72,6 +82,8 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
         receiptDate: r.receipt_date,
         note: r.additional_info,
         photoUrl,
+        photoIsImage,
+        photoName,
         isLate: r.is_late,
         isDuplicate: r.is_duplicate,
       };
