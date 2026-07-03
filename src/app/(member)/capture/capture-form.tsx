@@ -105,21 +105,31 @@ export function CaptureForm({
 
     // OCR only applies to images. A PDF / Word doc goes straight to manual entry —
     // a NORMAL path, not a failure, so no "couldn't read" message is shown.
+    // Pass the in-memory File straight to the OCR action — never re-fetch what we
+    // just uploaded (the read-back would 400 under RLS and hang the spinner).
     if (isImage) {
       setPhase("analyzing");
-      const res = await analyzeReceipt(path);
-      if (res) {
-        if (res.vendor) setVendor(res.vendor);
-        if (res.date) setDate(res.date);
-        if (res.amount != null) setAmount(String(res.amount));
-        if (res.currency && currencies.includes(res.currency))
-          setCurrency(res.currency);
-        if (res.category && CATEGORIES.includes(res.category as Category))
-          setCategory(res.category as Category);
-      } else {
+      try {
+        const fd = new FormData();
+        fd.set("file", file);
+        const res = await analyzeReceipt(fd);
+        if (res) {
+          if (res.vendor) setVendor(res.vendor);
+          if (res.date) setDate(res.date);
+          if (res.amount != null) setAmount(String(res.amount));
+          if (res.currency && currencies.includes(res.currency))
+            setCurrency(res.currency);
+          if (res.category && CATEGORIES.includes(res.category as Category))
+            setCategory(res.category as Category);
+        } else {
+          setError("analyzeFailed");
+        }
+      } catch {
+        // OCR failed hard (e.g. payload/network) → manual entry, never a hang.
         setError("analyzeFailed");
       }
     }
+    // ALWAYS resolves the spinner — the verify form shows regardless of OCR result.
     setPhase("verify");
   }
 

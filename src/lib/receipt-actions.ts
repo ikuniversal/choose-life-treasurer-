@@ -9,34 +9,30 @@ import type { Database } from "@/lib/supabase/database.types";
 type Category = Database["public"]["Enums"]["expense_category"];
 const CATEGORIES = Constants.public.Enums.expense_category as readonly Category[];
 
-const RECEIPT_BUCKET = "receipt-photos";
-
 export interface SaveState {
   // i18n key under "capture", or undefined.
   error?: string;
   ok?: boolean;
 }
 
-// Runs the OCR boundary against an already-uploaded image. Downloads the bytes
-// via the RLS-scoped client (the caller can only read their own group's object)
-// and hands a Buffer to lib/ocr (real Azure Document Intelligence). Any failure —
-// download error or an OCR miss — returns null, and the client falls through to
-// manual entry exactly as before.
+// Runs the OCR boundary against the file the client ALREADY holds — passed
+// straight through as a FormData entry. We deliberately do NOT re-download the
+// just-uploaded object from storage: a member has no SELECT grant on their own
+// photo until a receipts row links it (RLS receipt_photos_select), so that
+// read-back 400s and hangs the capture flow. Passing the in-memory bytes avoids
+// that entirely and is faster. Any failure returns null → manual entry as before.
 export async function analyzeReceipt(
-  path: string,
+  formData: FormData,
 ): Promise<ReceiptExtraction | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.storage
-    .from(RECEIPT_BUCKET)
-    .download(path);
-  if (error || !data) return null;
+  const file = formData.get("file");
+  if (!(file instanceof File)) return null;
 
   // Only images go to OCR; a PDF / Word attachment skips it (normal path, not a
   // failure). Avoid even reading the bytes for non-images.
-  const contentType = data.type || "";
+  const contentType = file.type || "";
   if (!contentType.startsWith("image/")) return null;
 
-  const buffer = Buffer.from(await data.arrayBuffer());
+  const buffer = Buffer.from(await file.arrayBuffer());
   return extractReceipt(buffer, contentType);
 }
 
