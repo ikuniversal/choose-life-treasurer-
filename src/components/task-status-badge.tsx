@@ -2,17 +2,11 @@ import { useTranslations } from "next-intl";
 import type { TaskStatus } from "@/lib/data/tasks";
 import { cn } from "@/lib/utils";
 
-// Task status on the locked tokens: assigned→amber, done→blue, approved→green.
+// Reskin: solid filled badge — assigned→gold, done→blue-gray, approved→green.
 const PILL: Record<TaskStatus, string> = {
-  assigned: "bg-status-pending-bg text-status-pending-fg",
-  done: "bg-status-reviewed-bg text-status-reviewed-fg",
-  approved: "bg-status-approved-bg text-status-approved-fg",
-};
-
-const DOT: Record<TaskStatus, string> = {
-  assigned: "bg-status-pending-dot",
-  done: "bg-status-reviewed-dot",
-  approved: "bg-status-approved-dot",
+  assigned: "bg-status-pending-dot text-white",
+  done: "bg-status-reviewed-dot text-white",
+  approved: "bg-status-approved-dot text-white",
 };
 
 // Client component (uses useTranslations) — safe inside the intl provider.
@@ -21,11 +15,10 @@ export function TaskStatusBadge({ status }: { status: TaskStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-semibold",
         PILL[status],
       )}
     >
-      <span className={cn("h-2 w-2 rounded-swatch", DOT[status])} aria-hidden />
       {t(status)}
     </span>
   );
