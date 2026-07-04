@@ -3,19 +3,13 @@ import { cn } from "@/lib/utils";
 
 type ItemStatus = Database["public"]["Enums"]["item_status"];
 
-// Status pill on the locked "Ledger" tokens: 2px swatch dot + tinted bg/fg.
+// Reskin: solid, filled status pill — colored fill + white text per status
+// (green=approved, gold=pending, blue-gray=reviewed, terracotta=rejected).
 const PILL: Record<ItemStatus, string> = {
-  pending: "bg-status-pending-bg text-status-pending-fg",
-  reviewed: "bg-status-reviewed-bg text-status-reviewed-fg",
-  approved: "bg-status-approved-bg text-status-approved-fg",
-  rejected: "bg-status-rejected-bg text-status-rejected-fg",
-};
-
-const DOT: Record<ItemStatus, string> = {
-  pending: "bg-status-pending-dot",
-  reviewed: "bg-status-reviewed-dot",
-  approved: "bg-status-approved-dot",
-  rejected: "bg-status-rejected-dot",
+  pending: "bg-status-pending-dot text-white",
+  reviewed: "bg-status-reviewed-dot text-white",
+  approved: "bg-status-approved-dot text-white",
+  rejected: "bg-status-rejected-dot text-white",
 };
 
 export function StatusPill({
@@ -30,15 +24,11 @@ export function StatusPill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-semibold",
         PILL[status],
         className,
       )}
     >
-      <span
-        className={cn("h-2 w-2 rounded-swatch", DOT[status])}
-        aria-hidden
-      />
       {label}
     </span>
   );

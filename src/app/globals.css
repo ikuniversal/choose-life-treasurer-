@@ -56,12 +56,27 @@
   /* Radii */
   --radius-input: 10px; /* inputs 8–14 */
   --radius-card: 12px; /* cards 8–14 */
+  --radius-card-lg: 16px; /* reskin: rounded-2xl cards (reference design) */
   --radius-btn: 11px; /* buttons 10–13 */
   --radius-pill: 999px; /* pills / composer */
   --radius-swatch: 2px; /* status swatch */
 
+  /* Reskin: soft, warm-tinted card shadow (reference design). Applied on
+     surface cards — the old flat/hairline rule is relaxed to this soft lift. */
+  --shadow-card: 0 1px 2px 0 rgb(41 37 29 / 0.05), 0 6px 16px -6px rgb(41 37 29 / 0.08);
+
   /* Member content column (phone-first fluid width) */
   --spacing-member: 312px;
+}
+
+/*
+ * Shared numeric utility — IBM Plex Mono + tabular figures for every numeric
+ * value: amounts, currency (e.g. "48.20 USD"), dates, user emails, and codes.
+ * Use className="num"; do NOT hand-apply font-mono per instance (reskin rule).
+ */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 html,
