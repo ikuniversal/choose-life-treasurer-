@@ -28,7 +28,12 @@
     "empty": "No receipts yet.",
     "signedOut": "Sign in to view your receipts.",
     "goToConsole": "Treasurer console",
-    "viewEvidence": "View evidence"
+    "viewEvidence": "View evidence",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this?",
+    "confirmDelete": "Delete",
+    "cancel": "Cancel",
+    "deleteFailed": "Could not delete. Please try again."
   },
   "console": {
     "title": "Treasurer Console",
@@ -144,6 +149,10 @@
     "cancel": "Cancel",
     "approveSelected": "Approve selected",
     "selected": "{count} selected",
+    "delete": "Delete",
+    "deleteWarnSoft": "Remove this receipt from the queue?",
+    "deleteWarnHard": "Permanently delete this receipt? This cannot be undone.",
+    "confirmDelete": "Delete",
     "reasonRequired": "A rejection reason is required.",
     "forbidden": "You don't have permission to review.",
     "failed": "Action failed. Please try again."
@@ -168,6 +177,10 @@
     "saveFailed": "Could not submit. Please try again.",
     "noGroup": "You are not assigned to a group yet.",
     "reviewTitle": "No-receipt notes",
+    "delete": "Delete",
+    "deleteWarnSoft": "Remove this note from the queue?",
+    "deleteWarnHard": "Permanently delete this note? This cannot be undone.",
+    "confirmDelete": "Delete",
     "empty": "No notes to review.",
     "submittedBy": "Submitted by",
     "approve": "Approve",

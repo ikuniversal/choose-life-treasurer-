@@ -6,14 +6,21 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CommentThread } from "@/components/comment-thread";
 import { LateBadge } from "@/components/late-badge";
-import { approveNote, rejectNote } from "@/lib/note-actions";
+import { approveNote, deleteNote, rejectNote } from "@/lib/note-actions";
 import type { NoteReviewItem } from "@/lib/data/note-review";
 
-export function NotesReview({ items }: { items: NoteReviewItem[] }) {
+export function NotesReview({
+  items,
+  isAdmin,
+}: {
+  items: NoteReviewItem[];
+  isAdmin: boolean;
+}) {
   const t = useTranslations("notes");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +33,7 @@ export function NotesReview({ items }: { items: NoteReviewItem[] }) {
         return;
       }
       setRejectingId(null);
+      setConfirmDeleteId(null);
       setReason("");
       router.refresh();
     });
@@ -110,6 +118,32 @@ export function NotesReview({ items }: { items: NoteReviewItem[] }) {
                   </Button>
                 </div>
               </div>
+            ) : confirmDeleteId === item.id ? (
+              <div className="flex flex-col gap-2 rounded-input bg-hairline-row/50 p-3">
+                {/* Admin delete is irreversible; treasurer delete is a soft
+                    removal. Copy differs; the server action enforces which. */}
+                <p className="text-xs text-body">
+                  {isAdmin ? t("deleteWarnHard") : t("deleteWarnSoft")}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="reject"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => run(() => deleteNote(item.id))}
+                  >
+                    {t("confirmDelete")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => setConfirmDeleteId(null)}
+                  >
+                    {t("cancel")}
+                  </Button>
+                </div>
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Button
@@ -130,6 +164,17 @@ export function NotesReview({ items }: { items: NoteReviewItem[] }) {
                   }}
                 >
                   {t("reject")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={pending}
+                  onClick={() => {
+                    setConfirmDeleteId(item.id);
+                    setRejectingId(null);
+                  }}
+                >
+                  {t("delete")}
                 </Button>
               </div>
             )}

@@ -89,6 +89,58 @@ export async function approveNote(id: string): Promise<NoteResult> {
   return { ok: true };
 }
 
+// Delete a note from the review queue. treasurer → SOFT (UPDATE deleted_at),
+// admin → HARD (DELETE, irreversible). RLS enforces scope on both.
+export async function deleteNote(id: string): Promise<NoteResult> {
+  const me = await getSessionUser();
+  if (!canAccessConsole(me)) return { error: "forbidden" };
+  if (!id) return { error: "failed" };
+
+  const isAdmin = !!me && me.assignments.some((a) => a.role === "admin");
+  const supabase = await createClient();
+
+  if (isAdmin) {
+    const { error } = await supabase
+      .from("no_receipt_notes")
+      .delete()
+      .eq("id", id);
+    if (error) return { error: "failed" };
+  } else {
+    const { error } = await supabase
+      .from("no_receipt_notes")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", id)
+      .is("deleted_at", null);
+    if (error) return { error: "failed" };
+  }
+
+  revalidatePath("/console/review");
+  return { ok: true };
+}
+
+// Member removes their OWN note — always SOFT, and only while pending. The
+// notes_update_owner_pending policy scopes it to the owner's own pending row;
+// the explicit filters keep it unambiguous. Error key is in the "member" ns.
+export async function softDeleteOwnNote(id: string): Promise<NoteResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !id) return { error: "deleteFailed" };
+
+  const { error } = await supabase
+    .from("no_receipt_notes")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("submitted_by", user.id)
+    .eq("status", "pending")
+    .is("deleted_at", null);
+  if (error) return { error: "deleteFailed" };
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function rejectNote(
   id: string,
   reason: string,

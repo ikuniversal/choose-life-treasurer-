@@ -29,6 +29,7 @@ export async function getNoteReviewQueue(): Promise<NoteReviewItem[]> {
       "id, description, note_date, signer1_name, signer2_name, signer1_signature_path, signer2_signature_path, group_id, submitted_by, is_late, groups(name)",
     )
     .eq("status", "pending")
+    .is("deleted_at", null) // hide soft-deleted notes
     .order("created_at", { ascending: false });
 
   const rows = notes ?? [];

@@ -9,6 +9,7 @@ import { CommentThread } from "@/components/comment-thread";
 import { CurrencyConverter } from "@/components/currency-converter";
 import { getMemberLedger } from "@/lib/data/member-ledger";
 import { canAccessConsole, getSessionUser } from "@/lib/auth";
+import { LedgerItemDelete } from "./ledger-item-delete";
 
 export default async function MemberHomePage() {
   const [t, tStatus, ledger, user] = await Promise.all([
@@ -128,6 +129,11 @@ export default async function MemberHomePage() {
                     </div>
                   </div>
                 </div>
+                {/* Members may remove their own submission while it is still
+                    pending review (always a soft delete). */}
+                {item.status === "pending" && (
+                  <LedgerItemDelete kind={item.kind} id={item.id} />
+                )}
                 <CommentThread
                   kind={item.kind}
                   parentId={item.id}

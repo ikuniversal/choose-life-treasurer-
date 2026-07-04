@@ -151,6 +151,7 @@ export type Database = {
       no_receipt_notes: {
         Row: {
           created_at: string
+          deleted_at: string | null
           description: string
           group_id: string
           id: string
@@ -169,6 +170,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           description: string
           group_id: string
           id?: string
@@ -187,6 +189,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           description?: string
           group_id?: string
           id?: string
@@ -262,6 +265,7 @@ export type Database = {
           category: Database["public"]["Enums"]["expense_category"]
           created_at: string
           currency: string
+          deleted_at: string | null
           group_id: string
           id: string
           is_duplicate: boolean
@@ -281,6 +285,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["expense_category"]
           created_at?: string
           currency: string
+          deleted_at?: string | null
           group_id: string
           id?: string
           is_duplicate?: boolean
@@ -300,6 +305,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["expense_category"]
           created_at?: string
           currency?: string
+          deleted_at?: string | null
           group_id?: string
           id?: string
           is_duplicate?: boolean
