@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-04 by Choose Life Director 6.0 (active) — CATCH-UP BANK #42–#46 (shipped untracked between writes): Azure OCR wired (#42, roadmap #6 OCR UNBLOCKED/DONE) · attachment support (#43) · stuck-upload fix (#44) · signed-URL error surfacing (#45) · guarded role removal (#46). prod = b00252e (#46). Only i18n now blocked. Migrations 11→12 (source-lock-in 11/12 — one pending mirror).
+> Last updated: 2026-07-04 by Choose Life Director 6.0 (active) — CATCH-UP BANK #42–#46 (shipped untracked between writes): Azure OCR wired (#42, roadmap #6 OCR UNBLOCKED/DONE) · attachment support (#43) · stuck-upload fix (#44) · signed-URL error surfacing (#45) · guarded role removal (#46). prod = b00252e (#46). Only i18n now blocked. Migrations 11→12 — source-lock-in 12/12 CURRENT (migration #12 mime-widen mirrored).
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -47,13 +47,11 @@ IN-FLIGHT / HANDED FORWARD:
    Azure OCR wired (#42) + attachment support (#43). Only BLOCKED item remaining: i18n 197-key
    seed + logos (desktop commit). (OCR "blocked on keys" is RESOLVED — #42 shipped live.)
 3. i18n 197-key seed + logos — still blocked on desktop commit (§12 source risk).
-4. Mirror migration #12 (widen_receipt_photos_bucket_mime_types) into supabase/migrations/ —
-   source-lock-in is now 11/12; the mime-widen migration (applied ahead of #43) is not yet
-   mirrored. NEW pending item (see §6 + CLEANUP PENDING).
 
-RESOLVED: Migrations source-lock-in — 11 of 12 mirrored (#40). One NEW migration
-(widen_receipt_photos_bucket_mime_types, #12) applied ahead of #43 is NOT yet mirrored —
-re-opened as a small pending item (item 4 above). §6 "prod-ahead-of-repo drift" otherwise closed.
+RESOLVED: Migrations source-lock-in — 12/12 mirrored, CURRENT again. Migration #12
+(widen_receipt_photos_bucket_mime_types, applied ahead of #43) is now mirrored verbatim into
+supabase/migrations/ (PR to mirror it — archival only, verified byte-faithful vs the live bucket
+state). §6 "prod-ahead-of-repo drift" closed once more.
 
 RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
 roadmap #5 verification fully closed) · "Belts"/"Camp" test data DELETED via MCP (children
@@ -114,7 +112,7 @@ restored; the 5.0 degradation no longer applies).
   buildable slices SHIPPED — export CSV #29 + PDF #37 · FX #31 · deadline #33 · guarded
   delete #35 · dup detection #39 · Azure OCR #42 · attachment support #43. Follow-ups #44
   (stuck-upload fix) · #45 (upload confirmation + ledger thumbnails) · #46 (guarded role
-  removal). Migrations source-lock-in 11/12 (#12 mime-widen not yet mirrored — see §6/CLEANUP).
+  removal). Migrations source-lock-in 12/12 CURRENT (#12 mime-widen now mirrored).
   prod = b00252e (#46). Auth + capture + review + polish all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
@@ -228,8 +226,8 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 12 total — verified live via list_migrations; 11 of 12 mirrored in
-  supabase/migrations/ — source-lock-in 11/12, migration #12 NOT yet mirrored, see CLEANUP):**
+- **Migrations (in order, 12 total — verified live via list_migrations; ALL 12 mirrored in
+  supabase/migrations/ — source-lock-in 12/12 CURRENT):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
@@ -243,9 +241,10 @@ restored; the 5.0 degradation no longer applies).
   same group+amount+currency+receipt_date as a non-rejected receipt; tamper-proof) ·
   widen_receipt_photos_bucket_mime_types (#12, 20260703070915 — widens the receipt-photos
   bucket allowed mime types from image/* to the 7 attachment types for #43; applied ahead of
-  the #43 merge). All Director-authored via MCP. The FIRST 11 are committed verbatim as
-  archival mirrors under supabase/migrations/ (#40, 6f3c329); migration #12 is NOT yet
-  mirrored — source-lock-in is 11/12 (see CLEANUP PENDING). None re-run, live schema unchanged.
+  the #43 merge). All Director-authored via MCP. The first 11 committed verbatim as archival
+  mirrors under supabase/migrations/ (#40, 6f3c329); migration #12 mirrored subsequently
+  (byte-faithful vs live bucket state) — source-lock-in is 12/12 CURRENT. None re-run, live
+  schema unchanged.
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -331,11 +330,11 @@ restored; the 5.0 degradation no longer applies).
     linked to the now-deleted Ifogbb receipt, 1 is an orphan from an abandoned capture
     retry) — DB row is gone but the physical files remain; PENDING operator dashboard
     tap-delete (no MCP storage-delete tool; raw SQL delete would strand files worse).
-- **Prod-ahead-of-repo drift — RE-OPENED (small):** 11 of 12 live migrations are mirrored
-  verbatim under supabase/migrations/ (#40). Migration #12 (widen_receipt_photos_bucket_mime_types,
-  applied ahead of #43) is NOT yet mirrored — the "mirror every new migration in-session" rule
-  slipped once. Re-close by committing the #12 mirror (see CLEANUP PENDING). Going forward, any
-  NEW Director-authored migration must be mirrored in the same session to keep repo == live.
+- **Prod-ahead-of-repo drift — RECONCILED:** all 12 live migrations are mirrored verbatim under
+  supabase/migrations/ (11 via #40; #12 mime-widen mirrored subsequently). Migration #12 had
+  slipped the "mirror every new migration in-session" rule (applied ahead of #43) — now closed.
+  Going forward, any NEW Director-authored migration must be mirrored in the same session to keep
+  repo == live.
 - **MCP / tooling:** Supabase MCP connected (DB/migrations/storage/advisors/logs/types —
   Director operates directly). Vercel MCP connected READ-ONLY (deployments, build logs,
   runtime errors — RELIABLE independent verification; NO env/redeploy writes, NO storage
@@ -519,8 +518,8 @@ restored; the 5.0 degradation no longer applies).
   is_duplicate trigger · widen receipt-photos mime #12) · CASCADE-wipe hazard RETIRED (guarded
   delete) · roadmap #6 ALL buildable slices done incl. OCR (only i18n blocked) · zero residue
   across synthetic test data (Belts/Camp, synthetic receipts, DelTest group all cleaned).
-  Open items at this bank: migration #12 not yet source-lock-in-mirrored (11/12); 4 orphan
-  storage files (operator); i18n 197-key seed + logos (desktop commit). prod = b00252e (#46).
+  Open items at this bank: 4 orphan storage files (operator); i18n 197-key seed + logos
+  (desktop commit). Migration #12 source-lock-in mirror — DONE (12/12). prod = b00252e (#46).
   Op note: Vercel dropped the #45 push-to-main webhook (prod stuck on #44) → recovered via an
   empty re-trigger commit; watch for repeat drops on future merges.
 
@@ -549,8 +548,8 @@ FEATURE ROADMAP
    6. Azure OCR ✅ DONE (#42, 36a7b05) — real Document Intelligence behind lib/ocr, confidence
       ≥ 0.5 gate, any failure → manual-entry fallback. NO LONGER BLOCKED (was "operator keys").
    7. Attachment support ✅ DONE (#43, 036f687) — images + PDF + Word; OCR skips non-image mime.
-   ALL buildable slices SHIPPED (incl. OCR). Migrations source-lock-in 11/12 (migration #12
-   widen_receipt_photos_bucket_mime_types not yet mirrored — see CLEANUP PENDING).
+   ALL buildable slices SHIPPED (incl. OCR). Migrations source-lock-in 12/12 CURRENT
+   (migration #12 widen_receipt_photos_bucket_mime_types now mirrored).
    Remaining (BLOCKED, parked — no action pending):
    • i18n real-seed + logo drop-in — BLOCKED on desktop commit (ONLY remaining blocker).
 
@@ -560,12 +559,10 @@ POLISH / CLEANUP — DONE:
   surface now shipped at /console/export (roadmap #6 slice 1, CSV — #29).
 - ✅ Test receipt "Ifogbb" — deleted via MCP, verified 0 rows.
 - ✅ "Belts"/"Camp" smoke-test project+group — DELETED via MCP (0 rows), Director 6.0.
+- ✅ Migration #12 `widen_receipt_photos_bucket_mime_types` (20260703070915) — mirrored into
+  supabase/migrations/ (archival, byte-faithful vs live). Source-lock-in 12/12 CURRENT.
 
 CLEANUP STILL PENDING:
-- (source control) Mirror migration #12 `widen_receipt_photos_bucket_mime_types`
-  (20260703070915) into supabase/migrations/ as an archival mirror — source-lock-in is
-  currently 11/12. Applied live ahead of #43; committing the mirror re-closes repo == live.
-  Cody/Director action (a docs-adjacent commit), NOT operator.
 - (operator action) 4 orphan storage files — dashboard tap-delete: 2 in receipt-photos
   (Chisinau path, historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke
   test; note row already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
