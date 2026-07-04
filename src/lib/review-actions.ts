@@ -53,6 +53,34 @@ export async function rejectReceipt(
   return { ok: true };
 }
 
+// Delete a receipt from the review queue. Actor role decides the mechanism:
+//   • treasurer → SOFT delete (UPDATE deleted_at = now()) via receipts_update_treasurer_admin
+//   • admin     → HARD delete (DELETE the row, irreversible) via receipts_delete_admin
+// Both run on the RLS-respecting client; RLS is the real scope gate.
+export async function deleteReceipt(id: string): Promise<ReviewResult> {
+  const me = await getSessionUser();
+  if (!canAccessConsole(me)) return { error: "forbidden" };
+  if (!id) return { error: "failed" };
+
+  const isAdmin = !!me && me.assignments.some((a) => a.role === "admin");
+  const supabase = await createClient();
+
+  if (isAdmin) {
+    const { error } = await supabase.from("receipts").delete().eq("id", id);
+    if (error) return { error: "failed" };
+  } else {
+    const { error } = await supabase
+      .from("receipts")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", id)
+      .is("deleted_at", null);
+    if (error) return { error: "failed" };
+  }
+
+  revalidatePath("/console/review");
+  return { ok: true };
+}
+
 export async function bulkApprove(ids: string[]): Promise<ReviewResult> {
   if (!(await callerIsReviewer())) return { error: "forbidden" };
   const clean = [...new Set(ids)].filter(Boolean);

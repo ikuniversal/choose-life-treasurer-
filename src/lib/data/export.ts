@@ -105,6 +105,7 @@ export async function getExportRows(
     if (filters.status !== "all") q = q.eq("status", filters.status);
     if (filters.from) q = q.gte("receipt_date", filters.from);
     if (filters.to) q = q.lte("receipt_date", filters.to);
+    q = q.is("deleted_at", null); // exclude soft-deleted receipts from exports
     q = q.order("created_at", { ascending: false });
 
     const { data } = await q;
@@ -141,6 +142,7 @@ export async function getExportRows(
     if (filters.status !== "all") q = q.eq("status", filters.status);
     if (filters.from) q = q.gte("note_date", filters.from);
     if (filters.to) q = q.lte("note_date", filters.to);
+    q = q.is("deleted_at", null); // exclude soft-deleted notes from exports
     q = q.order("created_at", { ascending: false });
 
     const { data } = await q;

@@ -11,11 +11,18 @@ import { DuplicateBadge } from "@/components/duplicate-badge";
 import {
   approveReceipt,
   bulkApprove,
+  deleteReceipt,
   rejectReceipt,
 } from "@/lib/review-actions";
 import type { ReviewItem } from "@/lib/data/review";
 
-export function ReviewQueue({ items }: { items: ReviewItem[] }) {
+export function ReviewQueue({
+  items,
+  isAdmin,
+}: {
+  items: ReviewItem[];
+  isAdmin: boolean;
+}) {
   const t = useTranslations("review");
   const tCat = useTranslations("categories");
   const router = useRouter();
@@ -23,6 +30,7 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +52,7 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
         return;
       }
       setRejectingId(null);
+      setConfirmDeleteId(null);
       setReason("");
       setSelected(new Set());
       router.refresh();
@@ -182,6 +191,32 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
                     </Button>
                   </div>
                 </div>
+              ) : confirmDeleteId === item.id ? (
+                <div className="mt-3 flex flex-col gap-2 rounded-input bg-hairline-row/50 p-3">
+                  {/* Admin delete is irreversible; treasurer delete is a soft
+                      removal. Copy differs; the server action enforces which. */}
+                  <p className="text-xs text-body">
+                    {isAdmin ? t("deleteWarnHard") : t("deleteWarnSoft")}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="reject"
+                      size="sm"
+                      disabled={pending}
+                      onClick={() => run(() => deleteReceipt(item.id))}
+                    >
+                      {t("confirmDelete")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={pending}
+                      onClick={() => setConfirmDeleteId(null)}
+                    >
+                      {t("cancel")}
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <div className="mt-3 flex items-center gap-2">
                   <Button
@@ -202,6 +237,17 @@ export function ReviewQueue({ items }: { items: ReviewItem[] }) {
                     }}
                   >
                     {t("reject")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => {
+                      setConfirmDeleteId(item.id);
+                      setRejectingId(null);
+                    }}
+                  >
+                    {t("delete")}
                   </Button>
                 </div>
               )}

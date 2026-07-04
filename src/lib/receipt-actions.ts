@@ -36,6 +36,29 @@ export async function analyzeReceipt(
   return extractReceipt(buffer, contentType);
 }
 
+// Member removes their OWN receipt — always SOFT, and only while pending. The
+// receipts_update_owner_pending policy scopes it to the owner's own pending row;
+// the explicit filters keep it unambiguous. Error key is in the "member" ns.
+export async function softDeleteOwnReceipt(id: string): Promise<SaveState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !id) return { error: "deleteFailed" };
+
+  const { error } = await supabase
+    .from("receipts")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("submitted_by", user.id)
+    .eq("status", "pending")
+    .is("deleted_at", null);
+  if (error) return { error: "deleteFailed" };
+
+  revalidatePath("/");
+  return { ok: true };
+}
+
 export async function saveReceipt(formData: FormData): Promise<SaveState> {
   const supabase = await createClient();
   const {

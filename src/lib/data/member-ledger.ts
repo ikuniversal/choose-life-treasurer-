@@ -68,12 +68,14 @@ export async function getMemberLedger(): Promise<MemberLedger> {
       )
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
+      .is("deleted_at", null) // hide soft-deleted receipts
       .order("receipt_date", { ascending: false }),
     supabase
       .from("no_receipt_notes")
       .select("id, group_id, description, note_date, status, is_late")
       .in("group_id", groupIds)
       .eq("submitted_by", user.id)
+      .is("deleted_at", null) // hide soft-deleted notes
       .order("note_date", { ascending: false }),
   ]);
 

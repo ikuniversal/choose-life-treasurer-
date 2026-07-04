@@ -41,6 +41,7 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
       "id, vendor, amount, currency, usd_equivalent, category, group_id, submitted_by, receipt_date, additional_info, photo_path, is_late, is_duplicate, groups(name)",
     )
     .eq("status", "pending")
+    .is("deleted_at", null) // hide soft-deleted receipts
     .order("created_at", { ascending: false });
 
   const rows = receipts ?? [];
