@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { X } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
-import { removeRole } from "@/lib/admin-actions";
 import { getGroupOptions, getUsersOverview } from "@/lib/data/users";
 import { InviteForm } from "./invite-form";
+import { UserRoleChips } from "./user-role-chips";
 
 export default async function UsersPage() {
   // Admin-only — Treasurers reach the console but not this page.
@@ -12,9 +11,8 @@ export default async function UsersPage() {
   const isAdmin = !!me && me.assignments.some((a) => a.role === "admin");
   if (!isAdmin) redirect("/console");
 
-  const [t, tRoles, users, groups] = await Promise.all([
+  const [t, users, groups] = await Promise.all([
     getTranslations("users"),
-    getTranslations("roles"),
     getUsersOverview(),
     getGroupOptions(),
   ]);
@@ -48,35 +46,7 @@ export default async function UsersPage() {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                {u.chips.length === 0 && (
-                  <span className="text-xs text-muted">{t("noRoles")}</span>
-                )}
-                {u.chips.map((c) => (
-                  <span
-                    key={c.id}
-                    className="inline-flex items-center gap-1.5 rounded-pill bg-hairline-row px-2.5 py-1 text-xs text-body"
-                  >
-                    <span className="font-medium text-olive">
-                      {tRoles(c.role)}
-                    </span>
-                    {c.groupName && (
-                      <span className="text-muted">· {c.groupName}</span>
-                    )}
-                    <form action={removeRole}>
-                      <input type="hidden" name="roleId" value={c.id} />
-                      <button
-                        type="submit"
-                        aria-label={t("remove")}
-                        title={t("remove")}
-                        className="ml-0.5 rounded-full p-0.5 text-muted transition-colors hover:text-reject"
-                      >
-                        <X className="h-3.5 w-3.5" aria-hidden />
-                      </button>
-                    </form>
-                  </span>
-                ))}
-              </div>
+              <UserRoleChips chips={u.chips} />
             </li>
           ))}
         </ul>

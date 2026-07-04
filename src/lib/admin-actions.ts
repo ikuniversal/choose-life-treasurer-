@@ -16,6 +16,12 @@ export interface InviteState {
   ok?: boolean;
 }
 
+export interface RemoveRoleState {
+  // i18n key under the "users" namespace, or undefined.
+  error?: string;
+  ok?: boolean;
+}
+
 async function callerIsAdmin(): Promise<boolean> {
   const me = await getSessionUser();
   return !!me && me.assignments.some((a) => a.role === "admin");
@@ -73,13 +79,43 @@ export async function inviteUser(
 }
 
 // Deletes exactly one user_roles row — never a profile, receipt, or note.
-export async function removeRole(formData: FormData): Promise<void> {
-  if (!(await callerIsAdmin())) return;
+// Guards the org against locking itself out: the FINAL admin role can never be
+// removed, no matter who removes whom (incl. self-removal).
+export async function removeRole(roleId: string): Promise<RemoveRoleState> {
+  if (!(await callerIsAdmin())) return { error: "removeFailed" };
 
-  const roleId = String(formData.get("roleId") ?? "").trim();
-  if (!roleId) return;
+  const id = String(roleId ?? "").trim();
+  if (!id) return { error: "removeFailed" };
 
   const supabase = await createClient();
-  await supabase.from("user_roles").delete().eq("id", roleId);
+
+  // Read the target row first so we know its role for the lockout guard. The
+  // caller is admin → user_roles_select lets them see every row.
+  const { data: target, error: fetchErr } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("id", id)
+    .maybeSingle();
+  if (fetchErr) return { error: "removeFailed" };
+  if (!target) return { error: "removeFailed" }; // already gone
+
+  // Last-admin lockout: count remaining admin roles BEFORE deleting; refuse if
+  // this is the only one left. Regardless of which admin removes which.
+  if (target.role === "admin") {
+    const { count, error: countErr } = await supabase
+      .from("user_roles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin");
+    if (countErr) return { error: "removeFailed" };
+    if ((count ?? 0) <= 1) return { error: "lastAdmin" };
+  }
+
+  const { error: delErr } = await supabase
+    .from("user_roles")
+    .delete()
+    .eq("id", id);
+  if (delErr) return { error: "removeFailed" };
+
   revalidatePath("/console/users");
+  return { ok: true };
 }
