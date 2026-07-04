@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { getGroupOptions, getUsersOverview } from "@/lib/data/users";
 import { InviteForm } from "./invite-form";
 import { UserRoleChips } from "./user-role-chips";
+import { DeleteUserButton } from "./delete-user-button";
 
 export default async function UsersPage() {
   // Admin-only — Treasurers reach the console but not this page.
@@ -46,7 +47,10 @@ export default async function UsersPage() {
                 )}
               </div>
 
-              <UserRoleChips chips={u.chips} />
+              <div className="flex flex-col items-start gap-2 sm:items-end">
+                <UserRoleChips chips={u.chips} />
+                <DeleteUserButton userId={u.id} />
+              </div>
             </li>
           ))}
         </ul>
