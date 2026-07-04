@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-02 by Choose Life Director 6.0 (active) — roadmap #6 ALL buildable slices shipped (dup detection #39); migrations source-lock-in DONE (#40); only OCR + i18n blocked
+> Last updated: 2026-07-04 by Choose Life Director 6.0 (active) — CATCH-UP BANK #42–#46 (shipped untracked between writes): Azure OCR wired (#42, roadmap #6 OCR UNBLOCKED/DONE) · attachment support (#43) · stuck-upload fix (#44) · signed-URL error surfacing (#45) · guarded role removal (#46). prod = b00252e (#46). Only i18n now blocked. Migrations 11→12 (source-lock-in 11/12 — one pending mirror).
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,7 +26,8 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = 6f3c329 (merge #40), READY.
+- App live: https://choose-life-treasurer.vercel.app · prod = b00252e (merge #46), READY.
+  (Was 6f3c329/#40 at last write; #42–#46 shipped + merged untracked — reconciled this bank.)
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -41,13 +42,18 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
 IN-FLIGHT / HANDED FORWARD:
 1. 4 orphan storage files — operator dashboard tap-delete (2 receipt-photos/Chisinau +
    2 signatures/fade7a24-…). No storage-delete MCP tool exists.
-2. Roadmap #6 (cross-cutting) — ALL buildable slices SHIPPED: export CSV (#29) + PDF (#37) ·
-   real FX (#31) · deadline (#33) · guarded delete (#35) · duplicate detection (#39). Only
-   BLOCKED items remain: Azure OCR (operator keys) · i18n 197-key seed + logos (desktop commit).
+2. Roadmap #6 (cross-cutting) — ALL buildable slices SHIPPED incl. OCR now: export CSV (#29) +
+   PDF (#37) · real FX (#31) · deadline (#33) · guarded delete (#35) · duplicate detection (#39) ·
+   Azure OCR wired (#42) + attachment support (#43). Only BLOCKED item remaining: i18n 197-key
+   seed + logos (desktop commit). (OCR "blocked on keys" is RESOLVED — #42 shipped live.)
 3. i18n 197-key seed + logos — still blocked on desktop commit (§12 source risk).
+4. Mirror migration #12 (widen_receipt_photos_bucket_mime_types) into supabase/migrations/ —
+   source-lock-in is now 11/12; the mime-widen migration (applied ahead of #43) is not yet
+   mirrored. NEW pending item (see §6 + CLEANUP PENDING).
 
-RESOLVED: Migrations source-lock-in — DONE (#40): all 11 live migrations mirrored verbatim
-into supabase/migrations/ (archival). Backlog retired; §6 "prod-ahead-of-repo drift" closed.
+RESOLVED: Migrations source-lock-in — 11 of 12 mirrored (#40). One NEW migration
+(widen_receipt_photos_bucket_mime_types, #12) applied ahead of #43 is NOT yet mirrored —
+re-opened as a small pending item (item 4 above). §6 "prod-ahead-of-repo drift" otherwise closed.
 
 RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
 roadmap #5 verification fully closed) · "Belts"/"Camp" test data DELETED via MCP (children
@@ -106,8 +112,10 @@ restored; the 5.0 degradation no longer applies).
 ## 4. IN-FLIGHT WORK (keep live)
 - Roadmap #5 COMPLETE (#18/#20/#22/#24), converter spot-check CONFIRMED. Roadmap #6: ALL
   buildable slices SHIPPED — export CSV #29 + PDF #37 · FX #31 · deadline #33 · guarded
-  delete #35 · dup detection #39. Migrations source-lock-in DONE (#40, archival mirrors).
-  prod = 6f3c329 (#40). Auth + capture + review + polish all live.
+  delete #35 · dup detection #39 · Azure OCR #42 · attachment support #43. Follow-ups #44
+  (stuck-upload fix) · #45 (upload confirmation + ledger thumbnails) · #46 (guarded role
+  removal). Migrations source-lock-in 11/12 (#12 mime-widen not yet mirrored — see §6/CLEANUP).
+  prod = b00252e (#46). Auth + capture + review + polish all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -144,8 +152,25 @@ restored; the 5.0 degradation no longer applies).
 | 37 | PDF export (roadmap #6 export slice — PDF) | 3b63bc5 | 2026-07-02 | /console/export "Download PDF" beside CSV (same form/filters via formAction, same RLS data path incl. RPC-only names, same route-handler access re-check as #29). NEW DEPS (Director-approved, first since scaffold): @react-pdf/renderer + dejavu-fonts-ttf — full-Cyrillic TTF REGISTERED + EMBEDDED (data URI) so RU UGC renders (default PDF fonts = blanks). next.config: serverExternalPackages (@react-pdf off webpack/wasm) + outputFileTracingIncludes (bundles .ttf into pdf function). GET route streams application/pdf, report_{group|all}_{from}_{to}.pdf; formal layout (header/table/per-currency totals+USD total/page-footer); shared parseExportFilters+slugifyGroup extracted (CSV route refactored onto them). Verified: CI green + independent Vercel preview + Director sandbox replication (same deps, exact Cyrillic string, text-extraction round-trip PASS incl. «»/ё/em-dash — MEDIUM-HIGH) + Cody local font-embed pre-check. WAIVED residual (operator): deployed route PDF not device-opened — approach proven, exact deployed render is first-real-use |
 | 39 | Duplicate-detection UI (roadmap #6) | 8d8278a | 2026-07-02 | POSSIBLE DUPLICATE badge (blue, distinct from amber LATE), advisory/no-block, on /console/review receipt cards + member ledger receipt rows where is_duplicate; /console/export CSV is_duplicate column (after is_late) + PDF status "· DUP" marker. Surfaces the tamper-proof receipts.is_duplicate flag (BEFORE-INSERT trigger; app never sets/sends it; column pre-existed → no types change). UI/types only, no deps/schema/RLS. Operator merged DIRECTLY out-of-band; Director post-hoc verified (0 runtime errors since merge; UI/types-only vs pre-existing column, nothing schema-side to cross-check) |
 | 40 | Migrations source-lock-in (archival) | 6f3c329 | 2026-07-02 | supabase/migrations/ created with all 11 live migrations mirrored VERBATIM (archival only — NOT run/applied; live schema unchanged). Byte-audit vs Director manifest: every file = manifest + 1 (trailing newline manifest omits); 2 files further +2/+6 for UTF-8 multibyte glyphs (→, —) the manifest counted as single chars — complete, no truncation. Retires the source-lock-in backlog. Verified: CI green + independent Vercel preview + byte-deltas explained; on own branch claude/migrations-source-lock-in (two concurrent PRs can't share one head) |
+| 42 | Azure OCR wired (roadmap #6 OCR item) | 36a7b05 | 2026-07-03 | Real Azure AI Document Intelligence prebuilt-receipt call behind the EXISTING lib/ocr boundary (Azure never imported elsewhere; server-only; raw REST + LRO poll; no new deps). Prefills vendor/date/amount/currency ONLY where per-field confidence ≥ 0.5; ANY failure (missing env, timeout/abort, non-2xx, "failed", malformed JSON) → null → the existing manual-entry fallback fires unchanged, NO new error state. Roadmap #6 OCR item UNBLOCKS — no longer "blocked on operator keys." |
+| 43 | Attachment support — images + PDF + Word (roadmap #6) | 036f687 | 2026-07-03 | Capture accepts the 7 bucket mime types (was image/*); dropped capture="environment" so iOS shows its native picker (Camera/Library/Browse); client type + 10MB validation w/ PDF/Word-aware messages. lib/ocr SKIPS the Azure call for non-image mime (normal manual path, not a failure). /console/review renders images as a signed-URL thumbnail, PDF/Word as a labeled signed-URL download link (FileText icon + filename); review data carries photoIsImage + photoName. UI/server-actions only; bucket mime already widened via migration #12 (see §6). |
+| 44 | Fix stuck "Uploading…" hang + dead /receipts nav | d6ffcdb (feat 0d35b97) | 2026-07-03 | ROOT CAUSE (regression surfaced w/ #42/#43): analyzeReceipt re-downloaded the just-uploaded object server-side via the RLS client to read its bytes — but a member has NO storage SELECT on their own photo until a receipts row links it (receipt_photos_select = admin OR treasurer OR owner-of-linked-receipt) → GET /object 400 → spinner hangs on every receipt. FIX: analyzeReceipt takes the in-memory File via FormData (no storage read-back); capture-form wraps OCR in try/catch so setPhase("verify") ALWAYS runs; next.config serverActions.bodySizeLimit "10mb" (1MB default rejected most photos). Also removed the dead "/receipts" member nav tab (404 since scaffold — ledger lives on Home "/"). UI/server-actions only. |
+| 45 | Upload confirmation + member-ledger evidence + signed-URL error surfacing | 28ec25b (squash: 439c762 + af2cd5a) | 2026-07-03 | (a) Capture SUCCESS card: after save, a persistent confirmation (thumbnail via a client object URL, or doc icon + filename; "Submitted"; vendor/amount when OCR filled; timestamp) before returning — no silent redirect. (b) Member Home ledger rows now show a small evidence thumbnail (image) / doc icon (PDF/Word) via a signed URL from the RLS client — closes the #43 gap (no member-side evidence surface existed). (c) createSignedUrl errors were DISCARDED (const { data } = …) → silent no-thumbnail; now console.error'd at all 3 signing sites (member ledger, console review, note review); photoUrl still falls back to null. NOTE: the operator's "no thumbnails" report was a DEPLOY gap (#45 preview vs prod still on #44), NOT a code defect — RLS grants the owner the signed URL (live-simulated). No schema/RLS/env change, no new deps. ⚠️ Director directive under-described #45 as only the signed-URL surfacing (af2cd5a); it also carried the upload card + ledger thumbnails (439c762) — banked to full scope. |
+| 46 | Remove role assignment, last-admin guarded (roadmap #2 polish) | b00252e (feat 841c282) | 2026-07-04 | /console/users per-chip X now deletes that specific user_roles row (id PK) via the EXISTING user_roles_admin_write (ALL already covers DELETE — no new RLS/migration). removeRole(roleId) returns a friendly {error} (was void); server-side LAST-ADMIN GUARD: reads the target role, and if role='admin' counts remaining admin rows and REFUSES when ≤ 1 ("Cannot remove the last remaining Administrator") — regardless of who removes whom, incl. self. Count-then-confirm UX (inline ✓/✕, inline error, no chip removed) mirrors #35; chips extracted to a client component. i18n EN+RU. UI/server-action only. Verified: CI green (verify run #98) + independent Vercel preview. |
 
 ## 5b. LATEST SESSION NOTES
+- 2026-07-04 (Director 6.0, CATCH-UP BANK): live/Vercel audit found prod had moved
+  6f3c329(#40) → b00252e(#46) via FIVE unbanked merges (#42–#46) since the last write —
+  none recorded. Reconstructed §5 rows #42–#46, §6 migration #12 + user_roles DELETE,
+  roadmap #6 (OCR now DONE), and a NEW source-lock-in pending item (migration #12 not yet
+  mirrored). Also this session: diagnosed the "no ledger thumbnails" report as a DEPLOY gap
+  (prod was still #44; #45 unmerged) not a code defect — cleared + merged #45 (28ec25b);
+  Vercel had DROPPED the #45 merge webhook (prod stuck on #44) → re-triggered via empty
+  commit bb5a04d, prod built. Then shipped #46 (guarded role removal). SHA reconciliation
+  vs the directive: #44 merge = d6ffcdb (feat 0d35b97), #45 merge = 28ec25b (squash of
+  439c762 + af2cd5a), #46 merge = b00252e (feat 841c282) — merge SHAs banked as primary.
+  Flag: the directive under-described #45 (also carried the upload card + ledger thumbnails,
+  not just signed-URL surfacing) — banked to full scope.
 - 2026-07-02 (Director 6.0): cold-started from v2.8, zero drift vs live; prod verified
   4a2c4cd at start. Closed roadmap #5 verification (converter spot-check CONFIRMED),
   deleted Belts/Camp test data via MCP (0 rows), resolved handoff loose ends (PR #21 = docs
@@ -203,8 +228,8 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 11 total — verified live via list_migrations; ALL now mirrored in
-  supabase/migrations/ — source-lock-in RETIRED, #40):**
+- **Migrations (in order, 12 total — verified live via list_migrations; 11 of 12 mirrored in
+  supabase/migrations/ — source-lock-in 11/12, migration #12 NOT yet mirrored, see CLEANUP):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
@@ -215,9 +240,12 @@ restored; the 5.0 degradation no longer applies).
   (receipts/notes/tasks→groups + groups→projects flipped CASCADE→RESTRICT; user_roles +
   group_messages keep CASCADE by design — memberships/chat die with the group) ·
   add_duplicate_detection_trigger (is_duplicate on receipts via BEFORE-INSERT set_is_duplicate(),
-  same group+amount+currency+receipt_date as a non-rejected receipt; tamper-proof). All
-  Director-authored via MCP; all 11 now committed verbatim as archival mirrors under
-  supabase/migrations/ (#40, 6f3c329) — NOT re-run, live schema unchanged.
+  same group+amount+currency+receipt_date as a non-rejected receipt; tamper-proof) ·
+  widen_receipt_photos_bucket_mime_types (#12, 20260703070915 — widens the receipt-photos
+  bucket allowed mime types from image/* to the 7 attachment types for #43; applied ahead of
+  the #43 merge). All Director-authored via MCP. The FIRST 11 are committed verbatim as
+  archival mirrors under supabase/migrations/ (#40, 6f3c329); migration #12 is NOT yet
+  mirrored — source-lock-in is 11/12 (see CLEANUP PENDING). None re-run, live schema unchanged.
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -263,7 +291,11 @@ restored; the 5.0 degradation no longer applies).
     session — admin-write already fully covers create/edit, so Projects/Groups slice 1
     needed ZERO new RLS.
   · user_roles: `user_roles_admin_write` (ALL, is_admin()), `user_roles_select` (admin OR
-    self OR treasurer_of the group). Verified live, unchanged.
+    self OR treasurer_of the group). Verified live, unchanged. NOTE (#46): DELETE is now
+    exercised from the UI (per-chip role removal) — the ALL admin-write policy already
+    covers it, no new RLS. Target key = id (PK, one row per user+role+group). App enforces a
+    last-admin lockout in the server action (count admin rows, refuse when ≤ 1); the DB does
+    not — the guard is app-level, so any future direct-API delete path must re-check it.
   · security-advisor: 3 accepted-residual WARNs (role-fns RPC-callable by authenticated,
     self-uid only, no leak) + 1 WARN "Leaked Password Protection Disabled" (Auth toggle,
     deferred). perf-advisor clean bar 1 cosmetic deferred.
@@ -272,9 +304,11 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 6f3c329 (merge #40), READY
-  (independent preview checks ran on #29/#31/#33/#35/#37/#40; #39 was operator out-of-band —
-  Director post-hoc verified 0 runtime errors).
+  https://choose-life-treasurer.vercel.app. Latest prod = b00252e (merge #46), READY
+  (independent preview checks ran on #29/#31/#33/#35/#37/#40/#45/#46; #39 was operator
+  out-of-band — Director post-hoc verified 0 runtime errors). ⚠️ Vercel DROPPED the #45
+  push-to-main webhook once (prod stuck on #44 after the #45 merge) — recovered with an empty
+  re-trigger commit (bb5a04d); if a merge lands but no prod deploy appears, re-trigger the same way.
 - **Vercel env vars:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   (Prod+Preview), SUPABASE_SECRET_KEY (Prod+Preview, Sensitive). Functionally confirmed
   (invite + admin ops work). Assumed the new sb_secret_ key per §8; not separately eyeballed.
@@ -297,9 +331,11 @@ restored; the 5.0 degradation no longer applies).
     linked to the now-deleted Ifogbb receipt, 1 is an orphan from an abandoned capture
     retry) — DB row is gone but the physical files remain; PENDING operator dashboard
     tap-delete (no MCP storage-delete tool; raw SQL delete would strand files worse).
-- **Prod-ahead-of-repo drift — RECONCILED (#40):** all 11 live migrations are now mirrored
-  verbatim under supabase/migrations/ (archival). Going forward, any NEW Director-authored
-  migration should be mirrored there in the same session to keep repo == live.
+- **Prod-ahead-of-repo drift — RE-OPENED (small):** 11 of 12 live migrations are mirrored
+  verbatim under supabase/migrations/ (#40). Migration #12 (widen_receipt_photos_bucket_mime_types,
+  applied ahead of #43) is NOT yet mirrored — the "mirror every new migration in-session" rule
+  slipped once. Re-close by committing the #12 mirror (see CLEANUP PENDING). Going forward, any
+  NEW Director-authored migration must be mirrored in the same session to keep repo == live.
 - **MCP / tooling:** Supabase MCP connected (DB/migrations/storage/advisors/logs/types —
   Director operates directly). Vercel MCP connected READ-ONLY (deployments, build logs,
   runtime errors — RELIABLE independent verification; NO env/redeploy writes, NO storage
@@ -475,12 +511,18 @@ restored; the 5.0 degradation no longer applies).
 | 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
 | 2026-07-01 | Choose Life Director 5.0 → 6.0 | Routine, operator-requested, at clean boundary — roadmap #5 complete, zero open PRs |
 
-- **Director 6.0 session summary (no swap — still active):** 6 features shipped (CSV export
-  #29 · FX rate editor #31 · deadline enforcement #33 · guarded delete #35 · PDF export #37
-  · duplicate detection #39) · 4 Director-authored migrations (is_late trigger · set_is_late
-  revoke · RESTRICT-delete FKs · is_duplicate trigger) · CASCADE-wipe hazard RETIRED (guarded
-  delete) · migrations source-lock-in RETIRED (#40, 11 archival mirrors) · zero residue
-  across all synthetic test data (Belts/Camp, synthetic receipts, DelTest group all cleaned).
+- **Director 6.0 session summary (no swap — still active):** 11 features shipped — CSV export
+  #29 · FX rate editor #31 · deadline enforcement #33 · guarded delete #35 · PDF export #37 ·
+  duplicate detection #39 · Azure OCR #42 · attachment support #43 · stuck-upload fix #44 ·
+  upload confirmation + ledger thumbnails + signed-URL surfacing #45 · guarded role removal #46
+  · 5 Director-authored migrations (is_late trigger · set_is_late revoke · RESTRICT-delete FKs ·
+  is_duplicate trigger · widen receipt-photos mime #12) · CASCADE-wipe hazard RETIRED (guarded
+  delete) · roadmap #6 ALL buildable slices done incl. OCR (only i18n blocked) · zero residue
+  across synthetic test data (Belts/Camp, synthetic receipts, DelTest group all cleaned).
+  Open items at this bank: migration #12 not yet source-lock-in-mirrored (11/12); 4 orphan
+  storage files (operator); i18n 197-key seed + logos (desktop commit). prod = b00252e (#46).
+  Op note: Vercel dropped the #45 push-to-main webhook (prod stuck on #44) → recovered via an
+  empty re-trigger commit; watch for repeat drops on future merges.
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
@@ -504,10 +546,13 @@ FEATURE ROADMAP
    3. Deadline enforcement ✅ DONE (#33, afd7b16). Soft LATE flag (is_late trigger + UI).
    4. Guarded delete (Projects/Groups) ✅ DONE (#35, 9c8f478). RESTRICT FKs + count-then-confirm UI.
    5. Duplicate detection ✅ DONE (#39, 8d8278a). Advisory POSSIBLE DUPLICATE badge + CSV/PDF.
-   ALL buildable slices SHIPPED. Also DONE: migrations source-lock-in (#40, archival mirrors).
+   6. Azure OCR ✅ DONE (#42, 36a7b05) — real Document Intelligence behind lib/ocr, confidence
+      ≥ 0.5 gate, any failure → manual-entry fallback. NO LONGER BLOCKED (was "operator keys").
+   7. Attachment support ✅ DONE (#43, 036f687) — images + PDF + Word; OCR skips non-image mime.
+   ALL buildable slices SHIPPED (incl. OCR). Migrations source-lock-in 11/12 (migration #12
+   widen_receipt_photos_bucket_mime_types not yet mirrored — see CLEANUP PENDING).
    Remaining (BLOCKED, parked — no action pending):
-   • Azure OCR wiring — BLOCKED on operator keys.
-   • i18n real-seed + logo drop-in — BLOCKED on desktop commit.
+   • i18n real-seed + logo drop-in — BLOCKED on desktop commit (ONLY remaining blocker).
 
 POLISH / CLEANUP — DONE:
 - ✅ Member Home → Console link (#13).
@@ -516,7 +561,11 @@ POLISH / CLEANUP — DONE:
 - ✅ Test receipt "Ifogbb" — deleted via MCP, verified 0 rows.
 - ✅ "Belts"/"Camp" smoke-test project+group — DELETED via MCP (0 rows), Director 6.0.
 
-CLEANUP STILL PENDING (operator action):
-- 4 orphan storage files — dashboard tap-delete: 2 in receipt-photos (Chisinau path,
-  historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke test; note row
-  already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
+CLEANUP STILL PENDING:
+- (source control) Mirror migration #12 `widen_receipt_photos_bucket_mime_types`
+  (20260703070915) into supabase/migrations/ as an archival mirror — source-lock-in is
+  currently 11/12. Applied live ahead of #43; committing the mirror re-closes repo == live.
+  Cody/Director action (a docs-adjacent commit), NOT operator.
+- (operator action) 4 orphan storage files — dashboard tap-delete: 2 in receipt-photos
+  (Chisinau path, historical) + 2 in signatures (fade7a24-…/ path, from the #18 prod smoke
+  test; note row already MCP-deleted, verified 0 rows). No storage-delete MCP tool exists.
