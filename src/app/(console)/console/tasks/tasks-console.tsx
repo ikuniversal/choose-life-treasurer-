@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { TaskStatusBadge } from "@/components/task-status-badge";
+import { FilterPillRow, type FilterOption } from "@/components/filter-pill-row";
 import { approveTask, createTask } from "@/lib/task-actions";
 import type {
   ConsoleTask,
@@ -12,7 +13,6 @@ import type {
   RosterMember,
   TaskStatus,
 } from "@/lib/data/tasks";
-import { cn } from "@/lib/utils";
 
 const inputCls =
   "h-10 w-full rounded-input border border-hairline bg-canvas px-3 text-sm text-ink outline-none focus:border-olive focus:ring-2 focus:ring-olive/30";
@@ -38,7 +38,7 @@ export function TasksConsole({
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
 
-  const options = useMemo(() => {
+  const options: FilterOption[] = useMemo(() => {
     const present = STATUS_ORDER.filter((s) => tasks.some((x) => x.status === s));
     return [
       { value: "all", label: t("all"), count: tasks.length },
@@ -131,40 +131,12 @@ export function TasksConsole({
 
       {/* Reskin: status filter pills over the task list. */}
       {options.length > 2 && (
-        <div
-          role="tablist"
-          aria-label={t("consoleTitle")}
-          className="flex gap-2 overflow-x-auto"
-        >
-          {options.map((o) => {
-            const active = o.value === filter;
-            return (
-              <button
-                key={o.value}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setFilter(o.value)}
-                className={cn(
-                  "inline-flex shrink-0 items-center gap-1.5 rounded-pill px-3.5 py-1.5 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-ink text-white"
-                    : "bg-hairline-row text-body hover:bg-hairline",
-                )}
-              >
-                {o.label}
-                <span
-                  className={cn(
-                    "num text-xs",
-                    active ? "text-white/70" : "text-muted",
-                  )}
-                >
-                  {o.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <FilterPillRow
+          options={options}
+          value={filter}
+          onChange={setFilter}
+          ariaLabel={t("consoleTitle")}
+        />
       )}
 
       {/* Task list */}

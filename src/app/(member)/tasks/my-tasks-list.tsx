@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { TaskStatusBadge } from "@/components/task-status-badge";
+import { FilterPillRow, type FilterOption } from "@/components/filter-pill-row";
 import { markTaskDone } from "@/lib/task-actions";
 import type { MyTask, TaskStatus } from "@/lib/data/tasks";
-import { cn } from "@/lib/utils";
 
 // Canonical order for the filter row — only statuses actually present are shown.
 const STATUS_ORDER: TaskStatus[] = ["assigned", "done", "approved"];
@@ -21,7 +21,7 @@ export function MyTasksList({ tasks }: { tasks: MyTask[] }) {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
 
-  const options = useMemo(() => {
+  const options: FilterOption[] = useMemo(() => {
     const present = STATUS_ORDER.filter((s) => tasks.some((x) => x.status === s));
     return [
       { value: "all", label: t("all"), count: tasks.length },
@@ -52,42 +52,13 @@ export function MyTasksList({ tasks }: { tasks: MyTask[] }) {
     <div className="flex flex-col gap-3">
       {error && <p className="text-sm text-reject">{t(error)}</p>}
 
-      {/* Reskin: status filter pills (same pill language as the console nav). */}
       {options.length > 2 && (
-        <div
-          role="tablist"
-          aria-label={t("myTitle")}
-          className="flex gap-2 overflow-x-auto"
-        >
-          {options.map((o) => {
-            const active = o.value === filter;
-            return (
-              <button
-                key={o.value}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setFilter(o.value)}
-                className={cn(
-                  "inline-flex shrink-0 items-center gap-1.5 rounded-pill px-3.5 py-1.5 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-ink text-white"
-                    : "bg-hairline-row text-body hover:bg-hairline",
-                )}
-              >
-                {o.label}
-                <span
-                  className={cn(
-                    "num text-xs",
-                    active ? "text-white/70" : "text-muted",
-                  )}
-                >
-                  {o.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <FilterPillRow
+          options={options}
+          value={filter}
+          onChange={setFilter}
+          ariaLabel={t("myTitle")}
+        />
       )}
 
       <ul className="overflow-hidden rounded-card-lg bg-card shadow-card">
