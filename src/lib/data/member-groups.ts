@@ -42,3 +42,26 @@ export async function getMemberGroups(): Promise<MemberGroup[]> {
     deadline: deadlineById.get(id) ?? null,
   }));
 }
+
+// ALL groups, labeled "Project · Group", for the ADMIN capture picker (#16 —
+// admins may file a receipt into any group). RLS-respecting client: an admin
+// sees every project/group. Group + project names are UGC — never translated.
+export async function getAllGroupsForCapture(): Promise<MemberGroup[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("projects")
+    .select("name, groups(id, name, submission_deadline)")
+    .order("name");
+
+  const out: MemberGroup[] = [];
+  for (const p of data ?? []) {
+    for (const g of p.groups ?? []) {
+      out.push({
+        id: g.id,
+        name: `${p.name} · ${g.name}`,
+        deadline: g.submission_deadline,
+      });
+    }
+  }
+  return out.sort((a, b) => a.name.localeCompare(b.name));
+}
