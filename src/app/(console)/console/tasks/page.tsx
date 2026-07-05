@@ -35,9 +35,9 @@ export default async function ConsoleTasksPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold text-ink">{t("consoleTitle")}</h1>
+      <h1 className="text-2xl font-bold text-ink">{t("consoleTitle")}</h1>
       {groups.length === 0 ? (
-        <p className="rounded-card border border-hairline bg-card px-4 py-6 text-center text-sm text-muted">
+        <p className="rounded-card-lg bg-card px-4 py-6 text-center text-sm text-muted shadow-card">
           {t("noGroups")}
         </p>
       ) : (
