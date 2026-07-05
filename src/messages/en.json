@@ -25,6 +25,7 @@
     "newReceipt": "New receipt",
     "noReceiptNote": "No-receipt note",
     "ledgerTitle": "Your ledger",
+    "all": "All",
     "empty": "No receipts yet.",
     "signedOut": "Sign in to view your receipts.",
     "goToConsole": "Treasurer console",
