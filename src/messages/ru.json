@@ -40,6 +40,19 @@
     "pendingReview": "Ожидают проверки",
     "export": "Экспорт"
   },
+  "dashboard": {
+    "title": "Панель",
+    "submitted": "Отправлено",
+    "awaitingReview": "Ожидают проверки",
+    "overBudget": "Групп с перерасходом",
+    "activeProjects": "Активных проектов",
+    "groupsTitle": "Группы",
+    "of": "из {limit}",
+    "due": "Срок {date}",
+    "over": "Перерасход",
+    "deadline": "Срок {date}",
+    "noDeadline": "Без срока"
+  },
   "auth": {
     "signInTitle": "Вход",
     "email": "Эл. почта",

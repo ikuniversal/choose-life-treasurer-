@@ -23,8 +23,7 @@ export default async function ConsoleLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [t, tRoles, user] = await Promise.all([
-    getTranslations("console"),
+  const [tRoles, user] = await Promise.all([
     getTranslations("roles"),
     getSessionUser(),
   ]);
@@ -42,37 +41,27 @@ export default async function ConsoleLayout({
   const roleLabel = tRoles(isAdmin ? "admin" : "treasurer");
 
   return (
-    <div className="flex min-h-full flex-col bg-canvas min-[880px]:flex-row">
-      {/* Sidebar — dark, ≥880px only */}
-      <aside className="hidden w-64 shrink-0 flex-col gap-6 bg-sidebar p-4 min-[880px]:flex">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold text-canvas">{t("title")}</span>
-          <RoleBadge label={roleLabel} />
-        </div>
-        <ContextSwitcher assignments={assignments} activeKey={activeKey} />
-        <ConsoleNav variant="sidebar" isAdmin={isAdmin} />
-        <div className="mt-auto flex items-center justify-between gap-2">
-          <LocaleSwitcher className="border-white/15" />
-          <SignOutButton />
-        </div>
-      </aside>
-
-      {/* Tab-strip — below 880px */}
-      <div className="flex flex-col gap-2 border-b border-hairline px-4 py-2 min-[880px]:hidden">
+    <div className="flex min-h-full flex-col bg-canvas">
+      {/* Reskin: one top shell for every breakpoint — wordmark + role/locale/
+          sign-out header, then a horizontally-scrollable nav pill row that
+          visually replaces the old dark sidebar. Routes, links, and role gating
+          are unchanged; the group ContextSwitcher is preserved below the nav. */}
+      <header className="flex flex-col gap-3 border-b border-hairline bg-card px-4 py-3">
         <div className="flex items-center justify-between gap-3">
-          <ConsoleNav variant="strip" isAdmin={isAdmin} />
+          <span className="text-base font-bold text-ink">Choose Life</span>
           <div className="flex items-center gap-2">
             <RoleBadge label={roleLabel} />
             <LocaleSwitcher />
             <SignOutButton />
           </div>
         </div>
+        <ConsoleNav isAdmin={isAdmin} />
         <ContextSwitcher
           assignments={assignments}
           activeKey={activeKey}
           tone="light"
         />
-      </div>
+      </header>
 
       <main className="flex-1 p-4 min-[880px]:p-8">{children}</main>
     </div>
