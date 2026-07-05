@@ -22,6 +22,12 @@ export interface RemoveRoleState {
   ok?: boolean;
 }
 
+export interface RemoveMemberState {
+  // i18n key under the "users" namespace, or undefined.
+  error?: string;
+  ok?: boolean;
+}
+
 export interface DeleteUserState {
   // i18n key under the "users" namespace, or undefined.
   error?: string;
@@ -129,6 +135,48 @@ export async function removeRole(roleId: string): Promise<RemoveRoleState> {
     .delete()
     .eq("id", id);
   if (delErr) return { error: "removeFailed" };
+
+  revalidatePath("/console/users");
+  return { ok: true };
+}
+
+// Treasurer action (#15): remove a MEMBER from one of the treasurer's own
+// groups. Deletes exactly the member role row — never a treasurer/admin row,
+// never the auth account (that stays admin-only, #50). The RLS policy
+// user_roles_treasurer_delete_member is the real gate (scoped to
+// is_treasurer_of(group_id) and role='member'); the caller check + explicit
+// filters keep it tight, and a 0-row result surfaces a friendly message rather
+// than a raw error.
+export async function removeMember(
+  userId: string,
+  groupId: string,
+): Promise<RemoveMemberState> {
+  const uid = String(userId ?? "").trim();
+  const gid = String(groupId ?? "").trim();
+  if (!uid || !gid) return { error: "cannotRemove" };
+
+  // Authorize the caller: treasurer of THIS group (admins manage roles through
+  // the admin view instead). RLS still enforces scope server-side.
+  const me = await getSessionUser();
+  const allowed =
+    !!me &&
+    me.assignments.some(
+      (a) => a.role === "treasurer" && a.groupId === gid,
+    );
+  if (!allowed) return { error: "cannotRemove" };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("user_roles")
+    .delete()
+    .eq("user_id", uid)
+    .eq("group_id", gid)
+    .eq("role", "member")
+    .select("id");
+  if (error) return { error: "cannotRemove" };
+  // 0 rows → nothing matched the policy/filters (already gone, or not scoped
+  // to this treasurer). Never a raw error.
+  if (!data || data.length === 0) return { error: "cannotRemove" };
 
   revalidatePath("/console/users");
   return { ok: true };
