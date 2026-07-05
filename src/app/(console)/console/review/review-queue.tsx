@@ -62,7 +62,7 @@ export function ReviewQueue({
   return (
     <div className="flex flex-col gap-4">
       {selected.size > 0 && (
-        <div className="flex items-center justify-between gap-3 rounded-card border border-hairline bg-card px-4 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-card-lg bg-card px-4 py-2 shadow-card">
           <span className="text-sm text-body">
             {t("selected", { count: selected.size })}
           </span>
@@ -83,7 +83,7 @@ export function ReviewQueue({
         {items.map((item) => (
           <li
             key={item.id}
-            className="flex flex-col gap-3 rounded-card border border-hairline bg-card p-4 sm:flex-row"
+            className="flex flex-col gap-3 rounded-card-lg bg-card p-4 shadow-card sm:flex-row"
           >
             <div className="flex items-start gap-3">
               <input

@@ -47,7 +47,7 @@ export function NotesReview({
         {items.map((item) => (
           <li
             key={item.id}
-            className="flex flex-col gap-3 rounded-card border border-hairline bg-card p-4"
+            className="flex flex-col gap-3 rounded-card-lg bg-card p-4 shadow-card"
           >
             {/* description / signer names are UGC — never translated */}
             <div className="flex items-start justify-between gap-2">

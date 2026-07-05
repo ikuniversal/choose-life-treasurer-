@@ -2,19 +2,14 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Camera, FileText, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { StatusPill } from "@/components/status-pill";
-import { LateBadge } from "@/components/late-badge";
-import { DuplicateBadge } from "@/components/duplicate-badge";
-import { CommentThread } from "@/components/comment-thread";
 import { CurrencyConverter } from "@/components/currency-converter";
 import { getMemberLedger } from "@/lib/data/member-ledger";
 import { canAccessConsole, getSessionUser } from "@/lib/auth";
-import { LedgerItemDelete } from "./ledger-item-delete";
+import { LedgerList } from "./ledger-list";
 
 export default async function MemberHomePage() {
-  const [t, tStatus, ledger, user] = await Promise.all([
+  const [t, ledger, user] = await Promise.all([
     getTranslations("member"),
-    getTranslations("status"),
     getMemberLedger(),
     getSessionUser(),
   ]);
@@ -29,7 +24,7 @@ export default async function MemberHomePage() {
       {showConsole && (
         <Link
           href="/console"
-          className="flex items-center justify-between rounded-card border border-hairline bg-card px-4 py-3 text-sm font-medium text-olive transition-colors hover:bg-hairline-row"
+          className="flex items-center justify-between rounded-card-lg bg-card px-4 py-3 text-sm font-medium text-olive shadow-card transition-colors hover:bg-hairline-row"
         >
           <span className="flex items-center gap-2">
             <LayoutDashboard className="h-5 w-5" aria-hidden />
@@ -61,87 +56,15 @@ export default async function MemberHomePage() {
         <h2 className="text-sm font-medium text-muted">{t("ledgerTitle")}</h2>
 
         {!ledger.signedIn ? (
-          <p className="rounded-card border border-hairline bg-card px-4 py-6 text-center text-sm text-muted">
+          <p className="rounded-card-lg bg-card px-4 py-6 text-center text-sm text-muted shadow-card">
             {t("signedOut")}
           </p>
         ) : ledger.items.length === 0 ? (
-          <p className="rounded-card border border-hairline bg-card px-4 py-6 text-center text-sm text-muted">
+          <p className="rounded-card-lg bg-card px-4 py-6 text-center text-sm text-muted shadow-card">
             {t("empty")}
           </p>
         ) : (
-          <ul className="overflow-hidden rounded-card border border-hairline bg-card">
-            {ledger.items.map((item) => (
-              <li
-                key={`${item.kind}-${item.id}`}
-                className="border-b border-hairline-row px-4 py-3 last:border-b-0"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    {/* Evidence thumbnail so the member can confirm at a glance that
-                        a file is attached (closes the gap flagged in #43). */}
-                    {item.photoUrl && item.photoIsImage ? (
-                      <a
-                        href={item.photoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={t("viewEvidence")}
-                        className="shrink-0"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.photoUrl}
-                          alt={item.title}
-                          className="h-10 w-10 rounded-input border border-hairline object-cover"
-                        />
-                      </a>
-                    ) : item.photoUrl ? (
-                      <a
-                        href={item.photoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={item.photoName ?? t("viewEvidence")}
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-input border border-hairline text-olive"
-                      >
-                        <FileText className="h-5 w-5" aria-hidden />
-                      </a>
-                    ) : null}
-                    <div className="min-w-0">
-                      {/* title is UGC (vendor / note description) — never translated */}
-                      <p className="truncate text-sm font-medium text-ink">
-                        {item.title}
-                      </p>
-                      <p className="font-mono text-xs text-faint">{item.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    {item.amount !== null && (
-                      <span className="font-mono text-sm text-olive">
-                        {item.amount.toFixed(2)} {item.currency}
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1.5">
-                      {item.isDuplicate && <DuplicateBadge />}
-                      {item.isLate && <LateBadge />}
-                      <StatusPill
-                        status={item.status}
-                        label={tStatus(item.status)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/* Members may remove their own submission while it is still
-                    pending review (always a soft delete). */}
-                {item.status === "pending" && (
-                  <LedgerItemDelete kind={item.kind} id={item.id} />
-                )}
-                <CommentThread
-                  kind={item.kind}
-                  parentId={item.id}
-                  groupId={item.groupId}
-                />
-              </li>
-            ))}
-          </ul>
+          <LedgerList items={ledger.items} />
         )}
       </section>
     </div>

@@ -20,14 +20,14 @@ export default async function ExportPage() {
   return (
     <div className="flex max-w-lg flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold text-ink">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-ink">{t("title")}</h1>
         <p className="text-sm text-muted">{t("intro")}</p>
       </div>
 
       <form
         method="GET"
         action="/console/export/download"
-        className="flex flex-col gap-4 rounded-card border border-hairline bg-card p-5"
+        className="flex flex-col gap-4 rounded-card-lg bg-card p-5 shadow-card"
       >
         <label className={labelClass}>
           <span className={labelText}>{t("group")}</span>

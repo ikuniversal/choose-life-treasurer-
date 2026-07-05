@@ -21,7 +21,7 @@ export default async function ReviewPage() {
   const isAdmin = !!me && me.assignments.some((a) => a.role === "admin");
 
   const emptyBox = (label: string) => (
-    <p className="rounded-card border border-hairline bg-card px-4 py-6 text-center text-sm text-muted">
+    <p className="rounded-card-lg bg-card px-4 py-6 text-center text-sm text-muted shadow-card">
       {label}
     </p>
   );
@@ -29,7 +29,7 @@ export default async function ReviewPage() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4">
-        <h1 className="text-xl font-semibold text-ink">{t("title")}</h1>
+        <h1 className="text-2xl font-bold text-ink">{t("title")}</h1>
         {receipts.length === 0 ? (
           emptyBox(t("empty"))
         ) : (
