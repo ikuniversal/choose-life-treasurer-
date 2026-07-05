@@ -1,14 +1,22 @@
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { getMemberGroups } from "@/lib/data/member-groups";
+import { getSessionUser } from "@/lib/auth";
+import { getAllGroupsForCapture, getMemberGroups } from "@/lib/data/member-groups";
 import { CaptureForm } from "./capture-form";
 
 export default async function CapturePage() {
-  const [t, supabase, groups] = await Promise.all([
+  const [t, supabase, me] = await Promise.all([
     getTranslations("capture"),
     createClient(),
-    getMemberGroups(),
+    getSessionUser(),
   ]);
+
+  // Admins may file into ANY group (#16 — group chosen at capture time); members
+  // keep their own-group flow unchanged.
+  const isAdmin = !!me && me.assignments.some((a) => a.role === "admin");
+  const groups = isAdmin
+    ? await getAllGroupsForCapture()
+    : await getMemberGroups();
 
   const { data: fx } = await supabase
     .from("fx_rates")

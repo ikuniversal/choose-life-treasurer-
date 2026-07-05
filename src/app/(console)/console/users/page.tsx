@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { canAccessConsole, getSessionUser } from "@/lib/auth";
@@ -88,9 +89,10 @@ export default async function UsersPage() {
               key={u.id}
               className="flex flex-col gap-2 border-b border-hairline-row px-4 py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="min-w-0">
+              {/* Tap a user → their per-user activity view (#57, admin-only). */}
+              <Link href={`/console/users/${u.id}`} className="group min-w-0">
                 {/* name + email are UGC — never translated */}
-                <p className="truncate text-sm font-medium text-ink">
+                <p className="truncate text-sm font-medium text-ink transition-colors group-hover:text-olive">
                   {u.fullName ?? u.email ?? u.id}
                 </p>
                 {u.email && (
@@ -98,7 +100,7 @@ export default async function UsersPage() {
                     {u.email}
                   </p>
                 )}
-              </div>
+              </Link>
 
               <div className="flex flex-col items-start gap-2 sm:items-end">
                 <UserRoleChips chips={u.chips} />
