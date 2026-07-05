@@ -209,6 +209,7 @@
   "tasks": {
     "myTitle": "My tasks",
     "consoleTitle": "Tasks",
+    "all": "All",
     "empty": "No tasks.",
     "due": "Due",
     "noDue": "No due date",
