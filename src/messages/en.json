@@ -40,6 +40,19 @@
     "pendingReview": "Pending review",
     "export": "Export"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "submitted": "Submitted",
+    "awaitingReview": "Awaiting review",
+    "overBudget": "Groups over budget",
+    "activeProjects": "Active projects",
+    "groupsTitle": "Groups",
+    "of": "of {limit}",
+    "due": "Due {date}",
+    "over": "Over budget",
+    "deadline": "Deadline {date}",
+    "noDeadline": "No deadline"
+  },
   "auth": {
     "signInTitle": "Sign in",
     "email": "Email",
