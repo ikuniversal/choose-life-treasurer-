@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-05 by Cody (Code Agent, on Director 6.0 instruction) — BANK #57/#58/#60 merged + audit: treasurer member removal + mirror #15 (#57, 3b86e4c) · DRY tasks pills → FilterPillRow (#58, b9daede) · admin any-group capture + per-user activity /console/users/[id] + mirror #16 (#60, 8d92f9f feat 35a3b7d). prod = 8d92f9f (#60). POST-MERGE AUDIT: #60 was built pre-#57 and auto-merged onto a main already carrying #57's role-branched /console/users — verified CLEAN (role branch intact, activity link only inside the admin branch, no duplicated markup, tsc+build green). #50 auth-delete e2e CLOSED (operator deleted Dan + Dave via the live app — verified 0 rows in auth.users). Migrations 12→16 — source-lock-in 16/16 (#16 admin_insert_receipts_any_group Director-authored + verified, mirrored via #60). Owed now ONLY: 4 orphan storage files + i18n seed/logos (both operator/desktop). Designated branch claude/chat-session-e4mevb to be resynced → 8d92f9f.
+> Last updated: 2026-07-06 by Cody (Code Agent, on Director 6.0 instruction) — BANK #17 + #62 (OPEN/HOLD): OCR speed pass (client downscale for the OCR call only ~1600px/JPEG 0.75 · upload+OCR in parallel · Azure poll tightened ~600ms→2s) + multi-attachment capture (migration #17 receipt_attachments; first image = primary/OCR, up to 5 extras; attachment count + signed-URL links in review/ledger/activity) → PR #62, HOLD. database.types.ts REGENERATED for receipt_attachments. Migrations 12→17 — source-lock-in 17/17 (#17 mirrored via #62). TEST DATA CLEARED: live receipts = 0 (total), no_receipt_notes = 0, receipt_attachments = 0 (operator wiped test data; verified via MCP). prod = 8d92f9f (#60) — #62 still HOLD. PRIOR-CYCLE (already done, relay may have dropped the report): #57/#58/#60 merged + the #57↔#60 /console/users auto-merge audit (CLEAN) + #50 e2e CLOSED were all banked in #61 (159af0d). Owed now ONLY: 4 orphan storage files + i18n seed/logos. Designated branch claude/chat-session-e4mevb synced → 159af0d.
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -52,15 +52,17 @@ IN-FLIGHT / HANDED FORWARD:
    review+export+ledger), 3/3b (#56, tasks) all SHIPPED. Per the design-fidelity addendum
    the SummaryCard now shows approved-only spend + a gold/terracotta progress bar (#53) —
    this SUPERSEDES the earlier "limit + counts only, no bar" call (§8 updated).
-5. Migrations source-lock-in — CLOSED at 16/16 (#13/#14 via #54, #15 via #57, #16 via #60).
+5. Migrations source-lock-in — CLOSED at 17/17 (#13/#14 via #54, #15 via #57, #16 via #60, #17 via #62).
    #49 dup-trigger gap RESOLVED by Director's migration #14 (exclude_soft_deleted_from_duplicate_check).
 6. Admin any-group capture + per-user activity SHIPPED (#60, 8d92f9f) — admins file receipts
    into any group; /console/users/[id] admin-only activity view. Migration #16 live.
 
-RESOLVED: Source-lock-in fully closed (16/16). Design refresh fully shipped (1/3→3/3).
+RESOLVED: Source-lock-in fully closed (17/17). Design refresh fully shipped (1/3→3/3).
 #57 (treasurer member removal) + #58 (DRY pills) + #60 (admin capture + activity) all MERGED,
-0 runtime errors. #60/#57 /console/users auto-merge audited CLEAN. #50 auth-delete e2e CLOSED
-(operator deleted Dan + Dave, verified 0 rows in auth.users). Designated branch → resync to 8d92f9f.
+0 runtime errors, banked in #61 (159af0d). #60/#57 /console/users auto-merge audited CLEAN.
+#50 auth-delete e2e CLOSED (operator deleted Dan + Dave, verified 0 rows in auth.users).
+Designated branch synced → 159af0d. OPEN this cycle (HOLD): #62 OCR speed + multi-attachment.
+TEST DATA CLEARED: live receipts / notes / attachments all 0 (operator-wiped, MCP-verified).
 
 RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
 roadmap #5 verification fully closed) · "Belts"/"Camp" test data DELETED via MCP (children
@@ -123,8 +125,9 @@ restored; the 5.0 degradation no longer applies).
   (stuck-upload fix) · #45 (upload confirmation + ledger thumbnails) · #46 (guarded role
   removal). Soft/hard delete #49 · delete user #50 · design refresh 1/3 #51 · 2/3 #53 ·
   3/3a #55 · 3/3b #56 (reskin COMPLETE) · treasurer member removal #57 · admin any-group
-  capture + per-user activity #60. Migrations source-lock-in CLOSED 16/16.
-  prod = 8d92f9f (#60). Auth + capture + review + polish + full reskin all live.
+  capture + per-user activity #60 · OCR speed + multi-attachment #62 (OPEN/HOLD).
+  Migrations source-lock-in CLOSED 17/17. prod = 8d92f9f (#60).
+  Auth + capture + review + polish + full reskin all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -179,6 +182,9 @@ restored; the 5.0 degradation no longer applies).
 | 58 | chore: DRY tasks filter pills → FilterPillRow | b9daede (feat 502579b) | 2026-07-05 | Pure refactor: both task lists now use the shared FilterPillRow (from #55) instead of #56's inlined copies; identical markup/behavior, drops local cn-pill blocks + unused cn imports. MERGED, 0 runtime errors. |
 | 59 | Docs bank #52–#58 + #52 corrections | a92dd4b | 2026-07-05 | PROJECT_STATE bank (docs-only, self-merge §11): §5 rows #52–#58, SummaryCard precedent SUPERSEDED, source-lock-in + prod SHA + owed list refreshed. |
 | 60 | Admin any-group capture + per-user activity (+ mirror #16) | 8d92f9f (feat 35a3b7d) | 2026-07-05 | Live migration #16 (admin_insert_receipts_any_group, 20260705133257) — additive admin INSERT policies on receipts (submitted_by=self AND is_admin()) + receipt-photos storage; member policies untouched. UI/server-action only. /capture: admins get a required dropdown of ALL groups ("Project · Group", getAllGroupsForCapture on the RLS client), upload to receipt-photos/{chosen group_id}, insert group_id=chosen (saveReceipt keeps submitted_by=self; is_late/is_duplicate stay trigger-owned); members unchanged. /console/users/[id]: admin-only per-user activity — receipts+notes newest-first, deleted_at is null, on the RLS client; email via a single auth.admin.getUserById (sanctioned §8); StatusPill + LATE/DUP + .num; link added to admin user rows only. Mirrors migration #16 → source-lock-in 16/16. i18n EN/RU. Built pre-#57; auto-merged onto #57's role-branched /console/users — AUDITED CLEAN (role branch intact, link only in admin branch, no dup markup, tsc+build green). MERGED, 0 runtime errors. |
+
+| 61 | Docs bank #57/#58/#60 merged + post-merge audit | 159af0d | 2026-07-05 | PROJECT_STATE bank (docs-only, self-merge §11): #57/#58/#60 merge SHAs; #57↔#60 /console/users auto-merge AUDITED CLEAN; #50 e2e CLOSED; migration #16 + source-lock-in 16/16; §8 precedents (admin capture, per-user activity). |
+| 62 | OCR speed pass + multi-attachment capture (+ mirror #17) | OPEN PR #62 (HOLD) | 2026-07-06 | Live migration #17 (add_receipt_attachments_table, 20260705225506 — receipt_attachments child table, RLS mirrors parent receipt). UI/server-action only; types REGENERATED. (A) OCR speed: client-side downscale for the OCR call ONLY (~1600px/JPEG 0.75, stored original untouched, ~10× smaller payload); storage upload(s) + OCR run in parallel (Promise.all); Azure poll tightened (first ~600ms, backoff→2s, same budget + fail-closed). (B) Multi-attachment: capture input multi-select (#43 mime set); first image = PRIMARY (photo_path + OCR), remaining ≤5 (10MB each) → receipt-photos/{group_id}/ + one receipt_attachments row each after the receipt insert (best-effort, is_late/is_duplicate stay trigger-owned); shared getReceiptAttachments (batched select + signed URLs) + hook-free AttachmentLinks; count + signed-URL links shown in review queue, member ledger, /console/users/[id] activity. Mirrors migration #17 → source-lock-in 17/17. i18n EN/RU. lint+tsc+build green. |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-04 (Director 6.0, CATCH-UP BANK): live/Vercel audit found prod had moved
@@ -250,8 +256,8 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 16 total — verified live via list_migrations; ALL 16 mirrored in
-  supabase/migrations/ — source-lock-in CLOSED 16/16):**
+- **Migrations (in order, 17 total — verified live via list_migrations; ALL 17 mirrored in
+  supabase/migrations/ — source-lock-in CLOSED 17/17):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
@@ -277,7 +283,11 @@ restored; the 5.0 degradation no longer applies).
   storage.objects; lets an admin file a receipt into ANY group; member policies untouched; powers
   #60). All Director-authored via MCP (Cody mirrors only). The first 11 committed verbatim as
   archival mirrors under supabase/migrations/ (#40, 6f3c329); #12 via #48; #13+#14 via #54; #15
-  via #57; #16 via #60 — source-lock-in CLOSED 16/16. None re-run, live schema unchanged.
+  via #57; #16 via #60) · add_receipt_attachments_table (#17, 20260705225506 — receipt_attachments
+  child table: id / receipt_id FK ON DELETE CASCADE / path / mime_type / created_at + index;
+  RLS mirrors the parent receipt — select = admin/treasurer-of-group/owner, insert = owner AND
+  member-of/admin, delete = admin; powers #62 multi-attachment) — #17 mirrored via #62.
+  source-lock-in CLOSED 17/17. None re-run, live schema unchanged.
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -366,8 +376,8 @@ restored; the 5.0 degradation no longer applies).
     linked to the now-deleted Ifogbb receipt, 1 is an orphan from an abandoned capture
     retry) — DB row is gone but the physical files remain; PENDING operator dashboard
     tap-delete (no MCP storage-delete tool; raw SQL delete would strand files worse).
-- **Prod-ahead-of-repo drift — CLOSED (16/16):** all 16 live migrations are mirrored under
-  supabase/migrations/ (11 via #40; #12 via #48; #13+#14 via #54; #15 via #57; #16 via #60). The "mirror
+- **Prod-ahead-of-repo drift — CLOSED (17/17):** all 17 live migrations are mirrored under
+  supabase/migrations/ (11 via #40; #12 via #48; #13+#14 via #54; #15 via #57; #16 via #60; #17 via #62). The "mirror
   every new migration in-session" rule is satisfied. Going forward, any NEW Director-authored
   migration must still be mirrored in the same session.
 - **MCP / tooling:** Supabase MCP connected (DB/migrations/storage/advisors/logs/types —
@@ -426,6 +436,19 @@ restored; the 5.0 degradation no longer applies).
   receipts+notes (deleted_at is null, newest-first) on the RLS client (admin sees all); the email
   comes from a single auth.admin.getUserById (the ONLY admin-client use — auth.admin.* precedent,
   §8). Route re-checks admin defensively; the list link renders only in the admin branch.
+- **Multi-attachment = child table, primary stays on the receipt (#62, live migration #17):**
+  receipts.photo_path remains the PRIMARY evidence + OCR source; extra files live in
+  receipt_attachments (RLS mirrors the parent). Capture: first image = primary, ≤5 extras
+  uploaded to receipt-photos/{group_id}/ then one row each AFTER the receipt insert (best-effort —
+  a failed attachment insert never fails the submission; the primary is intact). Display via a
+  shared getReceiptAttachments (one batched select + one createSignedUrls) + a hook-free
+  AttachmentLinks component reused across review/ledger/activity. Reuse this shape for any future
+  "N files per row."
+- **OCR speed pattern (#62):** downscale the image CLIENT-SIDE for the OCR call ONLY (~1600px,
+  JPEG 0.75) — the STORED original is never touched (evidence quality preserved); run upload(s)
+  and OCR in parallel (Promise.all); poll the Azure LRO soon (~600ms) with gentle backoff. All
+  three keep the existing fail-closed-to-manual behavior. Trigger-owned fields (is_late,
+  is_duplicate) are still never sent by the app.
 - **Soft-delete pattern (#49):** `deleted_at` timestamptz + admin-only DELETE policy; treasurer
   soft-deletes (UPDATE deleted_at) / admin hard-deletes (DELETE); member soft-deletes own
   pending; EVERY active-data read must filter `deleted_at is null`. NOTE: DB triggers that
@@ -596,14 +619,15 @@ restored; the 5.0 degradation no longer applies).
   #42 · attachments #43 · stuck-upload fix #44 · upload confirmation + ledger thumbnails #45 ·
   guarded role removal #46 · soft/hard delete #49 · delete user #50 · design refresh 1/3 #51 ·
   2/3 #53 · 3/3a #55 · 3/3b #56 (reskin COMPLETE) · treasurer member removal #57 · admin
-  any-group capture + per-user activity #60 · 9 Director-authored migrations mirrored (is_late
-  trigger · set_is_late revoke · RESTRICT-delete FKs · is_duplicate trigger · widen mime #12 ·
-  soft-delete #13 · dup-excludes-soft-deleted #14 · treasurer-remove-member #15 · admin-insert-
-  any-group #16) · CASCADE-wipe hazard RETIRED · roadmap #6 ALL buildable slices done incl. OCR
-  (only i18n blocked) · design refresh COMPLETE · source-lock-in CLOSED 16/16 · #50 auth-delete
-  e2e CLOSED (Dan+Dave deleted, 0 rows) · zero residue across synthetic test data. Nothing open
-  at this bank. Owed (operator/desktop only): 4 orphan storage files; i18n seed + logos.
-  prod = 8d92f9f (#60). Op notes: Vercel
+  any-group capture + per-user activity #60 · OCR speed + multi-attachment #62 (OPEN) · 10
+  Director-authored migrations mirrored (is_late trigger · set_is_late revoke · RESTRICT-delete
+  FKs · is_duplicate trigger · widen mime #12 · soft-delete #13 · dup-excludes-soft-deleted #14 ·
+  treasurer-remove-member #15 · admin-insert-any-group #16 · receipt_attachments #17) ·
+  CASCADE-wipe hazard RETIRED · roadmap #6 ALL buildable slices done incl. OCR (only i18n
+  blocked) · design refresh COMPLETE · source-lock-in CLOSED 17/17 · #50 auth-delete e2e CLOSED
+  (Dan+Dave deleted, 0 rows) · TEST DATA CLEARED (live receipts/notes/attachments all 0) · zero
+  residue. Open at this bank (HOLD): #62. Owed (operator/desktop only): 4 orphan storage files;
+  i18n seed + logos. prod = 8d92f9f (#60). Op notes: Vercel
   dropped the #45 push-to-main webhook once (recovered via empty commit); #50 merged
   operator-side pre-report (§12 pattern).
 
@@ -632,8 +656,9 @@ FEATURE ROADMAP
    6. Azure OCR ✅ DONE (#42, 36a7b05) — real Document Intelligence behind lib/ocr, confidence
       ≥ 0.5 gate, any failure → manual-entry fallback. NO LONGER BLOCKED (was "operator keys").
    7. Attachment support ✅ DONE (#43, 036f687) — images + PDF + Word; OCR skips non-image mime.
-   ALL buildable slices SHIPPED (incl. OCR). Migrations source-lock-in CLOSED 16/16
-   (#13/#14 via #54, #15 via #57, #16 via #60).
+   ALL buildable slices SHIPPED (incl. OCR). OCR speed pass shipped in #62 (client downscale +
+   parallel upload/OCR + tighter polling). Migrations source-lock-in CLOSED 17/17
+   (#13/#14 via #54, #15 via #57, #16 via #60, #17 via #62).
    Remaining (BLOCKED, parked — no action pending):
    • i18n real-seed + logo drop-in — BLOCKED on desktop commit (ONLY remaining blocker).
 
@@ -643,11 +668,14 @@ POLISH / CLEANUP — DONE:
   surface now shipped at /console/export (roadmap #6 slice 1, CSV — #29).
 - ✅ Test receipt "Ifogbb" — deleted via MCP, verified 0 rows.
 - ✅ "Belts"/"Camp" smoke-test project+group — DELETED via MCP (0 rows), Director 6.0.
+- ✅ ALL test receipts + notes cleared by the operator — live receipts / no_receipt_notes /
+  receipt_attachments counts all 0 (MCP-verified 2026-07-06). Clean slate for real data.
 - ✅ Migration #12 `widen_receipt_photos_bucket_mime_types` (20260703070915) — mirrored into
   supabase/migrations/ (#48, archival, byte-faithful vs live).
 - ✅ Migrations #13 `add_receipt_note_soft_delete` + #14 `exclude_soft_deleted_from_duplicate_check`
   — mirrored (#54, archival). #15 `treasurer_remove_member_from_own_group` — mirrored (#57).
-  #16 `admin_insert_receipts_any_group` — mirrored (#60). Source-lock-in CLOSED at 16/16.
+  #16 `admin_insert_receipts_any_group` — mirrored (#60). #17 `add_receipt_attachments_table`
+  — mirrored (#62). Source-lock-in CLOSED at 17/17.
 - ✅ Dup-detection trigger `set_is_duplicate` now excludes soft-deleted rows — Director-authored
   migration #14 (20260704210822), verified live. (The #49 gap is closed.)
 - ✅ #50 delete-user e2e CLOSED — operator deleted Dan + Dave via the live app; verified 0 rows
