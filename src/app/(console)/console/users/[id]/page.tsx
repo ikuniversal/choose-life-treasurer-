@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
 import { getUserActivity } from "@/lib/data/user-activity";
 import { StatusPill } from "@/components/status-pill";
+import { AttachmentLinks } from "@/components/attachment-links";
 import { LateBadge } from "@/components/late-badge";
 import { DuplicateBadge } from "@/components/duplicate-badge";
 
@@ -21,9 +22,10 @@ export default async function UserActivityPage({
     redirect("/console");
   }
 
-  const [t, tStatus, activity] = await Promise.all([
+  const [t, tStatus, tCommon, activity] = await Promise.all([
     getTranslations("users"),
     getTranslations("status"),
+    getTranslations("common"),
     getUserActivity(id),
   ]);
   if (!activity) notFound();
@@ -67,29 +69,40 @@ export default async function UserActivityPage({
                 {activity.receipts.map((r) => (
                   <li
                     key={r.id}
-                    className="flex items-center justify-between gap-3 border-b border-hairline-row px-4 py-3 last:border-b-0"
+                    className="flex flex-col gap-2 border-b border-hairline-row px-4 py-3 last:border-b-0"
                   >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-ink">
-                        {r.vendor}
-                      </p>
-                      <p className="num text-xs text-faint">
-                        {r.date}
-                        {r.groupName && (
-                          <span className="text-muted"> · {r.groupName}</span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      <span className="num text-sm text-olive">
-                        {r.amount.toFixed(2)} {r.currency}
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        {r.isDuplicate && <DuplicateBadge />}
-                        {r.isLate && <LateBadge />}
-                        <StatusPill status={r.status} label={tStatus(r.status)} />
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-ink">
+                          {r.vendor}
+                        </p>
+                        <p className="num text-xs text-faint">
+                          {r.date}
+                          {r.groupName && (
+                            <span className="text-muted"> · {r.groupName}</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-1">
+                        <span className="num text-sm text-olive">
+                          {r.amount.toFixed(2)} {r.currency}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {r.isDuplicate && <DuplicateBadge />}
+                          {r.isLate && <LateBadge />}
+                          <StatusPill
+                            status={r.status}
+                            label={tStatus(r.status)}
+                          />
+                        </div>
                       </div>
                     </div>
+                    {r.attachments.length > 0 && (
+                      <AttachmentLinks
+                        attachments={r.attachments}
+                        label={tCommon("attachments")}
+                      />
+                    )}
                   </li>
                 ))}
               </ul>

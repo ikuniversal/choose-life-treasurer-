@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  getReceiptAttachments,
+  type AttachmentLink,
+} from "@/lib/data/receipt-attachments";
 import type { Database } from "@/lib/supabase/database.types";
 
 type ItemStatus = Database["public"]["Enums"]["item_status"];
@@ -16,6 +20,8 @@ export interface ActivityReceipt {
   isLate: boolean;
   isDuplicate: boolean;
   groupName: string | null;
+  /** extra attachments beyond the primary photo (migration #17). */
+  attachments: AttachmentLink[];
 }
 
 export interface ActivityNote {
@@ -78,6 +84,11 @@ export async function getUserActivity(
   // Unknown id: no profile AND no auth account.
   if (!fullName && !email && !authUser?.user) return null;
 
+  // Extra attachments per receipt (migration #17), batched.
+  const attByReceipt = await getReceiptAttachments(
+    (receiptsRes.data ?? []).map((r) => r.id),
+  );
+
   const receipts: ActivityReceipt[] = (receiptsRes.data ?? []).map((r) => ({
     id: r.id,
     vendor: r.vendor,
@@ -89,6 +100,7 @@ export async function getUserActivity(
     isLate: r.is_late,
     isDuplicate: r.is_duplicate,
     groupName: r.groups?.name ?? null,
+    attachments: attByReceipt.get(r.id) ?? [],
   }));
 
   const notes: ActivityNote[] = (notesRes.data ?? []).map((n) => ({

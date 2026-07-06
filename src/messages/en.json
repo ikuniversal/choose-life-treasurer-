@@ -85,6 +85,9 @@
     "fileHint": "Photo, PDF, or Word document — up to 10 MB.",
     "badFileType": "Use a photo (JPG/PNG/WEBP/HEIC), a PDF, or a Word document.",
     "badFileSize": "That file is too large (max 10 MB).",
+    "fileHintMulti": "Photo, PDF, or Word — up to 10 MB each. Select several to attach more than one.",
+    "attachedCount": "{count} extra file(s) attached",
+    "tooManyFiles": "You can attach up to 5 extra files.",
     "uploading": "Uploading…",
     "analyzing": "Reading receipt…",
     "vendor": "Vendor",
@@ -392,6 +395,7 @@
   },
   "common": {
     "dueWord": "Due",
-    "chatReadOnlyNote": "This conversation is read-only."
+    "chatReadOnlyNote": "This conversation is read-only.",
+    "attachments": "Attachments"
   }
 }
