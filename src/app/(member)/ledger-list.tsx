@@ -7,6 +7,7 @@ import { StatusPill } from "@/components/status-pill";
 import { LateBadge } from "@/components/late-badge";
 import { DuplicateBadge } from "@/components/duplicate-badge";
 import { CommentThread } from "@/components/comment-thread";
+import { AttachmentLinks } from "@/components/attachment-links";
 import { FilterPillRow, type FilterOption } from "@/components/filter-pill-row";
 import type { LedgerItem } from "@/lib/data/member-ledger";
 import { LedgerItemDelete } from "./ledger-item-delete";
@@ -22,6 +23,7 @@ const STATUS_ORDER = ["pending", "approved", "rejected", "reviewed"] as const;
 export function LedgerList({ items }: { items: LedgerItem[] }) {
   const t = useTranslations("member");
   const tStatus = useTranslations("status");
+  const tCommon = useTranslations("common");
   const [filter, setFilter] = useState("all");
 
   const options: FilterOption[] = useMemo(() => {
@@ -109,6 +111,14 @@ export function LedgerList({ items }: { items: LedgerItem[] }) {
                 </div>
               </div>
             </div>
+            {item.attachments.length > 0 && (
+              <div className="mt-2">
+                <AttachmentLinks
+                  attachments={item.attachments}
+                  label={tCommon("attachments")}
+                />
+              </div>
+            )}
             {/* Members may remove their own submission while it is still
                 pending review (always a soft delete). */}
             {item.status === "pending" && (

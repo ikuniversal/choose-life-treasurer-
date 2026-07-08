@@ -258,6 +258,38 @@ export type Database = {
         }
         Relationships: []
       }
+      receipt_attachments: {
+        Row: {
+          created_at: string
+          id: string
+          mime_type: string | null
+          path: string
+          receipt_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mime_type?: string | null
+          path: string
+          receipt_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mime_type?: string | null
+          path?: string
+          receipt_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_attachments_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "receipts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipts: {
         Row: {
           additional_info: string | null

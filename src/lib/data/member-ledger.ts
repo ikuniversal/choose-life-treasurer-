@@ -1,4 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  getReceiptAttachments,
+  type AttachmentLink,
+} from "@/lib/data/receipt-attachments";
 import type { Database } from "@/lib/supabase/database.types";
 
 type ItemStatus = Database["public"]["Enums"]["item_status"];
@@ -23,6 +27,8 @@ export interface LedgerItem {
   photoIsImage: boolean;
   /** evidence file name (doc-icon label / img alt) — UGC, else null. */
   photoName: string | null;
+  /** extra attachments beyond the primary photo (migration #17); [] for notes. */
+  attachments: AttachmentLink[];
 }
 
 export interface MemberLedger {
@@ -79,6 +85,11 @@ export async function getMemberLedger(): Promise<MemberLedger> {
       .order("note_date", { ascending: false }),
   ]);
 
+  // Extra attachments per receipt (migration #17), batched.
+  const attByReceipt = await getReceiptAttachments(
+    (receiptsRes.data ?? []).map((r) => r.id),
+  );
+
   // A member has SELECT on their own receipt rows, so RLS grants the signed URL
   // (receipt_photos_select → owner-of-linked-receipt). No new grant needed.
   const receipts: LedgerItem[] = await Promise.all(
@@ -112,6 +123,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
         photoUrl,
         photoIsImage: r.photo_path ? IMAGE_EXT.test(r.photo_path) : false,
         photoName: r.photo_path ? (r.photo_path.split("/").pop() ?? null) : null,
+        attachments: attByReceipt.get(r.id) ?? [],
       };
     }),
   );
@@ -131,6 +143,7 @@ export async function getMemberLedger(): Promise<MemberLedger> {
     photoUrl: null,
     photoIsImage: false,
     photoName: null,
+    attachments: [],
   }));
 
   const items = [...receipts, ...notes].sort((a, b) =>

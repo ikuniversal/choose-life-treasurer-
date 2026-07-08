@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CommentThread } from "@/components/comment-thread";
+import { AttachmentLinks } from "@/components/attachment-links";
 import { LateBadge } from "@/components/late-badge";
 import { DuplicateBadge } from "@/components/duplicate-badge";
 import {
@@ -25,6 +26,7 @@ export function ReviewQueue({
 }) {
   const t = useTranslations("review");
   const tCat = useTranslations("categories");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -158,6 +160,14 @@ export function ReviewQueue({
                 <p className="mt-1 text-sm text-body">
                   {t("note")}: {item.note}
                 </p>
+              )}
+              {item.attachments.length > 0 && (
+                <div className="mt-2">
+                  <AttachmentLinks
+                    attachments={item.attachments}
+                    label={tCommon("attachments")}
+                  />
+                </div>
               )}
 
               {rejectingId === item.id ? (

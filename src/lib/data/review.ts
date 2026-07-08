@@ -1,4 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  getReceiptAttachments,
+  type AttachmentLink,
+} from "@/lib/data/receipt-attachments";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Category = Database["public"]["Enums"]["expense_category"];
@@ -21,6 +25,8 @@ export interface ReviewItem {
   photoIsImage: boolean;
   /** attachment file name (for the download-link label), else null. UGC — not translated. */
   photoName: string | null;
+  /** extra attachments beyond the primary photo (migration #17). */
+  attachments: AttachmentLink[];
   isLate: boolean;
   isDuplicate: boolean;
 }
@@ -57,6 +63,9 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
     for (const p of profiles ?? []) nameById.set(p.id, p.full_name);
   }
 
+  // Extra attachments per receipt (migration #17), batched.
+  const attByReceipt = await getReceiptAttachments(rows.map((r) => r.id));
+
   return Promise.all(
     rows.map(async (r) => {
       let photoUrl: string | null = null;
@@ -90,6 +99,7 @@ export async function getReviewQueue(): Promise<ReviewItem[]> {
         photoUrl,
         photoIsImage,
         photoName,
+        attachments: attByReceipt.get(r.id) ?? [],
         isLate: r.is_late,
         isDuplicate: r.is_duplicate,
       };

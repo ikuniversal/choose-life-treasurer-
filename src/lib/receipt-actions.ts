@@ -75,6 +75,32 @@ export async function saveReceipt(formData: FormData): Promise<SaveState> {
   const note = String(formData.get("note") ?? "").trim();
   const photo_path = String(formData.get("photoPath") ?? "").trim();
 
+  // Extra attachments (migration #17): JSON [{ path, mime }]. The primary file
+  // stays photo_path above; these are additional evidence. Capped at 5, matching
+  // the client. Parsed defensively — a bad payload just means no extras.
+  const MAX_ATTACHMENTS = 5;
+  let attachments: { path: string; mime: string | null }[] = [];
+  try {
+    const raw = String(formData.get("attachments") ?? "");
+    if (raw) {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        attachments = parsed
+          .map((a) => ({
+            path: String((a as { path?: unknown })?.path ?? "").trim(),
+            mime:
+              typeof (a as { mime?: unknown })?.mime === "string"
+                ? ((a as { mime: string }).mime || null)
+                : null,
+          }))
+          .filter((a) => a.path)
+          .slice(0, MAX_ATTACHMENTS);
+      }
+    }
+  } catch {
+    attachments = [];
+  }
+
   if (
     !group_id ||
     !vendor ||
@@ -98,20 +124,38 @@ export async function saveReceipt(formData: FormData): Promise<SaveState> {
   if (!fx) return { error: "badCurrency" };
   const usd_equivalent = Math.round(amount * fx.rate_to_usd * 100) / 100;
 
-  const { error } = await supabase.from("receipts").insert({
-    group_id,
-    submitted_by: user.id,
-    vendor,
-    receipt_date,
-    amount,
-    currency,
-    usd_equivalent,
-    category,
-    status: "pending",
-    photo_path,
-    additional_info: note || null,
-  });
-  if (error) return { error: "saveFailed" };
+  const { data: inserted, error } = await supabase
+    .from("receipts")
+    .insert({
+      group_id,
+      submitted_by: user.id,
+      vendor,
+      receipt_date,
+      amount,
+      currency,
+      usd_equivalent,
+      category,
+      status: "pending",
+      photo_path,
+      additional_info: note || null,
+    })
+    .select("id")
+    .single();
+  if (error || !inserted) return { error: "saveFailed" };
+
+  // Attach the extra files (migration #17). Best-effort: the receipt is already
+  // saved; a failed attachment insert must not fail the whole submission (the
+  // primary evidence is intact). RLS receipt_attachments_insert re-checks the
+  // owner + group.
+  if (attachments.length > 0) {
+    await supabase.from("receipt_attachments").insert(
+      attachments.map((a) => ({
+        receipt_id: inserted.id,
+        path: a.path,
+        mime_type: a.mime,
+      })),
+    );
+  }
 
   revalidatePath("/");
   return { ok: true };

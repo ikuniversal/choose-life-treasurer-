@@ -51,7 +51,11 @@ const FIELD_CONFIDENCE_MIN = 0.5;
 const API_VERSION = "2024-11-30";
 const SUBMIT_TIMEOUT_MS = 15000;
 const POLL_TIMEOUT_MS = 10000;
-const POLL_INTERVAL_MS = 1200;
+// Tighter polling: a small receipt often finishes within ~1s, so check early and
+// back off gently instead of a flat 1.2s wait. Same overall budget + fail-closed.
+const POLL_FIRST_MS = 600;
+const POLL_MAX_MS = 2000;
+const POLL_BACKOFF = 1.5;
 const POLL_BUDGET_MS = 18000;
 
 // Minimal shape of the bits of the Azure response we read (the body is otherwise
@@ -116,10 +120,14 @@ export async function extractReceipt(
     if (!operationLocation) return null;
 
     // 2. Poll the operation until it succeeds/fails or the budget runs out.
+    // Start soon (~600ms) and back off gently up to ~2s — most receipts resolve
+    // in the first couple of polls, shaving a fixed 1.2s wait off the fast path.
     const deadline = Date.now() + POLL_BUDGET_MS;
+    let wait = POLL_FIRST_MS;
     let result: AzureAnalyze | null = null;
     while (Date.now() < deadline) {
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+      await new Promise((r) => setTimeout(r, wait));
+      wait = Math.min(Math.round(wait * POLL_BACKOFF), POLL_MAX_MS);
       const poll = await fetch(operationLocation, {
         headers: { "Ocp-Apim-Subscription-Key": key },
         signal: AbortSignal.timeout(POLL_TIMEOUT_MS),

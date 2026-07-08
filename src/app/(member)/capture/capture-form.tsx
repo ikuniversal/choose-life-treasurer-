@@ -18,6 +18,8 @@ const RECEIPT_BUCKET = "receipt-photos";
 // Receipt evidence: images (camera/library) OR a PDF / Word document. Matches the
 // bucket's allowed mime types (Director-applied). 10MB ceiling matches the bucket.
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+// A receipt may carry extra attachments beyond the primary (migration #17).
+const MAX_ATTACHMENTS = 5;
 const ALLOWED_MIME = [
   "image/jpeg",
   "image/png",
@@ -31,6 +33,47 @@ const ACCEPT = ALLOWED_MIME.join(",");
 // Fallback when the browser reports an empty mime type (e.g. some HEIC pickers).
 const ALLOWED_EXT = /\.(jpe?g|png|webp|heic|pdf|docx?)$/i;
 const IMAGE_EXT = /\.(jpe?g|png|webp|heic)$/i;
+
+// OCR speed: downscale the image CLIENT-SIDE for the OCR call ONLY (the stored
+// original is never touched). ~1600px max edge + JPEG 0.75 shrinks the analyze
+// payload ~10× with no loss of evidence quality. Falls back to the original
+// bytes on any failure.
+const OCR_MAX_EDGE = 1600;
+const OCR_JPEG_QUALITY = 0.75;
+
+async function downscaleForOcr(file: File): Promise<Blob> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = url;
+    });
+    const scale = Math.min(1, OCR_MAX_EDGE / Math.max(img.width, img.height));
+    if (scale >= 1) return file; // already small enough — send as-is
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob = await new Promise<Blob | null>((res) =>
+      canvas.toBlob(res, "image/jpeg", OCR_JPEG_QUALITY),
+    );
+    return blob ?? file;
+  } catch {
+    return file;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function isImageFile(f: File): boolean {
+  return f.type ? f.type.startsWith("image/") : IMAGE_EXT.test(f.name);
+}
 
 type Phase = "idle" | "uploading" | "analyzing" | "verify" | "saving" | "done";
 
@@ -54,7 +97,11 @@ export function CaptureForm({
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
-  // Local preview of the chosen file (object URL for images) — drives the
+  // Extra attachments uploaded alongside the primary (path + mime for the row).
+  const [attachments, setAttachments] = useState<
+    { path: string; mime: string | null }[]
+  >([]);
+  // Local preview of the chosen primary file (object URL for images) — drives the
   // upload-confirmation card so the member visibly sees what was submitted.
   const [preview, setPreview] = useState<{
     url: string | null;
@@ -69,6 +116,7 @@ export function CaptureForm({
     amount: string;
     currency: string;
     at: string;
+    attachmentCount: number;
   } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -85,76 +133,104 @@ export function CaptureForm({
   const deadline = groups.find((g) => g.id === groupId)?.deadline ?? null;
   const deadlinePassed = deadline !== null && deadline < today;
 
-  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !groupId) return;
+  async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const list = e.target.files;
+    if (!list || list.length === 0 || !groupId) return;
+    const files = Array.from(list);
     setError(null);
 
     // Client-side validation (server RLS + bucket mime allow-list are the real gate).
-    const typeOk = file.type
-      ? ALLOWED_MIME.includes(file.type)
-      : ALLOWED_EXT.test(file.name);
-    if (!typeOk) {
-      setError("badFileType");
-      return;
+    for (const f of files) {
+      const typeOk = f.type ? ALLOWED_MIME.includes(f.type) : ALLOWED_EXT.test(f.name);
+      if (!typeOk) {
+        setError("badFileType");
+        return;
+      }
+      if (f.size > MAX_UPLOAD_BYTES) {
+        setError("badFileSize");
+        return;
+      }
     }
-    if (file.size > MAX_UPLOAD_BYTES) {
-      setError("badFileSize");
-      return;
-    }
-    const isImage = file.type
-      ? file.type.startsWith("image/")
-      : IMAGE_EXT.test(file.name);
 
-    setPhase("uploading");
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const path = `${groupId}/${crypto.randomUUID()}.${ext}`;
+    // PRIMARY = the first image (OCR source + photo_path); if none, the first
+    // file. Everything else becomes an attachment (capped at 5).
+    const firstImageIdx = files.findIndex(isImageFile);
+    const primaryIdx = firstImageIdx === -1 ? 0 : firstImageIdx;
+    const primary = files[primaryIdx];
+    const rest = files.filter((_, i) => i !== primaryIdx);
+    if (rest.length > MAX_ATTACHMENTS) {
+      setError("tooManyFiles");
+      return;
+    }
+    const primaryIsImage = isImageFile(primary);
+
+    setPhase(primaryIsImage ? "analyzing" : "uploading");
     const supabase = createClient();
-    const { error: upErr } = await supabase.storage
-      .from(RECEIPT_BUCKET)
-      .upload(path, file, { upsert: false });
-    if (upErr) {
-      setError("uploadFailed");
-      setPhase("idle");
-      return;
-    }
-    setPhotoPath(path);
-    // Keep a local preview of exactly what was uploaded (object URL for images)
-    // for the post-save confirmation card — no storage read-back needed.
-    setPreview({
-      url: isImage ? URL.createObjectURL(file) : null,
-      isImage,
-      name: file.name,
-    });
 
-    // OCR only applies to images. A PDF / Word doc goes straight to manual entry —
-    // a NORMAL path, not a failure, so no "couldn't read" message is shown.
-    // Pass the in-memory File straight to the OCR action — never re-fetch what we
-    // just uploaded (the read-back would 400 under RLS and hang the spinner).
-    if (isImage) {
-      setPhase("analyzing");
-      try {
-        const fd = new FormData();
-        fd.set("file", file);
-        const res = await analyzeReceipt(fd);
-        if (res) {
-          if (res.vendor) setVendor(res.vendor);
-          if (res.date) setDate(res.date);
-          if (res.amount != null) setAmount(String(res.amount));
-          if (res.currency && currencies.includes(res.currency))
-            setCurrency(res.currency);
-          if (res.category && CATEGORIES.includes(res.category as Category))
-            setCategory(res.category as Category);
+    async function uploadOne(
+      file: File,
+    ): Promise<{ path: string; mime: string | null }> {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `${groupId}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from(RECEIPT_BUCKET)
+        .upload(path, file, { upsert: false });
+      if (upErr) throw new Error("uploadFailed");
+      return { path, mime: file.type || null };
+    }
+
+    // OCR runs in PARALLEL with all uploads and on the DOWNSCALED image only.
+    const ocrPromise = primaryIsImage
+      ? (async () => {
+          try {
+            const blob = await downscaleForOcr(primary);
+            const ocrFile =
+              blob instanceof File
+                ? blob
+                : new File([blob], "ocr.jpg", { type: "image/jpeg" });
+            const fd = new FormData();
+            fd.set("file", ocrFile);
+            return await analyzeReceipt(fd);
+          } catch {
+            return null;
+          }
+        })()
+      : Promise.resolve(null);
+
+    try {
+      const [primaryUp, restUp, ocr] = await Promise.all([
+        uploadOne(primary),
+        Promise.all(rest.map(uploadOne)),
+        ocrPromise,
+      ]);
+
+      setPhotoPath(primaryUp.path);
+      setAttachments(restUp);
+      setPreview({
+        url: primaryIsImage ? URL.createObjectURL(primary) : null,
+        isImage: primaryIsImage,
+        name: primary.name,
+      });
+
+      if (primaryIsImage) {
+        if (ocr) {
+          if (ocr.vendor) setVendor(ocr.vendor);
+          if (ocr.date) setDate(ocr.date);
+          if (ocr.amount != null) setAmount(String(ocr.amount));
+          if (ocr.currency && currencies.includes(ocr.currency))
+            setCurrency(ocr.currency);
+          if (ocr.category && CATEGORIES.includes(ocr.category as Category))
+            setCategory(ocr.category as Category);
         } else {
           setError("analyzeFailed");
         }
-      } catch {
-        // OCR failed hard (e.g. payload/network) → manual entry, never a hang.
-        setError("analyzeFailed");
       }
+      // ALWAYS resolves to the verify form regardless of OCR result.
+      setPhase("verify");
+    } catch {
+      setError("uploadFailed");
+      setPhase("idle");
     }
-    // ALWAYS resolves the spinner — the verify form shows regardless of OCR result.
-    setPhase("verify");
   }
 
   async function onSave(e: React.FormEvent) {
@@ -172,6 +248,7 @@ export function CaptureForm({
     fd.set("category", category);
     fd.set("note", note);
     fd.set("photoPath", photoPath);
+    fd.set("attachments", JSON.stringify(attachments));
 
     const r = await saveReceipt(fd);
     if (r.error) {
@@ -179,9 +256,7 @@ export function CaptureForm({
       setPhase("verify");
       return;
     }
-    // Unmistakable confirmation before leaving the flow: the member sees the very
-    // photo/file they submitted plus vendor/amount and a timestamp. They tap
-    // through (or add another) — no silent redirect where the save is ambiguous.
+    // Unmistakable confirmation before leaving the flow.
     setSaved({
       previewUrl: preview?.url ?? null,
       isImage: preview?.isImage ?? false,
@@ -190,6 +265,7 @@ export function CaptureForm({
       amount,
       currency,
       at: new Date().toISOString(),
+      attachmentCount: attachments.length,
     });
     setPhase("done");
   }
@@ -199,6 +275,7 @@ export function CaptureForm({
     setPhase("idle");
     setError(null);
     setPhotoPath(null);
+    setAttachments([]);
     setPreview(null);
     setSaved(null);
     setVendor("");
@@ -241,11 +318,16 @@ export function CaptureForm({
               </p>
             )}
             {saved.amount && (
-              <p className="font-mono text-sm text-olive">
+              <p className="num text-sm text-olive">
                 {saved.amount} {saved.currency}
               </p>
             )}
-            <p className="mt-1 font-mono text-xs text-faint">
+            {saved.attachmentCount > 0 && (
+              <p className="mt-1 text-xs text-muted">
+                {t("attachedCount", { count: saved.attachmentCount })}
+              </p>
+            )}
+            <p className="mt-1 num text-xs text-faint">
               {new Date(saved.at).toLocaleString()}
             </p>
           </div>
@@ -298,15 +380,16 @@ export function CaptureForm({
         <label className="flex flex-col gap-1.5">
           <span className="text-sm text-body">{t("photo")}</span>
           {/* No `capture` attr → the OS shows its native picker (Camera / Photo
-              Library / Browse Files). Accepts images + PDF + Word. */}
+              Library / Browse Files). Accepts images + PDF + Word, multiple. */}
           <input
             ref={fileRef}
             type="file"
             accept={ACCEPT}
-            onChange={onFile}
+            multiple
+            onChange={onFiles}
             className="text-sm text-body file:mr-3 file:rounded-btn file:border-0 file:bg-olive file:px-4 file:py-2 file:text-sm file:text-canvas"
           />
-          <span className="text-xs text-faint">{t("fileHint")}</span>
+          <span className="text-xs text-faint">{t("fileHintMulti")}</span>
         </label>
       )}
 
@@ -318,6 +401,11 @@ export function CaptureForm({
 
       {(phase === "verify" || phase === "saving") && (
         <form onSubmit={onSave} className="flex flex-col gap-3">
+          {attachments.length > 0 && (
+            <p className="text-xs text-muted">
+              {t("attachedCount", { count: attachments.length })}
+            </p>
+          )}
           <label className="flex flex-col gap-1.5">
             <span className="text-sm text-body">{t("vendor")}</span>
             <input
