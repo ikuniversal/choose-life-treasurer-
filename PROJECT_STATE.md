@@ -6,7 +6,7 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > reads THIS file and confirms.
 >
 > Template version: v2.8
-> Last updated: 2026-07-06 by Cody (Code Agent, on Director 6.0 instruction) — BANK #17 + #62 (OPEN/HOLD): OCR speed pass (client downscale for the OCR call only ~1600px/JPEG 0.75 · upload+OCR in parallel · Azure poll tightened ~600ms→2s) + multi-attachment capture (migration #17 receipt_attachments; first image = primary/OCR, up to 5 extras; attachment count + signed-URL links in review/ledger/activity) → PR #62, HOLD. database.types.ts REGENERATED for receipt_attachments. Migrations 12→17 — source-lock-in 17/17 (#17 mirrored via #62). TEST DATA CLEARED: live receipts = 0 (total), no_receipt_notes = 0, receipt_attachments = 0 (operator wiped test data; verified via MCP). prod = 8d92f9f (#60) — #62 still HOLD. PRIOR-CYCLE (already done, relay may have dropped the report): #57/#58/#60 merged + the #57↔#60 /console/users auto-merge audit (CLEAN) + #50 e2e CLOSED were all banked in #61 (159af0d). Owed now ONLY: 4 orphan storage files + i18n seed/logos. Designated branch claude/chat-session-e4mevb synced → 159af0d.
+> Last updated: 2026-07-09 by Cody (Code Agent, on Director 6.0 instruction) — BANK #62/#64/#65 MERGED + Project Admin role + group expenses. CORRECTS #63's stale "#62 OPEN/HOLD": #62 MERGED fc7ff44 (OCR speed + multi-attachment, delayed by the Vercel outage). #64 MERGED 90de69c (Project Admin role UI — new app_role 'project_admin', user_roles.project_id, is_project_admin_of() kept SEPARATE from is_admin(); scoped group CRUD + treasurer/member mgmt; role-branched /console/users 3 ways; project-scoped dashboard). #65 MERGED 105c67a (dashboard SummaryCards → tappable; export-link version). Migrations 17→22 — source-lock-in 22/22: #18 project_admin foundation · #19 is_project_admin_of helper · #20 group+role mgmt RLS · #21 role-scope constraint correction · #22 project_admin names + spend visibility (CLOSES the two #64 gaps Cody flagged — get_group_member_names widened + receipts/notes SELECT for project_admin). database.types.ts REGENERATED (project_admin enum + project_id + helper). OPEN this cycle (HOLD): #66 /console/groups/[id] browsable group-expenses list (FilterPillRow + StatusPill + LATE/DUP; new getGroupActivity; repoints SummaryCard export-link → /console/groups/{id}) — the operator-preferred revise of #65. prod = 105c67a (#65). Owed now ONLY: 4 orphan storage files + i18n seed/logos. Designated branch claude/chat-session-e4mevb to be resynced → 105c67a.
 
 ═══════════════════════════════════════════════════════════
 SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
@@ -26,8 +26,9 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = 8d92f9f (merge #60), READY.
-  (Was 6f3c329/#40 at last write; #42–#46 shipped + merged untracked — reconciled this bank.)
+- App live: https://choose-life-treasurer.vercel.app · prod = 105c67a (merge #65), READY.
+  (Was 8d92f9f/#60 at last write; #62 OCR+attachments · #64 Project Admin role · #65 dashboard
+  card links all merged since — reconciled this bank. #66 group-expenses page OPEN/HOLD.)
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -52,16 +53,20 @@ IN-FLIGHT / HANDED FORWARD:
    review+export+ledger), 3/3b (#56, tasks) all SHIPPED. Per the design-fidelity addendum
    the SummaryCard now shows approved-only spend + a gold/terracotta progress bar (#53) —
    this SUPERSEDES the earlier "limit + counts only, no bar" call (§8 updated).
-5. Migrations source-lock-in — CLOSED at 17/17 (#13/#14 via #54, #15 via #57, #16 via #60, #17 via #62).
-   #49 dup-trigger gap RESOLVED by Director's migration #14 (exclude_soft_deleted_from_duplicate_check).
-6. Admin any-group capture + per-user activity SHIPPED (#60, 8d92f9f) — admins file receipts
-   into any group; /console/users/[id] admin-only activity view. Migration #16 live.
+5. Migrations source-lock-in — CLOSED at 22/22 (#13/#14 via #54, #15 via #57, #16 via #60,
+   #17 via #62, #18–#22 via #64). #49 dup-trigger gap RESOLVED by migration #14; the two #64
+   project_admin data gaps (names + spend visibility) RESOLVED by migration #22.
+6. Project Admin role SHIPPED (#64, 90de69c) — new app_role 'project_admin' + user_roles.project_id;
+   is_project_admin_of() kept SEPARATE from is_admin(); scoped group CRUD + treasurer/member mgmt;
+   role-branched /console/users 3 ways; project-scoped dashboard. Migrations #18–#22 live.
 
-RESOLVED: Source-lock-in fully closed (17/17). Design refresh fully shipped (1/3→3/3).
-#57 (treasurer member removal) + #58 (DRY pills) + #60 (admin capture + activity) all MERGED,
-0 runtime errors, banked in #61 (159af0d). #60/#57 /console/users auto-merge audited CLEAN.
+RESOLVED: Source-lock-in fully closed (22/22). Design refresh fully shipped (1/3→3/3).
+#62 (OCR speed + multi-attachment, fc7ff44) + #64 (Project Admin role UI, 90de69c) + #65
+(dashboard card links, export-link version, 105c67a) all MERGED, 0 runtime errors, banked here.
+#64's two data gaps (project_admin names + spend visibility) CLOSED by Director's migration #22.
 #50 auth-delete e2e CLOSED (operator deleted Dan + Dave, verified 0 rows in auth.users).
-Designated branch synced → 159af0d. OPEN this cycle (HOLD): #62 OCR speed + multi-attachment.
+Designated branch to be synced → 105c67a. OPEN this cycle (HOLD): #66 /console/groups/[id]
+browsable group-expenses list (repoints the #65 SummaryCard export-link → /console/groups/{id}).
 TEST DATA CLEARED: live receipts / notes / attachments all 0 (operator-wiped, MCP-verified).
 
 RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
@@ -125,9 +130,10 @@ restored; the 5.0 degradation no longer applies).
   (stuck-upload fix) · #45 (upload confirmation + ledger thumbnails) · #46 (guarded role
   removal). Soft/hard delete #49 · delete user #50 · design refresh 1/3 #51 · 2/3 #53 ·
   3/3a #55 · 3/3b #56 (reskin COMPLETE) · treasurer member removal #57 · admin any-group
-  capture + per-user activity #60 · OCR speed + multi-attachment #62 (OPEN/HOLD).
-  Migrations source-lock-in CLOSED 17/17. prod = 8d92f9f (#60).
-  Auth + capture + review + polish + full reskin all live.
+  capture + per-user activity #60 · OCR speed + multi-attachment #62 · Project Admin role UI
+  #64 · dashboard card links #65 · group-expenses page #66 (OPEN/HOLD).
+  Migrations source-lock-in CLOSED 22/22. prod = 105c67a (#65).
+  Auth + capture + review + polish + full reskin + Project Admin role all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
 - Test data: "Belts"/"Camp" smoke-test rows DELETED via MCP (0 rows). Remaining: 4 orphan
@@ -184,7 +190,11 @@ restored; the 5.0 degradation no longer applies).
 | 60 | Admin any-group capture + per-user activity (+ mirror #16) | 8d92f9f (feat 35a3b7d) | 2026-07-05 | Live migration #16 (admin_insert_receipts_any_group, 20260705133257) — additive admin INSERT policies on receipts (submitted_by=self AND is_admin()) + receipt-photos storage; member policies untouched. UI/server-action only. /capture: admins get a required dropdown of ALL groups ("Project · Group", getAllGroupsForCapture on the RLS client), upload to receipt-photos/{chosen group_id}, insert group_id=chosen (saveReceipt keeps submitted_by=self; is_late/is_duplicate stay trigger-owned); members unchanged. /console/users/[id]: admin-only per-user activity — receipts+notes newest-first, deleted_at is null, on the RLS client; email via a single auth.admin.getUserById (sanctioned §8); StatusPill + LATE/DUP + .num; link added to admin user rows only. Mirrors migration #16 → source-lock-in 16/16. i18n EN/RU. Built pre-#57; auto-merged onto #57's role-branched /console/users — AUDITED CLEAN (role branch intact, link only in admin branch, no dup markup, tsc+build green). MERGED, 0 runtime errors. |
 
 | 61 | Docs bank #57/#58/#60 merged + post-merge audit | 159af0d | 2026-07-05 | PROJECT_STATE bank (docs-only, self-merge §11): #57/#58/#60 merge SHAs; #57↔#60 /console/users auto-merge AUDITED CLEAN; #50 e2e CLOSED; migration #16 + source-lock-in 16/16; §8 precedents (admin capture, per-user activity). |
-| 62 | OCR speed pass + multi-attachment capture (+ mirror #17) | OPEN PR #62 (HOLD) | 2026-07-06 | Live migration #17 (add_receipt_attachments_table, 20260705225506 — receipt_attachments child table, RLS mirrors parent receipt). UI/server-action only; types REGENERATED. (A) OCR speed: client-side downscale for the OCR call ONLY (~1600px/JPEG 0.75, stored original untouched, ~10× smaller payload); storage upload(s) + OCR run in parallel (Promise.all); Azure poll tightened (first ~600ms, backoff→2s, same budget + fail-closed). (B) Multi-attachment: capture input multi-select (#43 mime set); first image = PRIMARY (photo_path + OCR), remaining ≤5 (10MB each) → receipt-photos/{group_id}/ + one receipt_attachments row each after the receipt insert (best-effort, is_late/is_duplicate stay trigger-owned); shared getReceiptAttachments (batched select + signed URLs) + hook-free AttachmentLinks; count + signed-URL links shown in review queue, member ledger, /console/users/[id] activity. Mirrors migration #17 → source-lock-in 17/17. i18n EN/RU. lint+tsc+build green. |
+| 62 | OCR speed pass + multi-attachment capture (+ mirror #17) | fc7ff44 | 2026-07-06 | Live migration #17 (add_receipt_attachments_table, 20260705225506 — receipt_attachments child table, RLS mirrors parent receipt). UI/server-action only; types REGENERATED. (A) OCR speed: client-side downscale for the OCR call ONLY (~1600px/JPEG 0.75, stored original untouched, ~10× smaller payload); storage upload(s) + OCR run in parallel (Promise.all); Azure poll tightened (first ~600ms, backoff→2s, same budget + fail-closed). (B) Multi-attachment: capture input multi-select (#43 mime set); first image = PRIMARY (photo_path + OCR), remaining ≤5 (10MB each) → receipt-photos/{group_id}/ + one receipt_attachments row each after the receipt insert (best-effort, is_late/is_duplicate stay trigger-owned); shared getReceiptAttachments (batched select + signed URLs) + hook-free AttachmentLinks; count + signed-URL links shown in review queue, member ledger, /console/users/[id] activity. Mirrors migration #17 → source-lock-in 17/17. i18n EN/RU. MERGED (delayed by the Vercel outage; CORRECTS #63's stale "#62 OPEN/HOLD"). |
+| 63 | Docs bank #17 + #62 + receipts-cleared | 71a159b | 2026-07-06 | PROJECT_STATE bank (docs-only, self-merge §11): migration #17 + source-lock-in 17/17, #62 row (recorded OPEN at write — later corrected to MERGED fc7ff44 by this bank), TEST DATA CLEARED note (live receipts/notes/attachments all 0). |
+| 64 | Project Admin role — UI (+ mirror #18–#22) | 90de69c | 2026-07-09 | Live migrations #18–#22 (project_admin foundation + is_project_admin_of helper + group/role mgmt RLS + role-scope constraint correction + names/spend visibility). New app_role 'project_admin' + user_roles.project_id; is_project_admin_of() kept SEPARATE from is_admin() (never widened). 1) /console/users invite gains Project Admin option → Project picker replaces Group picker, sets project_id + group_id null. 2) THREE-branch /console/users: admin (unchanged) · project_admin (their project's groups + rosters — scoped group CRUD via paCreateGroup/paUpdateGroup/paDeleteGroup over guarded-delete, treasurer/member mgmt via paAssignRole/paRemoveRole, NO invite-new-user; RLS is the real gate, caller re-checked, .select() detects 0-row scope failures) · treasurer (unchanged). 3) Project-scoped dashboard (their project's SummaryCards, no org StatCards). auth.ts: RoleAssignment gains projectId/projectName, CONSOLE_ROLES incl. project_admin, isOrgAdmin/projectAdminProjects helpers. Console plumbing: nav Users link shown to admin OR project_admin (projects/rates stay admin-only). Mirrors #18–#22 → source-lock-in 22/22. types REGENERATED. i18n EN/RU. FLAGGED two data gaps at PR (get_group_member_names + receipts/notes SELECT excluded project_admin → names uuid-fallback + counts read 0) — Director CLOSED both via migration #22. MERGED. |
+| 65 | Dashboard group cards → tappable (export-link) | 105c67a (feat d478769) | 2026-07-09 | SummaryCard wrapped in a Link into an existing filtered expense view — Director's read = the /console/export surface with the group pre-selected via URL param (?group=<id>); export page gains a searchParams param that pre-selects the group filter (unknown/out-of-scope id → "all"). Visible affordance: ChevronRight + hover lift/shadow + focus ring + aria-label. Applies to admin/treasurer/project_admin dashboards. No new route/query/RLS. i18n dashboard.viewGroupExpenses. Cody flagged that /console/export is a download FORM (no on-page list) and /console/review is pending-only → operator preferred a purpose-built browsable list → revise #66. MERGED. |
+| 66 | /console/groups/[id] browsable group expenses (revise of #65) | OPEN PR #66 (HOLD) | 2026-07-09 | NEW on-page browsable expenses list at /console/groups/[id]: server page getGroupActivity(id) (notFound() if null), back link to /console, header (project · group), client GroupActivityList unifying receipts + notes into rows — FilterPillRow (All + statuses present) + StatusPill + LATE/DUP + .num + AttachmentLinks (reuses #60's activity rendering keyed on group_id; new getGroupActivity read; groupExpenses i18n namespace). Repoints the #65 SummaryCard href from /console/export?group= → /console/groups/{group.id}, keeping the chevron/hover affordance. Export page stays the download surface, unchanged. Migration #22's SELECT policies (receipts_select_project_admin + notes_select_project_admin) + groups_select (is_admin OR is_member_of, covers treasurers) → all three roles see real data. No schema/RLS change. i18n EN/RU. lint+tsc+build green. |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-04 (Director 6.0, CATCH-UP BANK): live/Vercel audit found prod had moved
@@ -256,8 +266,8 @@ restored; the 5.0 degradation no longer applies).
 ## 6. INFRASTRUCTURE STATE (Pro)
 - **Supabase:** project `choose-life-receipt-tool`, ref `avmygueukigqbqhftuic`, org
   `twbszfyctshpcyyzizsp` (Pro), region us-east-1, Postgres 17. Status ACTIVE_HEALTHY.
-- **Migrations (in order, 17 total — verified live via list_migrations; ALL 17 mirrored in
-  supabase/migrations/ — source-lock-in CLOSED 17/17):**
+- **Migrations (in order, 22 total — verified live via list_migrations; ALL 22 mirrored in
+  supabase/migrations/ — source-lock-in CLOSED 22/22):**
   core_schema_and_rls · harden_rls_helper_functions · revoke_anon_execute_role_helpers ·
   rls_initplan_optimization_and_missing_indexes · create_storage_buckets ·
   add_group_member_names_helper (tasks-slice RPC, roadmap #5.3) · add_group_messages_chat ·
@@ -286,8 +296,25 @@ restored; the 5.0 degradation no longer applies).
   via #57; #16 via #60) · add_receipt_attachments_table (#17, 20260705225506 — receipt_attachments
   child table: id / receipt_id FK ON DELETE CASCADE / path / mime_type / created_at + index;
   RLS mirrors the parent receipt — select = admin/treasurer-of-group/owner, insert = owner AND
-  member-of/admin, delete = admin; powers #62 multi-attachment) — #17 mirrored via #62.
-  source-lock-in CLOSED 17/17. None re-run, live schema unchanged.
+  member-of/admin, delete = admin; powers #62 multi-attachment) — #17 mirrored via #62 ·
+  add_project_admin_role_foundation (#18, 20260709062325 — `alter type app_role add value
+  'project_admin'` + `user_roles.project_id uuid references projects(id)`; the new role scopes by
+  project, not group) · add_is_project_admin_helper (#19, 20260709062331 — is_project_admin_of(
+  p_project_id) SECURITY DEFINER: true when the caller holds a project_admin user_roles row for that
+  project; kept SEPARATE from is_admin(), never widens it) · project_admin_group_and_role_management
+  (#20, 20260709062836 — projects_select_project_admin, groups_project_admin_write (ALL),
+  user_roles_select_project_admin, user_roles_project_admin_write (insert treasurer/member only),
+  user_roles_project_admin_delete; a project_admin manages groups + treasurer/member roles WITHIN
+  their project) · fix_role_scope_constraints_for_project_admin (#21, 20260709062933 — drops the old
+  admin_no_group + scoped_role_has_group check constraints, adds role_scope_admin (admin → no group,
+  no project) / role_scope_project_admin (project_admin → project set, group null) / role_scope_group_roles
+  (treasurer/member → group set); schema-constraint correction so the new scope shape is enforced) ·
+  project_admin_names_and_spend_visibility (#22, 20260709070920 — widens get_group_member_names to
+  also return names when the caller is_project_admin_of the group's project, and adds
+  receipts_select_project_admin + notes_select_project_admin; CLOSES the two #64 gaps Cody flagged —
+  names no longer uuid-fallback, spend/counts no longer read 0). #18–#22 all mirrored via #64.
+  source-lock-in CLOSED 22/22. None re-run, live schema unchanged (#18/#21 are the only schema-shape
+  changes — new enum value + column + constraint swap; all Director-authored via MCP, Cody mirrors only).
 - **Schema:** profiles, projects, groups, user_roles (per-group role pairs; admin =
   org-wide, group_id null), receipts, no_receipt_notes, tasks, comments, group_messages,
   fx_rates.
@@ -349,7 +376,7 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 402b5f4 (merge #56), READY
+  https://choose-life-treasurer.vercel.app. Latest prod = 105c67a (merge #65), READY
   (independent preview checks ran on #29/#31/#33/#35/#37/#40/#45/#46; #39 was operator
   out-of-band — Director post-hoc verified 0 runtime errors). ⚠️ Vercel DROPPED the #45
   push-to-main webhook once (prod stuck on #44 after the #45 merge) — recovered with an empty
@@ -376,10 +403,10 @@ restored; the 5.0 degradation no longer applies).
     linked to the now-deleted Ifogbb receipt, 1 is an orphan from an abandoned capture
     retry) — DB row is gone but the physical files remain; PENDING operator dashboard
     tap-delete (no MCP storage-delete tool; raw SQL delete would strand files worse).
-- **Prod-ahead-of-repo drift — CLOSED (17/17):** all 17 live migrations are mirrored under
-  supabase/migrations/ (11 via #40; #12 via #48; #13+#14 via #54; #15 via #57; #16 via #60; #17 via #62). The "mirror
-  every new migration in-session" rule is satisfied. Going forward, any NEW Director-authored
-  migration must still be mirrored in the same session.
+- **Prod-ahead-of-repo drift — CLOSED (22/22):** all 22 live migrations are mirrored under
+  supabase/migrations/ (11 via #40; #12 via #48; #13+#14 via #54; #15 via #57; #16 via #60;
+  #17 via #62; #18–#22 via #64). The "mirror every new migration in-session" rule is satisfied.
+  Going forward, any NEW Director-authored migration must still be mirrored in the same session.
 - **MCP / tooling:** Supabase MCP connected (DB/migrations/storage/advisors/logs/types —
   Director operates directly). Vercel MCP connected READ-ONLY (deployments, build logs,
   runtime errors — RELIABLE independent verification; NO env/redeploy writes, NO storage
@@ -449,6 +476,35 @@ restored; the 5.0 degradation no longer applies).
   and OCR in parallel (Promise.all); poll the Azure LRO soon (~600ms) with gentle backoff. All
   three keep the existing fail-closed-to-manual behavior. Trigger-owned fields (is_late,
   is_duplicate) are still never sent by the app.
+- **Project Admin role — a THIRD scoped role, kept SEPARATE from is_admin (#64, live migrations
+  #18–#22):** app_role gains 'project_admin' + user_roles.project_id; is_project_admin_of(project)
+  is a NEW SECURITY DEFINER helper that NEVER widens is_admin() (org-admin stays org-wide, project
+  admin stays project-scoped). A project_admin manages GROUPS + treasurer/member ROLES within their
+  own project only — RLS (groups_project_admin_write, user_roles_project_admin_write/delete) is the
+  real gate; server actions re-check the caller and use .select() to detect 0-row scope failures.
+  NOT allowed: inviting new auth users (accounts stay admin-only, §8), touching another project,
+  assigning admin/project_admin roles. /console/users is role-branched THREE ways (admin ·
+  project_admin · treasurer). Role-scope check constraints (#21) enforce the shape: admin → no
+  group/project, project_admin → project set + group null, treasurer/member → group set. Reuse
+  is_project_admin_of() + this branch shape for any future project-scoped surface; never fold it
+  into is_admin().
+- **Data-layer widening follows the new role, one migration at a time (#22 closes #64's gaps):**
+  a new scoped role does NOT automatically see names/spend — get_group_member_names + the
+  receipts/notes SELECT policies were is_admin/is_treasurer/is_member only, so a project_admin got
+  uuid-fallback names + 0 counts until migration #22 widened get_group_member_names (adds
+  is_project_admin_of the group's project) and added receipts_select_project_admin +
+  notes_select_project_admin. Precedent: when adding a role, audit EVERY read path it needs (name
+  RPC, per-table SELECT) and widen each by migration — flag the gap at PR time, let the Director
+  author the fix. Name resolution still goes through the RPC ONLY; profiles SELECT is never widened.
+- **Group-expenses browsable page — read-only, RLS-scoped, all three roles (#66, no new migration):**
+  /console/groups/[id] is a purpose-built on-page list of a group's receipts + notes (getGroupActivity
+  on the RLS client, notFound() if out of scope), reusing the #60 activity rendering keyed on group_id
+  (FilterPillRow + StatusPill + LATE/DUP + .num + AttachmentLinks). Migration #22's SELECT policies +
+  groups_select (is_admin OR is_member_of — covers treasurers) mean admin/treasurer/project_admin all
+  see real data with ZERO new RLS. The dashboard SummaryCard links here (repointed off the #65
+  export-link). The /console/export download FORM stays a separate surface — a browsable list and a
+  file export are distinct affordances; don't conflate them (the #65→#66 revise was exactly this
+  correction).
 - **Soft-delete pattern (#49):** `deleted_at` timestamptz + admin-only DELETE policy; treasurer
   soft-deletes (UPDATE deleted_at) / admin hard-deletes (DELETE); member soft-deletes own
   pending; EVERY active-data read must filter `deleted_at is null`. NOTE: DB triggers that
@@ -614,22 +670,26 @@ restored; the 5.0 degradation no longer applies).
 | 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
 | 2026-07-01 | Choose Life Director 5.0 → 6.0 | Routine, operator-requested, at clean boundary — roadmap #5 complete, zero open PRs |
 
-- **Director 6.0 session summary (no swap — still active):** 15 features shipped — CSV #29 ·
+- **Director 6.0 session summary (no swap — still active):** features shipped — CSV #29 ·
   FX editor #31 · deadline #33 · guarded delete #35 · PDF #37 · dup detection #39 · Azure OCR
   #42 · attachments #43 · stuck-upload fix #44 · upload confirmation + ledger thumbnails #45 ·
   guarded role removal #46 · soft/hard delete #49 · delete user #50 · design refresh 1/3 #51 ·
   2/3 #53 · 3/3a #55 · 3/3b #56 (reskin COMPLETE) · treasurer member removal #57 · admin
-  any-group capture + per-user activity #60 · OCR speed + multi-attachment #62 (OPEN) · 10
-  Director-authored migrations mirrored (is_late trigger · set_is_late revoke · RESTRICT-delete
-  FKs · is_duplicate trigger · widen mime #12 · soft-delete #13 · dup-excludes-soft-deleted #14 ·
-  treasurer-remove-member #15 · admin-insert-any-group #16 · receipt_attachments #17) ·
-  CASCADE-wipe hazard RETIRED · roadmap #6 ALL buildable slices done incl. OCR (only i18n
-  blocked) · design refresh COMPLETE · source-lock-in CLOSED 17/17 · #50 auth-delete e2e CLOSED
+  any-group capture + per-user activity #60 · OCR speed + multi-attachment #62 (fc7ff44) ·
+  Project Admin role UI #64 (90de69c) · dashboard card links #65 (105c67a) · group-expenses
+  page #66 (OPEN) · 15 Director-authored migrations mirrored (is_late trigger · set_is_late
+  revoke · RESTRICT-delete FKs · is_duplicate trigger · widen mime #12 · soft-delete #13 ·
+  dup-excludes-soft-deleted #14 · treasurer-remove-member #15 · admin-insert-any-group #16 ·
+  receipt_attachments #17 · project_admin foundation #18 · is_project_admin_of helper #19 ·
+  project_admin group/role mgmt RLS #20 · role-scope constraint correction #21 · project_admin
+  names + spend visibility #22) · CASCADE-wipe hazard RETIRED · roadmap #6 ALL buildable slices
+  done incl. OCR (only i18n blocked) · design refresh COMPLETE · Project Admin role LIVE (kept
+  fully separate from is_admin) · source-lock-in CLOSED 22/22 · #50 auth-delete e2e CLOSED
   (Dan+Dave deleted, 0 rows) · TEST DATA CLEARED (live receipts/notes/attachments all 0) · zero
-  residue. Open at this bank (HOLD): #62. Owed (operator/desktop only): 4 orphan storage files;
-  i18n seed + logos. prod = 8d92f9f (#60). Op notes: Vercel
-  dropped the #45 push-to-main webhook once (recovered via empty commit); #50 merged
-  operator-side pre-report (§12 pattern).
+  residue. Open at this bank (HOLD): #66. Owed (operator/desktop only): 4 orphan storage files;
+  i18n seed + logos. prod = 105c67a (#65). Op notes: Vercel dropped the #45 push-to-main webhook
+  once (recovered via empty commit); #50 merged operator-side pre-report (§12 pattern); #62
+  merge delayed by a Vercel outage (banked OPEN in #63, corrected MERGED here).
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
@@ -657,8 +717,10 @@ FEATURE ROADMAP
       ≥ 0.5 gate, any failure → manual-entry fallback. NO LONGER BLOCKED (was "operator keys").
    7. Attachment support ✅ DONE (#43, 036f687) — images + PDF + Word; OCR skips non-image mime.
    ALL buildable slices SHIPPED (incl. OCR). OCR speed pass shipped in #62 (client downscale +
-   parallel upload/OCR + tighter polling). Migrations source-lock-in CLOSED 17/17
-   (#13/#14 via #54, #15 via #57, #16 via #60, #17 via #62).
+   parallel upload/OCR + tighter polling). Migrations source-lock-in CLOSED 22/22
+   (#13/#14 via #54, #15 via #57, #16 via #60, #17 via #62, #18–#22 via #64).
+   NOTE: the Project Admin role (#64) is a roadmap-adjacent org feature, not a #6 slice —
+   new app_role 'project_admin', project-scoped group + role management (see §5/§6/§8).
    Remaining (BLOCKED, parked — no action pending):
    • i18n real-seed + logo drop-in — BLOCKED on desktop commit (ONLY remaining blocker).
 
@@ -675,7 +737,9 @@ POLISH / CLEANUP — DONE:
 - ✅ Migrations #13 `add_receipt_note_soft_delete` + #14 `exclude_soft_deleted_from_duplicate_check`
   — mirrored (#54, archival). #15 `treasurer_remove_member_from_own_group` — mirrored (#57).
   #16 `admin_insert_receipts_any_group` — mirrored (#60). #17 `add_receipt_attachments_table`
-  — mirrored (#62). Source-lock-in CLOSED at 17/17.
+  — mirrored (#62). #18–#22 (project_admin foundation · is_project_admin_of helper · group/role
+  mgmt RLS · role-scope constraint correction · names + spend visibility) — mirrored (#64).
+  Source-lock-in CLOSED at 22/22.
 - ✅ Dup-detection trigger `set_is_duplicate` now excludes soft-deleted rows — Director-authored
   migration #14 (20260704210822), verified live. (The #49 gap is closed.)
 - ✅ #50 delete-user e2e CLOSED — operator deleted Dan + Dave via the live app; verified 0 rows
