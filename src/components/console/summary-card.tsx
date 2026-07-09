@@ -15,9 +15,9 @@ function money(n: number): string {
 // 100%); footer = deadline + group treasurer. A null limit shows spend only,
 // no bar. Spend = approved, non-deleted usd (v1 definition, dashboard.ts).
 //
-// The whole card is a LINK into this group's expenses: it opens the existing
-// /console/export surface with this group pre-selected in its group filter (all
-// statuses, receipts + notes) — no new route/query/RLS, just the group URL param.
+// The whole card is a LINK into this group's browsable expense view
+// (/console/groups/[id]): a status-filterable on-page list of the group's
+// receipts + notes. The chevron + hover lift signal it's tappable.
 export function SummaryCard({ group }: { group: GroupSummary }) {
   const t = useTranslations("dashboard");
   const limit = group.spendingLimit;
@@ -26,7 +26,7 @@ export function SummaryCard({ group }: { group: GroupSummary }) {
 
   return (
     <Link
-      href={`/console/export?group=${group.id}`}
+      href={`/console/groups/${group.id}`}
       aria-label={t("viewGroupExpenses", { group: group.name })}
       className="group/card flex flex-col gap-2 rounded-card-lg bg-card p-5 shadow-card transition hover:-translate-y-px hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive/40"
     >

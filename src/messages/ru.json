@@ -55,6 +55,12 @@
     "noDeadline": "Без срока",
     "viewGroupExpenses": "Расходы группы {group}"
   },
+  "groupExpenses": {
+    "back": "Панель",
+    "all": "Все",
+    "empty": "Пока нет чеков и заметок.",
+    "filterLabel": "Фильтр по статусу"
+  },
   "auth": {
     "signInTitle": "Вход",
     "email": "Эл. почта",
