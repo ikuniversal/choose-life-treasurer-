@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { getSessionUser, isOrgAdmin } from "@/lib/auth";
 import { getGroupActivity } from "@/lib/data/group-activity";
 import { GroupActivityList } from "./group-activity-list";
 
@@ -15,11 +17,25 @@ export default async function GroupExpensesPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [t, activity] = await Promise.all([
+  const [t, activity, me, supabase] = await Promise.all([
     getTranslations("groupExpenses"),
     getGroupActivity(id),
+    getSessionUser(),
+    createClient(),
   ]);
   if (!activity) notFound();
+
+  // Admin-only edit affordance (#71). Treasurer / project_admin see the read-only
+  // list. Currencies (for the edit form's picker) come from fx_rates like /capture.
+  const isAdmin = isOrgAdmin(me);
+  let currencies: string[] = [];
+  if (isAdmin) {
+    const { data: fx } = await supabase
+      .from("fx_rates")
+      .select("currency")
+      .order("currency");
+    currencies = (fx ?? []).map((r) => r.currency);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,6 +60,9 @@ export default async function GroupExpensesPage({
       <GroupActivityList
         receipts={activity.receipts}
         notes={activity.notes}
+        isAdmin={isAdmin}
+        groupId={activity.groupId}
+        currencies={currencies}
       />
     </div>
   );
