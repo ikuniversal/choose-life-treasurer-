@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { inviteUser, type InviteState } from "@/lib/admin-actions";
 import { Button } from "@/components/ui/button";
@@ -8,18 +8,26 @@ import type { GroupOption } from "@/lib/data/users";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Role = Database["public"]["Enums"]["app_role"];
-const ROLES: Role[] = ["admin", "treasurer", "member"];
+const ROLES: Role[] = ["admin", "treasurer", "member", "project_admin"];
 
-export function InviteForm({ groups }: { groups: GroupOption[] }) {
+export function InviteForm({
+  groups,
+  projects,
+}: {
+  groups: GroupOption[];
+  projects: GroupOption[];
+}) {
   const t = useTranslations("users");
   const tRoles = useTranslations("roles");
   const formRef = useRef<HTMLFormElement>(null);
+  const [role, setRole] = useState<Role>("member");
   const [state, formAction, pending] = useActionState<InviteState, FormData>(
     inviteUser,
     {},
   );
 
-  // Reset the form once an invite succeeds.
+  // Reset the form's native fields once an invite succeeds. (The role select is
+  // controlled and keeps its last choice — handy for inviting several of a kind.)
   useEffect(() => {
     if (state.ok) formRef.current?.reset();
   }, [state.ok]);
@@ -46,7 +54,12 @@ export function InviteForm({ groups }: { groups: GroupOption[] }) {
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-sm text-body">{t("role")}</span>
-          <select name="role" defaultValue="member" className={inputCls}>
+          <select
+            name="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value as Role)}
+            className={inputCls}
+          >
             {ROLES.map((r) => (
               <option key={r} value={r}>
                 {tRoles(r)}
@@ -54,17 +67,37 @@ export function InviteForm({ groups }: { groups: GroupOption[] }) {
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-sm text-body">{t("group")}</span>
-          <select name="groupId" defaultValue="" className={inputCls}>
-            <option value="">{t("globalOption")}</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
+
+        {/* A Project Admin is scoped to a PROJECT (mirrors the group picker's
+            "globally" pattern, but the project pick is required); every other
+            role keeps the existing group picker. */}
+        {role === "project_admin" ? (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm text-body">{t("project")}</span>
+            <select name="projectId" required defaultValue="" className={inputCls}>
+              <option value="" disabled>
+                {t("selectProject")}
               </option>
-            ))}
-          </select>
-        </label>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm text-body">{t("group")}</span>
+            <select name="groupId" defaultValue="" className={inputCls}>
+              <option value="">{t("globalOption")}</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       {state.error && <p className="text-sm text-reject">{t(state.error)}</p>}

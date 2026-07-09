@@ -24,8 +24,10 @@ export function ContextSwitcher({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
-  const label = (a: RoleAssignment) =>
-    a.groupName ? `${t(a.role)} · ${a.groupName}` : t(a.role);
+  const label = (a: RoleAssignment) => {
+    const scope = a.groupName ?? a.projectName;
+    return scope ? `${t(a.role)} · ${scope}` : t(a.role);
+  };
 
   const active = assignments.find((a) => contextKey(a) === activeKey);
 

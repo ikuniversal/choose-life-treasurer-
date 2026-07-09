@@ -9,6 +9,8 @@ export interface UserRoleChip {
   role: Role;
   groupId: string | null;
   groupName: string | null;
+  /** project scope name for a project_admin chip (else null). UGC. */
+  projectName: string | null;
 }
 
 export interface UserRow {
@@ -34,7 +36,7 @@ export async function getUsersOverview(): Promise<UserRow[]> {
   const [rolesRes, profilesRes] = await Promise.all([
     supabase
       .from("user_roles")
-      .select("id, user_id, role, group_id, groups(name)"),
+      .select("id, user_id, role, group_id, project_id, groups(name), projects(name)"),
     supabase.from("profiles").select("id, full_name"),
   ]);
 
@@ -56,6 +58,7 @@ export async function getUsersOverview(): Promise<UserRow[]> {
       role: r.role,
       groupId: r.group_id,
       groupName: r.groups?.name ?? null,
+      projectName: r.projects?.name ?? null,
     });
     chipsByUser.set(r.user_id, arr);
   }
@@ -76,5 +79,16 @@ export async function getUsersOverview(): Promise<UserRow[]> {
 export async function getGroupOptions(): Promise<GroupOption[]> {
   const supabase = await createClient();
   const { data } = await supabase.from("groups").select("id, name").order("name");
+  return data ?? [];
+}
+
+// Projects for the invite form's Project Admin picker (mirrors getGroupOptions).
+// RLS-respecting client; an admin reads all projects. Names are UGC.
+export async function getProjectOptions(): Promise<GroupOption[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("projects")
+    .select("id, name")
+    .order("name");
   return data ?? [];
 }

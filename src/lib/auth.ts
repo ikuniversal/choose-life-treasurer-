@@ -16,6 +16,10 @@ export interface RoleAssignment {
   groupId: string | null;
   /** group display name (UGC — never translated); null when global. */
   groupName: string | null;
+  /** set only for a project_admin assignment (scoped by project, not group). */
+  projectId: string | null;
+  /** project display name (UGC — never translated); null unless project_admin. */
+  projectName: string | null;
 }
 
 export interface SessionUser {
@@ -41,7 +45,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const [rolesRes, profileRes] = await Promise.all([
     supabase
       .from("user_roles")
-      .select("role, group_id, groups(name)")
+      .select("role, group_id, project_id, groups(name), projects(name)")
       .eq("user_id", user.id),
     supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
   ]);
@@ -50,6 +54,8 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     role: r.role,
     groupId: r.group_id,
     groupName: r.groups?.name ?? null,
+    projectId: r.project_id,
+    projectName: r.projects?.name ?? null,
   }));
 
   return {
@@ -65,18 +71,36 @@ export function hasAnyRole(user: SessionUser | null): boolean {
   return !!user && user.assignments.length > 0;
 }
 
-/** Treasurer or Admin anywhere → may also access (console). */
+const CONSOLE_ROLES: Role[] = ["treasurer", "admin", "project_admin"];
+
+/** Treasurer, Admin, or Project Admin anywhere → may also access (console). */
 export function canAccessConsole(user: SessionUser | null): boolean {
-  return (
-    !!user &&
-    user.assignments.some((a) => a.role === "treasurer" || a.role === "admin")
-  );
+  return !!user && user.assignments.some((a) => CONSOLE_ROLES.includes(a.role));
 }
 
 /** The subset of assignments that grant console access (for the switcher). */
 export function consoleAssignments(user: SessionUser | null): RoleAssignment[] {
   if (!user) return [];
-  return user.assignments.filter(
-    (a) => a.role === "treasurer" || a.role === "admin",
-  );
+  return user.assignments.filter((a) => CONSOLE_ROLES.includes(a.role));
+}
+
+/** Org-wide admin (unchanged meaning — never a project_admin). */
+export function isOrgAdmin(user: SessionUser | null): boolean {
+  return !!user && user.assignments.some((a) => a.role === "admin");
+}
+
+/** The distinct projects this user is a project_admin of (id + display name). */
+export function projectAdminProjects(
+  user: SessionUser | null,
+): { projectId: string; projectName: string | null }[] {
+  if (!user) return [];
+  const seen = new Set<string>();
+  const out: { projectId: string; projectName: string | null }[] = [];
+  for (const a of user.assignments) {
+    if (a.role === "project_admin" && a.projectId && !seen.has(a.projectId)) {
+      seen.add(a.projectId);
+      out.push({ projectId: a.projectId, projectName: a.projectName });
+    }
+  }
+  return out;
 }

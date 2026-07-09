@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/database.types";
 
 type Role = Database["public"]["Enums"]["app_role"];
-const ROLES: Role[] = ["admin", "treasurer", "member"];
+const ROLES: Role[] = ["admin", "treasurer", "member", "project_admin"];
 
 export interface InviteState {
   // i18n key under the "users" namespace, or undefined.
@@ -58,13 +58,20 @@ export async function inviteUser(
   const fullName = String(formData.get("fullName") ?? "").trim();
   const rawGroup = String(formData.get("groupId") ?? "").trim();
   const groupId = rawGroup === "" ? null : rawGroup;
+  const rawProject = String(formData.get("projectId") ?? "").trim();
+  const projectId = rawProject === "" ? null : rawProject;
   const role = String(formData.get("role") ?? "") as Role;
 
   if (!email || !fullName || !ROLES.includes(role)) {
     return { error: "missing" };
   }
-  // Members and treasurers are always scoped to a group; only admin may be global.
-  if (role !== "admin" && !groupId) return { error: "groupRequired" };
+  // Scope rules (mirror the DB role-scope constraints): a project_admin is
+  // scoped to a PROJECT (group_id null); treasurer/member to a GROUP; only a
+  // plain admin is global.
+  if (role === "project_admin" && !projectId) return { error: "projectRequired" };
+  if (role !== "admin" && role !== "project_admin" && !groupId) {
+    return { error: "groupRequired" };
+  }
 
   const admin = createAdminClient();
   const hdrs = await headers();
@@ -89,9 +96,11 @@ export async function inviteUser(
   // 4. Grant the role via the REGULAR server client — the calling admin's own
   //    session satisfies the user_roles_admin_write RLS policy.
   const supabase = await createClient();
-  const { error: roleError } = await supabase
-    .from("user_roles")
-    .insert({ user_id: userId, group_id: groupId, role });
+  const { error: roleError } = await supabase.from("user_roles").insert(
+    role === "project_admin"
+      ? { user_id: userId, project_id: projectId, group_id: null, role }
+      : { user_id: userId, group_id: groupId, role },
+  );
   if (roleError) return { error: "roleFailed" };
 
   revalidatePath("/console/users");

@@ -37,8 +37,13 @@ export default async function ConsoleLayout({
   const active = await getActiveContext(assignments);
   const activeKey = active ? contextKey(active) : "";
   const isAdmin = !!user && user.assignments.some((a) => a.role === "admin");
+  const isProjectAdmin =
+    !!user && user.assignments.some((a) => a.role === "project_admin");
   // Role indicator pill — the viewer's actual authenticated role (no switcher).
-  const roleLabel = tRoles(isAdmin ? "admin" : "treasurer");
+  // Highest scope wins: admin > project_admin > treasurer.
+  const roleLabel = tRoles(
+    isAdmin ? "admin" : isProjectAdmin ? "project_admin" : "treasurer",
+  );
 
   return (
     <div className="flex min-h-full flex-col bg-canvas">
@@ -55,7 +60,7 @@ export default async function ConsoleLayout({
             <SignOutButton />
           </div>
         </div>
-        <ConsoleNav isAdmin={isAdmin} />
+        <ConsoleNav isAdmin={isAdmin} isProjectAdmin={isProjectAdmin} />
         <ContextSwitcher
           assignments={assignments}
           activeKey={activeKey}
