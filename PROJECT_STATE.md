@@ -5,11 +5,11 @@ PROJECT_STATE — Choose Life Receipt & Project Tool
 > operator when the relay can't carry the payload. A handoff is just: new Director
 > reads THIS file and confirms.
 >
-> Template version: v2.8
-> Last updated: 2026-07-09 by Cody (Code Agent, on Director 6.0 instruction) — BANK #62/#64/#65/#66 MERGED + Project Admin role + group expenses (dashboard-drill-in thread CLOSED). CORRECTS #63's stale "#62 OPEN/HOLD": #62 MERGED fc7ff44 (OCR speed + multi-attachment, delayed by the Vercel outage). #64 MERGED 90de69c (Project Admin role UI — new app_role 'project_admin', user_roles.project_id, is_project_admin_of() kept SEPARATE from is_admin(); scoped group CRUD + treasurer/member mgmt; role-branched /console/users 3 ways; project-scoped dashboard). #65 MERGED 105c67a (dashboard SummaryCards → tappable; export-link version). Migrations 17→22 — source-lock-in 22/22: #18 project_admin foundation · #19 is_project_admin_of helper · #20 group+role mgmt RLS · #21 role-scope constraint correction · #22 project_admin names + spend visibility (CLOSES the two #64 gaps Cody flagged — get_group_member_names widened + receipts/notes SELECT for project_admin). database.types.ts REGENERATED (project_admin enum + project_id + helper). #66 MERGED 1f9d6d5 (/console/groups/[id] browsable group-expenses list — FilterPillRow + StatusPill + LATE/DUP; new getGroupActivity; repoints SummaryCard export-link → /console/groups/{id}; the operator-preferred revise of #65) → the whole dashboard-drill-in thread is CLOSED. NO open PRs. prod = 1f9d6d5 (#66). Owed now ONLY: 4 orphan storage files + i18n seed/logos. Designated branch claude/chat-session-e4mevb resynced → 1f9d6d5.
+> Template version: v2.9
+> Last updated: 2026-07-09 by Cody (Code Agent, on Director 6.0 instruction) — DIRECTOR 6.0 → 7.0 HANDOFF BANK. WHAT JUST HAPPENED: #69 MERGED e7aff6c (feat 91edf54) — scope-aware totals on /console/groups/[id]: per-currency lines + USD grand total (from locked usd_equivalent, NEVER live FX) + per-category breakdown (receipts only, reuses categories i18n), all respecting the active FilterPillRow filter; UI/read-only, ActivityReceipt gained `category` (no schema/RLS change). That closed the dashboard-drill-in arc (#65 export-link → #66 browsable list → #69 totals). prod = e7aff6c, READY, 0 runtime errors. WHAT'S NEXT: nothing in-flight — roadmap #6 all buildable slices shipped; only long-parked operator/desktop items remain (4 orphan storage files; i18n 197-key seed + logos). SESSION ARC (6.0): 15 features + 7 docs banks shipped — guarded role removal #46 · soft/hard delete #49 · delete user #50 · design reskin 1/3→3/3 (#51/#53/#55/#56) + DRY pills #58 · treasurer member removal #57 · admin any-group capture + per-user activity #60 · OCR speed + multi-attachment #62 · Project Admin role UI #64 · dashboard cards #65 · browsable group-expenses #66 · group totals #69 · docs banks #47/#52/#59/#61/#63/#67/#68. Migrations: 22 live, source-locked 22/22 (VERIFIED via list_migrations this bank); Director 6.0 authored 15 of them across the session incl. #14–#22 (the directive's "15 live" = 6.0-authored count, NOT the 22 live total — reconciled to the verified live count). #21 is a schema-constraint CORRECTION (dropped the old admin_no_group + scoped_role_has_group CHECKs, added the 3-way role_scope_* invariant for project_admin), NOT pure-additive. HAZARD for 7.0: Vercel MCP dropped TWICE mid-session (connector scope, not transient) — confirm Vercel MCP at cold start (list_projects must show choose-life-treasurer); if absent it's the same drop → operator reconnect, not a retry. NO open PRs. Designated branch claude/chat-session-e4mevb to be resynced → e7aff6c.
 
 ═══════════════════════════════════════════════════════════
-SWAP REASON: routine, operator-requested, at a clean boundary — roadmap #5 fully complete, zero open PRs, no stuck work. NOT mistake-driven, NOT stuck → CLEAN stance: inherit facts AND judgment verbatim. 5.0's session: cold-start zero-drift verification → shipped all four #5 slices (#18 notes, #20 tasks, #22 comments+chat, #24 converter) → authored 2 migrations (get_group_member_names RPC, group_messages chat; both simulated-JWT verified) → all banks current through this file.
+SWAP REASON (6.0 → 7.0): routine rotation at a clean boundary — zero open PRs, migrations 22/22 source-locked, prod green (e7aff6c, #69), no in-flight work. NOT mistake-driven, NOT stuck → CLEAN stance: incoming Director 7.0 inherits facts AND judgment verbatim, no re-litigation. 6.0's session (long, productive): cold-started from v2.8 → shipped 15 features + 7 docs banks (guarded role removal #46 · soft/hard delete #49 · delete user #50 · design reskin 1/3→3/3 #51/#53/#55/#56 + DRY #58 · treasurer member removal #57 · admin any-group capture + per-user activity #60 · OCR speed + multi-attachment #62 · Project Admin role UI #64 · dashboard cards #65 · browsable group-expenses #66 · group totals #69) → authored 15 migrations incl. the full Project Admin stack #18–#22 (all mirrored, source-lock 22/22) → CASCADE-wipe hazard retired, design refresh complete, #50 auth-delete e2e closed, test data cleared. Two operator/desktop items still parked (4 orphan storage files; i18n seed + logos). Vercel MCP dropped twice mid-session (see HAZARD in header + §12).
 ═══════════════════════════════════════════════════════════
 WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
 - Auth COMPLETE (PR #5/#7/#8). Core member loop COMPLETE (PR #10). Review loop COMPLETE
@@ -26,9 +26,9 @@ WHERE THINGS STAND (all verified live via Supabase + Vercel MCP):
   COMPLETE (all four slices #18/#20/#22/#24, all shipped 2026-07-01).
   Roadmap #5 COMPLETE (all four slices, all 2026-07-01): notes #18 (26a9e03) · tasks #20
   (a29516d) · comments+chat #22 (3bb1e27) · currency converter #24 (f154687).
-- App live: https://choose-life-treasurer.vercel.app · prod = 1f9d6d5 (merge #66), READY.
-  (Was 8d92f9f/#60 at last write; #62 OCR+attachments · #64 Project Admin role · #65 dashboard
-  card links · #66 group-expenses page all merged since — reconciled this bank. NO open PRs.)
+- App live: https://choose-life-treasurer.vercel.app · prod = e7aff6c (merge #69), READY,
+  0 runtime errors. (Was 1f9d6d5/#66 at last write; #69 group-expenses totals merged since —
+  operator/Director cleared + merged out-of-band, banked this handoff. NO open PRs.)
 - ✅ Converter math spot-check CONFIRMED by operator (500 MDL → $28.50) — roadmap #5
   verification fully closed (client-side math, zero data layer).
 - Test-data hygiene: the original "Ifogbb" rejected receipt was DELETED via MCP (verified
@@ -66,8 +66,8 @@ RESOLVED: Source-lock-in fully closed (22/22). Design refresh fully shipped (1/3
 1f9d6d5) all MERGED, 0 runtime errors, banked here. #64's two data gaps (project_admin names +
 spend visibility) CLOSED by Director's migration #22.
 #50 auth-delete e2e CLOSED (operator deleted Dan + Dave, verified 0 rows in auth.users).
-Designated branch synced → 1f9d6d5. NO open PRs — the dashboard-drill-in thread (#65 export-link
-→ #66 browsable list) is CLOSED; SummaryCard now links into /console/groups/{id}.
+Designated branch to be synced → e7aff6c. NO open PRs — the dashboard-drill-in arc (#65 export-link
+→ #66 browsable list → #69 scope-aware totals) is CLOSED; SummaryCard links into /console/groups/{id}.
 TEST DATA CLEARED: live receipts / notes / attachments all 0 (operator-wiped, MCP-verified).
 
 RESOLVED THIS SESSION (Director 6.0): converter spot-check CONFIRMED (500 MDL → $28.50 —
@@ -79,7 +79,7 @@ restored; the 5.0 degradation no longer applies).
 -----
 
 ## 0. ACTIVE DIRECTOR SESSIONS
-- Choose Life Director 6.0 — active (cold-started from v2.8, zero drift; closed roadmap #5 verification, opened roadmap #6). Choose Life Director 5.0 — outgoing, handed off clean.
+- Choose Life Director 7.0 — incoming (cold-start from v2.9; confirm this file vs live, then adopt). Choose Life Director 6.0 — outgoing, handed off clean at a zero-open-PR boundary (15 features + 7 docs banks + 15 migrations authored; roadmap #6 buildable slices all shipped).
 
 ## 1. IDENTITY
 - **Project:** Choose Life — Receipt & Project Tool
@@ -91,12 +91,12 @@ restored; the 5.0 degradation no longer applies).
   (EN/RU) production app replacing paper/spreadsheet tracking with auditable per-group
   budgets, OCR-assisted entry, real-time chat, and PDF/CSV export.
 - **Operator:** ikuniversal (ikuniversal@gmail.com)
-- **Current Director:** Choose Life Director 6.0 — P3 (incoming; confirm/rename)
+- **Current Director:** Choose Life Director 7.0 — P3 (incoming; confirm/rename)
 - **Current Code Agent:** Cody Choose Life 1.0
 - **Mode:** Pro
 
 ## 2. CHAT NAMING (authoritative)
-- Director: `Choose Life Director 6.0 — P3 (Cross-cutting: export, OCR, i18n & hardening)`
+- Director: `Choose Life Director 7.0 — P3 (Cross-cutting: export, OCR, i18n & hardening)`
 - Code Agent: `Cody Choose Life 1.0`
 - Cody opens PRs and stops; merges only on per-PR Director clearance (§9), except
   docs-only which self-merge (§11). Cody has DIRECT repo access; the Director does NOT
@@ -132,8 +132,8 @@ restored; the 5.0 degradation no longer applies).
   removal). Soft/hard delete #49 · delete user #50 · design refresh 1/3 #51 · 2/3 #53 ·
   3/3a #55 · 3/3b #56 (reskin COMPLETE) · treasurer member removal #57 · admin any-group
   capture + per-user activity #60 · OCR speed + multi-attachment #62 · Project Admin role UI
-  #64 · dashboard card links #65 · group-expenses page #66 (MERGED 1f9d6d5).
-  Migrations source-lock-in CLOSED 22/22. prod = 1f9d6d5 (#66). NO open PRs.
+  #64 · dashboard card links #65 · group-expenses page #66 · group-expenses totals #69
+  (MERGED e7aff6c). Migrations source-lock-in CLOSED 22/22. prod = e7aff6c (#69). NO open PRs.
   Auth + capture + review + polish + full reskin + Project Admin role + group drill-in all live.
 - Projects/Groups DELETE — SHIPPED (#35): DB-level RESTRICT FKs + count-then-confirm UI on
   /console/projects. CASCADE-wipe hazard RETIRED (§6/§8/§9/§12).
@@ -176,6 +176,7 @@ restored; the 5.0 degradation no longer applies).
 | 44 | Fix stuck "Uploading…" hang + dead /receipts nav | d6ffcdb (feat 0d35b97) | 2026-07-03 | ROOT CAUSE (regression surfaced w/ #42/#43): analyzeReceipt re-downloaded the just-uploaded object server-side via the RLS client to read its bytes — but a member has NO storage SELECT on their own photo until a receipts row links it (receipt_photos_select = admin OR treasurer OR owner-of-linked-receipt) → GET /object 400 → spinner hangs on every receipt. FIX: analyzeReceipt takes the in-memory File via FormData (no storage read-back); capture-form wraps OCR in try/catch so setPhase("verify") ALWAYS runs; next.config serverActions.bodySizeLimit "10mb" (1MB default rejected most photos). Also removed the dead "/receipts" member nav tab (404 since scaffold — ledger lives on Home "/"). UI/server-actions only. |
 | 45 | Upload confirmation + member-ledger evidence + signed-URL error surfacing | 28ec25b (squash: 439c762 + af2cd5a) | 2026-07-03 | (a) Capture SUCCESS card: after save, a persistent confirmation (thumbnail via a client object URL, or doc icon + filename; "Submitted"; vendor/amount when OCR filled; timestamp) before returning — no silent redirect. (b) Member Home ledger rows now show a small evidence thumbnail (image) / doc icon (PDF/Word) via a signed URL from the RLS client — closes the #43 gap (no member-side evidence surface existed). (c) createSignedUrl errors were DISCARDED (const { data } = …) → silent no-thumbnail; now console.error'd at all 3 signing sites (member ledger, console review, note review); photoUrl still falls back to null. NOTE: the operator's "no thumbnails" report was a DEPLOY gap (#45 preview vs prod still on #44), NOT a code defect — RLS grants the owner the signed URL (live-simulated). No schema/RLS/env change, no new deps. ⚠️ Director directive under-described #45 as only the signed-URL surfacing (af2cd5a); it also carried the upload card + ledger thumbnails (439c762) — banked to full scope. |
 | 46 | Remove role assignment, last-admin guarded (roadmap #2 polish) | b00252e (feat 841c282) | 2026-07-04 | /console/users per-chip X now deletes that specific user_roles row (id PK) via the EXISTING user_roles_admin_write (ALL already covers DELETE — no new RLS/migration). removeRole(roleId) returns a friendly {error} (was void); server-side LAST-ADMIN GUARD: reads the target role, and if role='admin' counts remaining admin rows and REFUSES when ≤ 1 ("Cannot remove the last remaining Administrator") — regardless of who removes whom, incl. self. Count-then-confirm UX (inline ✓/✕, inline error, no chip removed) mirrors #35; chips extracted to a client component. i18n EN+RU. UI/server-action only. Verified: CI green (verify run #98) + independent Vercel preview. |
+| 47 | Docs bank — catch-up #42–#46 (were untracked) | d6bcb5d | 2026-07-04 | PROJECT_STATE catch-up bank (docs-only, self-merge §11): live/Vercel audit found prod had moved 6f3c329(#40) → b00252e(#46) via five unbanked merges — reconstructed §5 rows #42–#46, §6 migration #12 + user_roles DELETE, roadmap #6 (OCR DONE), and re-opened the source-lock-in drift (11/12). Flagged the directive's under-description of #45 (also carried the upload card + ledger thumbnails) + the dropped #45 Vercel webhook. |
 | 48 | Source-lock-in: mirror migration #12 (archival) | e989d8c (feat 2e89ba8) | 2026-07-04 | supabase/migrations/20260703070915_widen_receipt_photos_bucket_mime_types.sql — verbatim archival mirror of the live mime-widen (image/* → the 7 attachment types), byte-faithful vs the live bucket state (verified via MCP). NOT run/applied. Bumped source-lock-in 11/12 → 12/12. Held for Director clearance (contains .sql, §11) then merged. |
 | 49 | Soft/hard delete — receipts + no-receipt notes | 2ba70a8 (feat da3ce70) | 2026-07-04 | Live migration #13 (add_receipt_note_soft_delete, 20260704204035) added deleted_at + admin-only DELETE policies on both tables (verified live). UI/server-actions only: /console/review "Delete" on receipt AND note cards — treasurer → SOFT (UPDATE deleted_at) via *_update_treasurer_admin; admin → HARD (DELETE) via *_delete_admin (confirm warns irreversible). Member soft-deletes own PENDING via owner-pending policy. `deleted_at is null` filter added to EVERY active read (review queue, note queue, member ledger receipts+notes, CSV+PDF export). types: deleted_at on both tables. i18n EN+RU, no deps. ⚠️ KNOWN GAP: dup-detection trigger set_is_duplicate still counts soft-deleted rows (a 1-line migration `and r.deleted_at is null` needed — OUT of this UI-only PR's scope; flagged, awaiting Director go). |
 | 50 | Delete user (admin-only) | 427e9c2 (feat 50d8374) | 2026-07-04 | Admin-only deleteUser via the secret client confined to auth.admin.deleteUser ONLY (§8). LAST-ADMIN guard reuses #46 (count≤1). AUTHORED-CONTENT guard counts receipts/notes/tasks(assignee OR created_by)/comments/messages — all NO ACTION FKs (verified live) → any >0 blocks with friendly counts; profiles+user_roles CASCADE so a content-free user (even one holding roles) deletes cleanly. "Delete user" on every user row, inline confirm. Merged operator-side pre-report (§12 pattern). Data-layer facts (2 admins, NO ACTION FKs) Director-confirmed independently; the auth.admin.deleteUser call is NOT self-testable (irreversible, no txn rollback) — first real e2e now CLOSED: operator deleted Dan + Dave via the live app, verified 0 rows in auth.users. |
@@ -196,6 +197,9 @@ restored; the 5.0 degradation no longer applies).
 | 64 | Project Admin role — UI (+ mirror #18–#22) | 90de69c | 2026-07-09 | Live migrations #18–#22 (project_admin foundation + is_project_admin_of helper + group/role mgmt RLS + role-scope constraint correction + names/spend visibility). New app_role 'project_admin' + user_roles.project_id; is_project_admin_of() kept SEPARATE from is_admin() (never widened). 1) /console/users invite gains Project Admin option → Project picker replaces Group picker, sets project_id + group_id null. 2) THREE-branch /console/users: admin (unchanged) · project_admin (their project's groups + rosters — scoped group CRUD via paCreateGroup/paUpdateGroup/paDeleteGroup over guarded-delete, treasurer/member mgmt via paAssignRole/paRemoveRole, NO invite-new-user; RLS is the real gate, caller re-checked, .select() detects 0-row scope failures) · treasurer (unchanged). 3) Project-scoped dashboard (their project's SummaryCards, no org StatCards). auth.ts: RoleAssignment gains projectId/projectName, CONSOLE_ROLES incl. project_admin, isOrgAdmin/projectAdminProjects helpers. Console plumbing: nav Users link shown to admin OR project_admin (projects/rates stay admin-only). Mirrors #18–#22 → source-lock-in 22/22. types REGENERATED. i18n EN/RU. FLAGGED two data gaps at PR (get_group_member_names + receipts/notes SELECT excluded project_admin → names uuid-fallback + counts read 0) — Director CLOSED both via migration #22. MERGED. |
 | 65 | Dashboard group cards → tappable (export-link) | 105c67a (feat d478769) | 2026-07-09 | SummaryCard wrapped in a Link into an existing filtered expense view — Director's read = the /console/export surface with the group pre-selected via URL param (?group=<id>); export page gains a searchParams param that pre-selects the group filter (unknown/out-of-scope id → "all"). Visible affordance: ChevronRight + hover lift/shadow + focus ring + aria-label. Applies to admin/treasurer/project_admin dashboards. No new route/query/RLS. i18n dashboard.viewGroupExpenses. Cody flagged that /console/export is a download FORM (no on-page list) and /console/review is pending-only → operator preferred a purpose-built browsable list → revise #66. MERGED. |
 | 66 | /console/groups/[id] browsable group expenses (revise of #65) | 1f9d6d5 | 2026-07-09 | NEW on-page browsable expenses list at /console/groups/[id]: server page getGroupActivity(id) (notFound() if null), back link to /console, header (project · group), client GroupActivityList unifying receipts + notes into rows — FilterPillRow (All + statuses present) + StatusPill + LATE/DUP + .num + AttachmentLinks (reuses #60's activity rendering keyed on group_id; new getGroupActivity read; groupExpenses i18n namespace). Repoints the #65 SummaryCard href from /console/export?group= → /console/groups/{group.id}, keeping the chevron/hover affordance. Export page stays the download surface, unchanged. Migration #22's SELECT policies (receipts_select_project_admin + notes_select_project_admin) + groups_select (is_admin OR is_member_of, covers treasurers) → all three roles see real data. No schema/RLS change. i18n EN/RU. CI verify green → MERGED (operator/clearance). Closes the dashboard-drill-in thread. |
+| 67 | Docs bank #62/#64/#65 merged + Project Admin role + group-expenses | 938cdf5 | 2026-07-09 | PROJECT_STATE bank (docs-only, self-merge §11): corrected #63's stale "#62 OPEN/HOLD" → #62 MERGED fc7ff44; banked #64 MERGED 90de69c + #65 MERGED 105c67a; source-lock-in 17/17 → 22/22 (#18–#22 via #64); §6 migration entries #18–#22; §8 precedents (project_admin separate from is_admin, per-role data widening via #22, group-expenses page). |
+| 68 | Docs bank #66 MERGED — dashboard-drill-in thread closed | ac5aa14 | 2026-07-09 | PROJECT_STATE bank (docs-only, self-merge §11): #66 flipped OPEN → MERGED 1f9d6d5; prod 105c67a → 1f9d6d5; header/§4/§6 Vercel prod/§13 updated; no open PRs. (Runner backlog delayed CI verify ~5 min — availability, not a code issue.) |
+| 69 | Scope-aware totals on /console/groups/[id] (currency + USD + per-category) | e7aff6c (feat 91edf54) | 2026-07-09 | Compact totals summary between header and list on the #66 group-expenses page. UI/read-only — getGroupActivity already returns rows; summed CLIENT-SIDE, no new query/RLS/deps. SCOPE-AWARE: all totals reflect ONLY the active FilterPillRow selection, labelled "Totals ({scope})". Per-currency lines (visible rows grouped by currency, amount summed, .num). USD grand total = sum of usd_equivalent (STORED-at-submission, NEVER recomputed from live FX — §8 locked-value precedent); null-usd money rows excluded + flagged. Per-category breakdown (RECEIPTS only) grouped by expense_category, USD-equivalent subtotal each, reusing the EXISTING categories i18n (no new labels); no-receipt notes have no category/amount → excluded with a caption. Data layer: shared ActivityReceipt gained `category`, added to getGroupActivity + getUserActivity selects/maps; receipts.category already existed → NO migration. i18n EN/RU. lint+tsc+build green. Customer-facing → held for clearance; operator/Director cleared + MERGED. |
 
 ## 5b. LATEST SESSION NOTES
 - 2026-07-04 (Director 6.0, CATCH-UP BANK): live/Vercel audit found prod had moved
@@ -377,7 +381,7 @@ restored; the 5.0 degradation no longer applies).
   file deletion is operator-dashboard-only (see §12).
 - **Vercel:** project `choose-life-treasurer` (prj_4rb6YuuNcJr6xrDKjTpPIiswnh6m, team
   team_IHCTzTPcdY47mLkznoU0idjD / roof-clean-pros-projects). Prod:
-  https://choose-life-treasurer.vercel.app. Latest prod = 1f9d6d5 (merge #66), READY
+  https://choose-life-treasurer.vercel.app. Latest prod = e7aff6c (merge #69), READY
   (independent preview checks ran on #29/#31/#33/#35/#37/#40/#45/#46; #39 was operator
   out-of-band — Director post-hoc verified 0 runtime errors). ⚠️ Vercel DROPPED the #45
   push-to-main webhook once (prod stuck on #44 after the #45 merge) — recovered with an empty
@@ -409,9 +413,13 @@ restored; the 5.0 degradation no longer applies).
   #17 via #62; #18–#22 via #64). The "mirror every new migration in-session" rule is satisfied.
   Going forward, any NEW Director-authored migration must still be mirrored in the same session.
 - **MCP / tooling:** Supabase MCP connected (DB/migrations/storage/advisors/logs/types —
-  Director operates directly). Vercel MCP connected READ-ONLY (deployments, build logs,
-  runtime errors — RELIABLE independent verification; NO env/redeploy writes, NO storage
-  file delete). GitHub: no Director MCP (Cody is the hands; Vercel MCP is the cross-check).
+  Director operates directly; list_migrations verified 22 live at the 6.0→7.0 handoff). Vercel
+  MCP connected READ-ONLY (deployments, build logs, runtime errors — RELIABLE independent
+  verification; NO env/redeploy writes, NO storage file delete). GitHub: no Director MCP (Cody is
+  the hands; Vercel MCP is the cross-check). ⚠️ Vercel MCP DROPPED TWICE during the 6.0 session
+  (connector scope, not transient) — verification-independence degraded ~2 cycles until the
+  operator reconnected. 7.0: confirm Vercel MCP at cold start (list_projects must show
+  choose-life-treasurer); if absent it's the same drop → operator reconnect, not a retry.
 
 ## 7. OPERATOR WORKING PREFERENCES
 - Lead with the answer, no preamble. Mobile phone; keep it short.
@@ -506,6 +514,18 @@ restored; the 5.0 degradation no longer applies).
   export-link). The /console/export download FORM stays a separate surface — a browsable list and a
   file export are distinct affordances; don't conflate them (the #65→#66 revise was exactly this
   correction).
+- **Scope-aware totals — client-side, over locked USD values (#69, no new query/RLS):** the
+  group-expenses page sums its ALREADY-FETCHED rows client-side into per-currency lines + a USD
+  grand total + a per-category breakdown, all reflecting ONLY the active FilterPillRow selection
+  (labelled "Totals ({scope})"). The USD total + category subtotals sum `usd_equivalent` — the
+  STORED-at-submission value, NEVER recomputed from live FX (the standing locked-value precedent,
+  same as the ledger/export) so the total stays accurate when rates move. Rows with a money amount
+  but null usd_equivalent are excluded and flagged; no-receipt notes (no category/amount) are
+  excluded from the category breakdown with a caption. Category labels REUSE the existing
+  `categories` i18n (no new labels). Data layer: the shared ActivityReceipt gained `category`
+  (added to getGroupActivity + getUserActivity selects/maps); receipts.category already existed →
+  no migration. Reuse this "sum the visible rows, respect the filter, never re-derive USD" shape
+  for any future totals surface.
 - **Soft-delete pattern (#49):** `deleted_at` timestamptz + admin-only DELETE policy; treasurer
   soft-deletes (UPDATE deleted_at) / admin hard-deletes (DELETE); member soft-deletes own
   pending; EVERY active-data read must filter `deleted_at is null`. NOTE: DB triggers that
@@ -670,15 +690,16 @@ restored; the 5.0 degradation no longer applies).
 | 2026-07-01 | Choose Life Director 3.0 → 4.0 | Routine, operator-requested handoff |
 | 2026-07-01 | Choose Life Director 4.0 → 5.0 | Routine, operator-requested, immediate handoff — no work performed during 4.0 session |
 | 2026-07-01 | Choose Life Director 5.0 → 6.0 | Routine, operator-requested, at clean boundary — roadmap #5 complete, zero open PRs |
+| 2026-07-09 | Choose Life Director 6.0 → 7.0 | Routine rotation at a clean boundary — zero open PRs, migrations 22/22 source-locked, prod green (e7aff6c/#69), no in-flight work. CLEAN stance. |
 
-- **Director 6.0 session summary (no swap — still active):** features shipped — CSV #29 ·
+- **Director 6.0 session summary (CLOSED at 6.0 → 7.0 handoff):** features shipped — CSV #29 ·
   FX editor #31 · deadline #33 · guarded delete #35 · PDF #37 · dup detection #39 · Azure OCR
   #42 · attachments #43 · stuck-upload fix #44 · upload confirmation + ledger thumbnails #45 ·
   guarded role removal #46 · soft/hard delete #49 · delete user #50 · design refresh 1/3 #51 ·
   2/3 #53 · 3/3a #55 · 3/3b #56 (reskin COMPLETE) · treasurer member removal #57 · admin
   any-group capture + per-user activity #60 · OCR speed + multi-attachment #62 (fc7ff44) ·
   Project Admin role UI #64 (90de69c) · dashboard card links #65 (105c67a) · group-expenses
-  page #66 (1f9d6d5) · 15 Director-authored migrations mirrored (is_late trigger · set_is_late
+  page #66 (1f9d6d5) · group-expenses totals #69 (e7aff6c) · 15 Director-authored migrations mirrored (is_late trigger · set_is_late
   revoke · RESTRICT-delete FKs · is_duplicate trigger · widen mime #12 · soft-delete #13 ·
   dup-excludes-soft-deleted #14 · treasurer-remove-member #15 · admin-insert-any-group #16 ·
   receipt_attachments #17 · project_admin foundation #18 · is_project_admin_of helper #19 ·
@@ -687,11 +708,15 @@ restored; the 5.0 degradation no longer applies).
   done incl. OCR (only i18n blocked) · design refresh COMPLETE · Project Admin role LIVE (kept
   fully separate from is_admin) · source-lock-in CLOSED 22/22 · #50 auth-delete e2e CLOSED
   (Dan+Dave deleted, 0 rows) · TEST DATA CLEARED (live receipts/notes/attachments all 0) · zero
-  residue. NO open PRs at this bank — the dashboard-drill-in thread (#65 export-link → #66
-  browsable list) is CLOSED. Owed (operator/desktop only): 4 orphan storage files;
-  i18n seed + logos. prod = 1f9d6d5 (#66). Op notes: Vercel dropped the #45 push-to-main webhook
-  once (recovered via empty commit); #50 merged operator-side pre-report (§12 pattern); #62
-  merge delayed by a Vercel outage (banked OPEN in #63, corrected MERGED in #67).
+  residue. NO open PRs at handoff — the dashboard-drill-in arc (#65 export-link → #66 browsable
+  list → #69 scope-aware totals) is CLOSED. Owed (operator/desktop only): 4 orphan storage files;
+  i18n seed + logos. prod = e7aff6c (#69). Op notes: Vercel dropped the #45 push-to-main webhook
+  once (recovered via empty commit); #50 + #69 merged operator-side pre/post-report (§12 pattern);
+  #62 merge delayed by a Vercel outage (banked OPEN in #63, corrected MERGED in #67). ⚠️ VERCEL
+  MCP dropped TWICE mid-session (connector scope, not transient) — verification-independence
+  degraded ~2 cycles until the operator reconnected; 7.0 must confirm Vercel MCP at cold start
+  (list_projects shows choose-life-treasurer) — if absent it's the same drop → operator reconnect,
+  not a retry. Migrations VERIFIED live via list_migrations at this handoff: 22 total, 22 mirrored.
 
 ## 14. REPO + CODE-AGENT DELIVERY
 - Repo: github.com/ikuniversal/choose-life-treasurer- (private, operator-owned, main default).
