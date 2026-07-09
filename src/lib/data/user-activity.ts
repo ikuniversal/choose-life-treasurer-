@@ -7,6 +7,7 @@ import {
 import type { Database } from "@/lib/supabase/database.types";
 
 type ItemStatus = Database["public"]["Enums"]["item_status"];
+type ExpenseCategory = Database["public"]["Enums"]["expense_category"];
 
 export interface ActivityReceipt {
   id: string;
@@ -15,6 +16,8 @@ export interface ActivityReceipt {
   amount: number;
   currency: string;
   usdEquivalent: number | null;
+  /** expense_category enum (7 values); labels via the shared `categories` i18n. */
+  category: ExpenseCategory;
   status: ItemStatus;
   date: string;
   isLate: boolean;
@@ -61,7 +64,7 @@ export async function getUserActivity(
     supabase
       .from("receipts")
       .select(
-        "id, vendor, amount, currency, usd_equivalent, status, receipt_date, is_late, is_duplicate, groups(name)",
+        "id, vendor, amount, currency, usd_equivalent, category, status, receipt_date, is_late, is_duplicate, groups(name)",
       )
       .eq("submitted_by", id)
       .is("deleted_at", null)
@@ -95,6 +98,7 @@ export async function getUserActivity(
     amount: r.amount,
     currency: r.currency,
     usdEquivalent: r.usd_equivalent,
+    category: r.category,
     status: r.status,
     date: r.receipt_date,
     isLate: r.is_late,
