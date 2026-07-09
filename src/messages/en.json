@@ -59,7 +59,13 @@
     "back": "Dashboard",
     "all": "All",
     "empty": "No receipts or notes yet.",
-    "filterLabel": "Filter by status"
+    "filterLabel": "Filter by status",
+    "totalsScoped": "Totals ({scope})",
+    "noAmounts": "No amounts in this view.",
+    "usdTotal": "USD total",
+    "usdMissing": "excludes {count} without USD value",
+    "byCategory": "By category",
+    "notesExcluded": "Notes are excluded from the category breakdown."
   },
   "auth": {
     "signInTitle": "Sign in",

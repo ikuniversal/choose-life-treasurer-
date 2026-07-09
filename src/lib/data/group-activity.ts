@@ -39,7 +39,7 @@ export async function getGroupActivity(
     supabase
       .from("receipts")
       .select(
-        "id, vendor, amount, currency, usd_equivalent, status, receipt_date, is_late, is_duplicate",
+        "id, vendor, amount, currency, usd_equivalent, category, status, receipt_date, is_late, is_duplicate",
       )
       .eq("group_id", id)
       .is("deleted_at", null)
@@ -62,6 +62,7 @@ export async function getGroupActivity(
     amount: r.amount,
     currency: r.currency,
     usdEquivalent: r.usd_equivalent,
+    category: r.category,
     status: r.status,
     date: r.receipt_date,
     isLate: r.is_late,

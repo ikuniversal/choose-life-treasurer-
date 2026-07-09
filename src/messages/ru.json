@@ -59,7 +59,13 @@
     "back": "Панель",
     "all": "Все",
     "empty": "Пока нет чеков и заметок.",
-    "filterLabel": "Фильтр по статусу"
+    "filterLabel": "Фильтр по статусу",
+    "totalsScoped": "Итого ({scope})",
+    "noAmounts": "В этом виде нет сумм.",
+    "usdTotal": "Итого в USD",
+    "usdMissing": "без учёта {count} без суммы в USD",
+    "byCategory": "По категориям",
+    "notesExcluded": "Заметки без чека не входят в разбивку по категориям."
   },
   "auth": {
     "signInTitle": "Вход",
