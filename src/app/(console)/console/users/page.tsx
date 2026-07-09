@@ -1,22 +1,36 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { canAccessConsole, getSessionUser } from "@/lib/auth";
-import { getGroupOptions, getUsersOverview } from "@/lib/data/users";
+import { canAccessConsole, getSessionUser, isOrgAdmin } from "@/lib/auth";
+import {
+  getGroupOptions,
+  getProjectOptions,
+  getUsersOverview,
+} from "@/lib/data/users";
 import { getTreasurerRoster } from "@/lib/data/treasurer-roster";
+import { getProjectAdminView } from "@/lib/data/project-admin";
 import { InviteForm } from "./invite-form";
 import { UserRoleChips } from "./user-role-chips";
 import { DeleteUserButton } from "./delete-user-button";
 import { RemoveMemberButton } from "./remove-member-button";
+import { ProjectAdminManager } from "./project-admin-manager";
 
 export default async function UsersPage() {
-  // Treasurers and admins reach this page (the console layout already gates out
-  // pure members); the two roles see very different views.
+  // Admin, project_admin, and treasurer all reach this page (the console layout
+  // gates out pure members); each sees a different, role-scoped view.
   const me = await getSessionUser();
   if (!canAccessConsole(me)) redirect("/");
-  const isAdmin = !!me && me.assignments.some((a) => a.role === "admin");
+  const isAdmin = isOrgAdmin(me);
+  const isProjectAdmin =
+    !isAdmin && !!me && me.assignments.some((a) => a.role === "project_admin");
 
   const t = await getTranslations("users");
+
+  // ── Project Admin view: their project's groups + treasurer/member management.
+  if (isProjectAdmin) {
+    const projects = await getProjectAdminView();
+    return <ProjectAdminManager projects={projects} />;
+  }
 
   // ── Treasurer view: their group roster(s), remove-member on members only.
   if (!isAdmin) {
@@ -66,17 +80,19 @@ export default async function UsersPage() {
     );
   }
 
-  // ── Admin view: unchanged — invite, full user list, delete user, role chips.
-  const [users, groups] = await Promise.all([
+  // ── Admin view: invite (now incl. Project Admin), full user list, delete
+  //    user, role chips. Unchanged apart from the invite form's project picker.
+  const [users, groups, projects] = await Promise.all([
     getUsersOverview(),
     getGroupOptions(),
+    getProjectOptions(),
   ]);
 
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold text-ink">{t("title")}</h1>
 
-      <InviteForm groups={groups} />
+      <InviteForm groups={groups} projects={projects} />
 
       {users.length === 0 ? (
         <p className="rounded-card border border-hairline bg-card px-4 py-6 text-center text-sm text-muted">

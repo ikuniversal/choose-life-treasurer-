@@ -44,9 +44,11 @@ export function UserRoleChips({ chips }: { chips: UserRoleChip[] }) {
             key={c.id}
             className="inline-flex items-center gap-1.5 rounded-pill bg-hairline-row px-2.5 py-1 text-xs text-body"
           >
-            {/* role label is translated; group name is UGC — never translated */}
+            {/* role label is translated; group/project name is UGC — not translated */}
             <span className="font-medium text-olive">{tRoles(c.role)}</span>
-            {c.groupName && <span className="text-muted">· {c.groupName}</span>}
+            {(c.groupName ?? c.projectName) && (
+              <span className="text-muted">· {c.groupName ?? c.projectName}</span>
+            )}
 
             {confirmId === c.id ? (
               <span className="ml-0.5 inline-flex items-center gap-1">

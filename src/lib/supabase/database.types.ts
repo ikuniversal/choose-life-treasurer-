@@ -417,6 +417,7 @@ export type Database = {
           created_at: string
           group_id: string | null
           id: string
+          project_id: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
@@ -424,6 +425,7 @@ export type Database = {
           created_at?: string
           group_id?: string | null
           id?: string
+          project_id?: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
@@ -431,6 +433,7 @@ export type Database = {
           created_at?: string
           group_id?: string | null
           id?: string
+          project_id?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -440,6 +443,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -458,10 +468,11 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_member_of: { Args: { p_group_id: string }; Returns: boolean }
+      is_project_admin_of: { Args: { p_project_id: string }; Returns: boolean }
       is_treasurer_of: { Args: { p_group_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "treasurer" | "member"
+      app_role: "admin" | "treasurer" | "member" | "project_admin"
       expense_category:
         | "groceries"
         | "fuel"
@@ -599,7 +610,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "treasurer", "member"],
+      app_role: ["admin", "treasurer", "member", "project_admin"],
       expense_category: [
         "groceries",
         "fuel",

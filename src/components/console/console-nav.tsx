@@ -18,8 +18,15 @@ import { cn } from "@/lib/utils";
 
 // Console navigation (reskin) — a single horizontally-scrollable pill row of the
 // EXISTING links per role. Active route = solid dark pill; inactive = cream pill.
-// Links + role gating are unchanged; Users & Roles stays Admin-only.
-export function ConsoleNav({ isAdmin }: { isAdmin: boolean }) {
+// Projects & Rates stay Admin-only; Users & Roles is reachable by an Admin OR a
+// Project Admin (whose management view lives at /console/users).
+export function ConsoleNav({
+  isAdmin,
+  isProjectAdmin = false,
+}: {
+  isAdmin: boolean;
+  isProjectAdmin?: boolean;
+}) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const items = [
@@ -33,8 +40,10 @@ export function ConsoleNav({ isAdmin }: { isAdmin: boolean }) {
       ? [
           { href: "/console/projects", label: t("projects"), icon: FolderKanban },
           { href: "/console/rates", label: t("rates"), icon: Coins },
-          { href: "/console/users", label: t("users"), icon: Users },
         ]
+      : []),
+    ...(isAdmin || isProjectAdmin
+      ? [{ href: "/console/users", label: t("users"), icon: Users }]
       : []),
   ];
 
