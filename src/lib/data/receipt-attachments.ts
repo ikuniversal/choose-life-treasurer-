@@ -6,6 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 // queue, member ledger, and per-user activity views.
 
 export interface AttachmentLink {
+  /** receipt_attachments row id — needed to remove a specific attachment (#71). */
+  id: string;
+  /** storage path (bucket-relative). */
+  path: string;
   /** short-lived signed URL to the file. */
   url: string;
   /** file name (basename of the storage path) — UGC, never translated. */
@@ -30,7 +34,7 @@ export async function getReceiptAttachments(
   const supabase = await createClient();
   const { data: rows } = await supabase
     .from("receipt_attachments")
-    .select("receipt_id, path, mime_type")
+    .select("id, receipt_id, path, mime_type")
     .in("receipt_id", ids)
     .order("created_at", { ascending: true });
   if (!rows || rows.length === 0) return out;
@@ -53,7 +57,7 @@ export async function getReceiptAttachments(
       ? r.mime_type.startsWith("image/")
       : IMAGE_EXT.test(r.path);
     const arr = out.get(r.receipt_id) ?? [];
-    arr.push({ url, name, isImage });
+    arr.push({ id: r.id, path: r.path, url, name, isImage });
     out.set(r.receipt_id, arr);
   }
   return out;
