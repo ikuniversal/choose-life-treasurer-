@@ -52,7 +52,8 @@
     "due": "Due {date}",
     "over": "Over budget",
     "deadline": "Deadline {date}",
-    "noDeadline": "No deadline"
+    "noDeadline": "No deadline",
+    "viewGroupExpenses": "View {group}'s expenses"
   },
   "auth": {
     "signInTitle": "Sign in",

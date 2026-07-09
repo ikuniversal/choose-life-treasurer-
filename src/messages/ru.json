@@ -52,7 +52,8 @@
     "due": "Срок {date}",
     "over": "Перерасход",
     "deadline": "Срок {date}",
-    "noDeadline": "Без срока"
+    "noDeadline": "Без срока",
+    "viewGroupExpenses": "Расходы группы {group}"
   },
   "auth": {
     "signInTitle": "Вход",
