@@ -6,11 +6,22 @@ import { getConsoleGroups } from "@/lib/data/tasks";
 // GET form (no client JS) submits the filters to the download endpoint, which
 // returns the file as an attachment. Group options are RLS-scoped (admin → all,
 // treasurer → own). Group names are UGC — never translated.
-export default async function ExportPage() {
-  const [t, groups] = await Promise.all([
+export default async function ExportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ group?: string }>;
+}) {
+  const [t, sp, groups] = await Promise.all([
     getTranslations("export"),
+    searchParams,
     getConsoleGroups(),
   ]);
+
+  // Arriving from a dashboard group card (?group=<id>) pre-selects that group in
+  // the existing filter, so the view lands scoped to just that group (all
+  // statuses). Ignore an unknown/out-of-scope id → fall back to "all".
+  const defaultGroup =
+    sp.group && groups.some((g) => g.id === sp.group) ? sp.group : "all";
 
   const fieldClass =
     "h-10 w-full rounded-input border border-hairline bg-canvas px-3 text-sm text-ink outline-none focus:border-olive focus:ring-2 focus:ring-olive/30";
@@ -31,7 +42,7 @@ export default async function ExportPage() {
       >
         <label className={labelClass}>
           <span className={labelText}>{t("group")}</span>
-          <select name="group" defaultValue="all" className={fieldClass}>
+          <select name="group" defaultValue={defaultGroup} className={fieldClass}>
             <option value="all">{t("allGroups")}</option>
             {groups.map((g) => (
               <option key={g.id} value={g.id}>
