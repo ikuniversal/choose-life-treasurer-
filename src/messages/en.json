@@ -55,6 +55,12 @@
     "noDeadline": "No deadline",
     "viewGroupExpenses": "View {group}'s expenses"
   },
+  "groupExpenses": {
+    "back": "Dashboard",
+    "all": "All",
+    "empty": "No receipts or notes yet.",
+    "filterLabel": "Filter by status"
+  },
   "auth": {
     "signInTitle": "Sign in",
     "email": "Email",
