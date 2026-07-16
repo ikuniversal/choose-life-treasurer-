@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
+import { getSessionUser, isOrgAdmin } from "@/lib/auth";
 import { getGroupActivity } from "@/lib/data/group-activity";
 import { GroupActivityList } from "./group-activity-list";
 
@@ -15,11 +16,17 @@ export default async function GroupExpensesPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [t, activity] = await Promise.all([
+  const [t, activity, me] = await Promise.all([
     getTranslations("groupExpenses"),
     getGroupActivity(id),
+    getSessionUser(),
   ]);
   if (!activity) notFound();
+
+  // Admin-only "Add receipt" affordance — deep-links into /capture with this
+  // group pre-selected (admin any-group insert, #60). Treasurer/project_admin
+  // don't get it here (capture is the admin's group-picker flow).
+  const isAdmin = isOrgAdmin(me);
 
   return (
     <div className="flex flex-col gap-6">
@@ -32,13 +39,24 @@ export default async function GroupExpensesPage({
       </Link>
 
       {/* project + group names are UGC — never translated */}
-      <header className="flex flex-col gap-0.5">
-        {activity.projectName && (
-          <span className="text-xs font-semibold uppercase tracking-wide text-amber">
-            {activity.projectName}
-          </span>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          {activity.projectName && (
+            <span className="text-xs font-semibold uppercase tracking-wide text-amber">
+              {activity.projectName}
+            </span>
+          )}
+          <h1 className="text-2xl font-bold text-ink">{activity.groupName}</h1>
+        </div>
+        {isAdmin && (
+          <Link
+            href={`/capture?group=${activity.groupId}`}
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-btn bg-olive px-4 text-sm font-medium text-canvas transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive/40"
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+            {t("addReceipt")}
+          </Link>
         )}
-        <h1 className="text-2xl font-bold text-ink">{activity.groupName}</h1>
       </header>
 
       <GroupActivityList

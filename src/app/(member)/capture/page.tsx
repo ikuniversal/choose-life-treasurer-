@@ -4,11 +4,16 @@ import { getSessionUser } from "@/lib/auth";
 import { getAllGroupsForCapture, getMemberGroups } from "@/lib/data/member-groups";
 import { CaptureForm } from "./capture-form";
 
-export default async function CapturePage() {
-  const [t, supabase, me] = await Promise.all([
+export default async function CapturePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ group?: string }>;
+}) {
+  const [t, supabase, me, sp] = await Promise.all([
     getTranslations("capture"),
     createClient(),
     getSessionUser(),
+    searchParams,
   ]);
 
   // Admins may file into ANY group (#16 — group chosen at capture time); members
@@ -24,6 +29,12 @@ export default async function CapturePage() {
     .order("currency");
   const currencies = (fx ?? []).map((r) => r.currency);
 
+  // Deep-link from the group-expenses "Add receipt" button (?group=<id>, #72):
+  // pre-select that group in the picker if it's in scope; ignore unknown/out-of-
+  // scope ids → the normal default. Never a new group the viewer can't file into.
+  const defaultGroup =
+    sp.group && groups.some((g) => g.id === sp.group) ? sp.group : undefined;
+
   // Server "today" (UTC) for the deadline-passed nudge — aligns with how the DB
   // trigger stamps is_late server-side.
   const today = new Date().toISOString().slice(0, 10);
@@ -36,7 +47,12 @@ export default async function CapturePage() {
           {t("noGroup")}
         </p>
       ) : (
-        <CaptureForm groups={groups} currencies={currencies} today={today} />
+        <CaptureForm
+          groups={groups}
+          currencies={currencies}
+          today={today}
+          defaultGroup={defaultGroup}
+        />
       )}
     </div>
   );

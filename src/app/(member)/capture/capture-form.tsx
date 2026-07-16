@@ -84,10 +84,13 @@ export function CaptureForm({
   groups,
   currencies,
   today,
+  defaultGroup,
 }: {
   groups: MemberGroup[];
   currencies: string[];
   today: string;
+  /** pre-selected group from a deep-link (?group=<id>, #72); validated upstream. */
+  defaultGroup?: string;
 }) {
   const t = useTranslations("capture");
   const tCat = useTranslations("categories");
@@ -120,7 +123,12 @@ export function CaptureForm({
   } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [groupId, setGroupId] = useState(groups[0]?.id ?? "");
+  const [groupId, setGroupId] = useState(
+    // Deep-linked group wins when valid; else the normal first-group default.
+    defaultGroup && groups.some((g) => g.id === defaultGroup)
+      ? defaultGroup
+      : (groups[0]?.id ?? ""),
+  );
   const [vendor, setVendor] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [amount, setAmount] = useState("");

@@ -57,6 +57,7 @@
   },
   "groupExpenses": {
     "back": "Dashboard",
+    "addReceipt": "Add receipt",
     "all": "All",
     "empty": "No receipts or notes yet.",
     "filterLabel": "Filter by status",
